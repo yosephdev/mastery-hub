@@ -1,36 +1,51 @@
 # Skill-Sharing Platform for Professionals
+
 ## MasteryHub
 
 ## Table of Contents
-- [Introduction](#introduction)
-- [Problem Statement](#problem-statement)
-- [Solution Overview](#solution-overview)
-- [User Experience](#user-experience)
-- [Project Goals](#project-goals)
-- [Agile Methodology](#agile-methodology)
-  - [User Stories and Epics](#user-stories-and-epics)
-  - [User Stories](#user-stories)
-    - [Developer User Stories](#developer-user-stories)
-    - [User Stories for Platform Users](#user-stories-for-platform-users)
-- [Main Technologies](#main-technologies)
-- [Key Features](#key-features)
-- [Planned Features](#planned-features)
+
+- [Skill-Sharing Platform for Professionals](#skill-sharing-platform-for-professionals)
+  - [MasteryHub](#masteryhub)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Problem Statement](#problem-statement)
+  - [Solution Overview](#solution-overview)
+  - [User Experience](#user-experience)
+  - [Project Goals](#project-goals)
+  - [Agile Methodology](#agile-methodology)
+    - [User Stories](#user-stories)
+      - [Developer User Stories](#developer-user-stories)
+      - [User Stories for Platform Users](#user-stories-for-platform-users)
+    - [Project Board](#project-board)
+  - [Design](#design)
+    - [Color Scheme](#color-scheme)
+    - [Wireframes](#wireframes)
+  - [Main Technologies](#main-technologies)
+  - [Key Features](#key-features)
+  - [Planned Features](#planned-features)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 ## Introduction
+
 In today's rapidly changing job market, professionals often need to acquire new skills or share their expertise with others to stay competitive and advance their careers. The Skill-Sharing Platform for Professionals aims to address this need by providing a web-based platform that connects professionals who want to learn new skills with experts willing to share their knowledge.
 
 ## Problem Statement
+
 Finding the right resources, connecting with experts, and engaging in meaningful skill-sharing can be challenging for professionals looking to enhance their skill sets and career opportunities.
 
 ## Solution Overview
+
 This platform facilitates skill-sharing sessions, workshops, and mentorship opportunities, allowing users to learn from and collaborate with experienced professionals in various domains.
 
 ## User Experience
+
 The primary goal of this project is to provide an exceptional user experience for both learners and experts. Users will enjoy a seamless and intuitive process for creating profiles, joining skill-sharing sessions, and managing their learning progress. The system will be designed with a clean and modern interface, ensuring ease of use and accessibility across various devices.
 
 Experts will benefit from a comprehensive administrative interface that streamlines the management of their sessions, participants, and feedback. The interface will be user-friendly and efficient, allowing experts to quickly access and update relevant data, ensuring smooth operations and excellent service.
 
 ## Project Goals
+
 1. **Develop a user-friendly skill-sharing platform**: Implement a web-based application that allows users to easily create profiles, join sessions, and manage their learning progress.
 2. **Provide an administrative interface**: Create a secure and comprehensive administrative interface for experts to manage sessions, participants, and feedback.
 3. **Ensure data integrity and security**: Implement robust data validation and security measures to protect user information and ensure the integrity of the platform.
@@ -39,65 +54,144 @@ Experts will benefit from a comprehensive administrative interface that streamli
 6. **Ensure responsiveness and accessibility**: Design the user interface to be responsive and accessible across various devices and platforms, ensuring a consistent and inclusive experience for all users.
 
 ## Agile Methodology
+
 The project is being developed using an Agile methodology to help prioritize and organize tasks. This involves writing user stories and using Project Boards on GitHub.
 
-### User Stories and Epics
-A template is created to help write user stories in a consistent format: "As a [type of user], I want [goal] so that [benefit]." Epics are also written, containing possible user stories. Based on these epics, the platform features are planned and implemented.
-
-User stories are created by looking at the epics and refined through an iterative process as the project progresses. This allows us to stay focused on delivering value to users.
-
 ### User Stories
+
+A template is created to help write user stories in a consistent format: "As a [type of user], I want [goal] so that [benefit]."
+
 #### Developer User Stories
+
 1. **Frontend Development**
    - As a developer, I want to set up the frontend using HTML, CSS, and JavaScript so that I can create an interactive and user-friendly interface for the platform.
-   
+
 2. **Backend Development**
    - As a developer, I want to implement the backend using Python and Django so that I can handle the business logic and data management securely and efficiently.
-   
+
 3. **Database Integration**
    - As a developer, I want to integrate Postgres for the database so that I can store and manage user data, session data, and other relevant information.
-   
+
 4. **Payment Integration**
    - As a developer, I want to set up Stripe for payments so that users can easily and securely pay for premium content and sessions.
-   
+
 5. **API Development**
    - As a developer, I want to build a robust API so that the frontend and backend can communicate seamlessly.
-   
+
 6. **User Authentication and Authorization**
    - As a developer, I want to create user authentication and authorization features so that user data and sessions are secure.
 
 #### User Stories for Platform Users
+
 1. **Profile Creation**
    - As a user, I want to create a profile highlighting my skills, experience, and areas of expertise so that I can showcase my qualifications to potential collaborators and mentors.
-   
+
 2. **Skill-Sharing Sessions**
    - As a user, I want to browse and register for skill-sharing sessions, workshops, and webinars so that I can learn and improve my skills.
-   
+
 3. **Mentor-Mentee Matching**
    - As a user, I want to be matched with potential mentors based on my skills and goals so that I can receive personalized guidance and support.
-   
+
 4. **Q&A and Discussion Forums**
    - As a user, I want to participate in Q&A and discussion forums so that I can seek advice, ask questions, and engage with the community.
-   
+
 5. **Skill Assessment and Tracking**
    - As a user, I want to assess and track my skill development and progress so that I can measure my growth and achievements over time.
-   
+
 6. **Access to Premium Content**
    - As a user, I want to access premium content and one-on-one mentorship sessions so that I can gain deeper insights and more personalized learning opportunities.
 
+### Project Board
+
+The project board on GitHub is publicly accessible, promoting transparency and facilitating collaboration. It employs columns such as "Backlog", "To Do", "In Progress", "Review", and "Done" to effectively track task progression.
+
+Tasks are categorized with labels like "frontend", "backend", and "user interface" to prioritize critical components of the project. This systematic approach ensures that the most important tasks are addressed promptly and efficiently.
+
+## Design
+
+### Color Scheme
+
+The color scheme for the Skill-Sharing Platform aims to create a professional and engaging atmosphere conducive to learning and collaboration. The primary colors are chosen to inspire creativity and focus.
+
+![Colour Palette](docs/readme_images/color-palette.png)
+
+- **Primary-color (#4285F4)**: A vibrant blue shade used for primary elements like buttons and headings to convey trust and professionalism.
+- **Secondary-color (#34A853)**: A fresh green shade used for secondary elements like navigation and accents, symbolizing growth and learning.
+- **Accent-color (#FBBC05)**: A bright yellow shade used for highlighting important elements and adding energy to the interface.
+- **Text-color (#333333)**: A dark gray shade used for body text to ensure readability and contrast with the background.
+- **Background-color (#FFFFFF)**: A clean white background to maintain a modern and minimalist look.
+
+### Wireframes
+
+Below are wireframe examples for different sections of the Skill-Sharing Platform:
+
+1. **Homepage Wireframe:**
+   - The homepage features a welcoming introduction, platform navigation, and highlights of upcoming skill-sharing sessions.
+   - It maintains a clean and inviting layout to encourage exploration and engagement.
+
+   ![Homepage-Desktop Wireframe](docs/wireframes/Homepage-Desktop.png)
+
+2. **User Registration and Login Wireframe:**
+   - The registration form includes fields for user credentials, skills, and areas of interest.
+   - The login form provides easy access to user accounts with options for social login and password recovery.
+
+   ![Register Page-Desktop Wireframe](docs/wireframes/Register-Desktop.png)
+
+3. **Session Discovery Wireframe:**
+   - The session discovery interface allows users to search and filter skill-sharing sessions based on topics, dates, and ratings.
+   - It showcases session details and provides options for registration and participation.
+
+   ![Session Page-Desktop Wireframe](docs/wireframes/Session-Desktop.png)
+
+4. **Expert Dashboard Wireframe:**
+   - The expert dashboard empowers mentors to manage their sessions, view participant details, and receive feedback.
+   - It offers insights into session performance and tools for improving engagement and content delivery.
+
+   ![Dashboard Page-Desktop Wireframe](docs/wireframes/Expert-Dashboard.png)
+
+5. **User Profile Wireframe:**
+   - The user profile page showcases skills, experience, and areas of expertise.
+   - It includes sections for projects, certifications, and achievements.
+
+   ![Dashboard Page-Desktop Wireframe](docs/wireframes/User-Profile.png)
+
+6. **Mentor-Mentee Matching Interface Wireframe:**
+   - The mentor-mentee matching system includes a questionnaire for skills and goals, a matching results page, and a communication interface.
+
+   ![Dashboard Page-Desktop Wireframe](docs/wireframes/Mentor-Mentee-Matching.png)
+
+7. **Q&A and Discussion Forums Wireframe:**
+   - The Q&A and discussion forums feature a main forum page with categories, a thread view, and a post creation interface.
+  
+  ![Dashboard Page-Desktop Wireframe](docs/wireframes/Discussion-Forums.png)
+
+8. **Skill Assessment and Tracking Dashboard Wireframe:**
+   - The skill assessment and tracking dashboard includes features for skill evaluation, progress tracking, goal setting, and expert feedback.
+
+   ![Dashboard Page-Desktop Wireframe](docs/wireframes/Dashboard-Desktop.png)
+
+9. **Payment and Subscription Wireframe:**
+   - The payment and subscription system includes pages for selecting subscription plans, a checkout process, and account management for subscriptions.
+
+     ![Dashboard Page-Desktop Wireframe](docs/wireframes/Payment-Subscription.png)
+
+Note: Mobile wireframes will be developed in a future iteration of the project, focusing on responsive design principles to ensure optimal user experience across all devices.
+
 ## Main Technologies
+
 - **Frontend**: HTML, CSS, JavaScript
 - **Backend**: Python, Django
 - **Database**: Postgres
 - **Payments**: Stripe
 
 ## Key Features
+
+## Planned Features
+
 - **User Profiles**: Allow users to create profiles highlighting their skills, experience, and areas of expertise. Include features for users to showcase their projects, certifications, and achievements.
 - **Skill-Sharing Sessions**: Implement a system for experts to create and host skill-sharing sessions, workshops, or webinars. Users can browse, register, and participate in these sessions based on their interests and learning goals.
 - **Mentor-Mentee Matching**: Develop an algorithm to match mentees with potential mentors based on their skills, experience, and goals. Facilitate communication and collaboration between mentors and mentees through the platform.
 - **Q&A and Discussion Forums**: Create forums where users can ask questions, seek advice, and engage in discussions related to specific skills or industries. Encourage knowledge sharing and community building.
 - **Skill Assessment and Tracking**: Implement features for users to assess their skills, track their progress, and receive feedback from experts. Provide tools for setting learning goals and measuring achievements.
 - **Payment and Subscription**: Integrate a payment system for users to purchase access to premium content, courses, or one-on-one mentorship sessions. Offer subscription plans for ongoing access to resources and experts.
-
-## Planned Features
 - **SEO and Marketing**: Implement SEO best practices to improve the platform's visibility in search engine results. Develop marketing strategies to attract professionals and experts to the platform, such as content marketing, social media campaigns, and email marketing.
