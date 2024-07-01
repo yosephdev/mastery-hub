@@ -10,7 +10,9 @@ class Profile(models.Model):
     skills = models.CharField(max_length=255, blank=True)
     experience = models.TextField(blank=True)
     achievements = models.TextField(blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    profile_picture = models.ImageField(
+        upload_to="profile_pics/", blank=True, null=True
+    )
     linkedin_profile = models.URLField(blank=True)
     github_profile = models.URLField(blank=True)
     is_expert = models.BooleanField(default=False)
@@ -30,9 +32,29 @@ class Session(models.Model):
     participants = models.ManyToManyField(
         User, related_name="sessions_participated", blank=True
     )
+    category = models.ForeignKey("Category", on_delete=models.SET_NULL, null=True)
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("scheduled", "Scheduled"),
+            ("ongoing", "Ongoing"),
+            ("completed", "Completed"),
+            ("cancelled", "Cancelled"),
+        ],
+        default="scheduled",
+    )
+    max_participants = models.PositiveIntegerField(default=10)
 
     def __str__(self):
         return self.title
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Mentorship(models.Model):
