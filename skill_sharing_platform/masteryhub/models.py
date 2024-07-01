@@ -29,3 +29,18 @@ class Session(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Mentorship(models.Model):
+    mentor = models.ForeignKey(
+        User, related_name="mentorships_as_mentor", on_delete=models.CASCADE
+    )
+    mentee = models.ForeignKey(
+        User, related_name="mentorships_as_mentee", on_delete=models.CASCADE
+    )
+    start_date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
+    goals = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.mentor.username} mentoring {self.mentee.username}"
