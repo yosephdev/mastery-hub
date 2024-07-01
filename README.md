@@ -192,36 +192,12 @@ Below are wireframe examples for different sections of the Skill-Sharing Platfor
 
 Note: Mobile wireframes will be developed in a future iteration of the project, focusing on responsive design principles to ensure optimal user experience across all devices.
 
-# Skill-Sharing Platform for Professionals - MasteryHub
-
-## Table of Contents
-- [Introduction](#introduction)
-- [Problem Statement](#problem-statement)
-- [Solution Overview](#solution-overview)
-- [User Experience](#user-experience)
-- [Data Model](#data-model)
-  - [User Journey](#user-journey)
-  - [Database Scheme](#database-scheme)
-  - [Models](#models)
-  - [ERD Diagram](#erd-diagram)
-- [Security Features](#security-features)
-
-## Introduction
-In today's rapidly changing job market, professionals often need to acquire new skills or share their expertise with others to stay competitive and advance their careers. The Skill-Sharing Platform for Professionals aims to address this need by providing a web-based platform that connects professionals who want to learn new skills with experts willing to share their knowledge.
-
-## Problem Statement
-Finding the right resources, connecting with experts, and engaging in meaningful skill-sharing can be challenging for professionals looking to enhance their skill sets and career opportunities.
-
-## Solution Overview
-This platform facilitates skill-sharing sessions, workshops, and mentorship opportunities, allowing users to learn from and collaborate with experienced professionals in various domains.
-
-## User Experience
-The primary goal of this project is to provide an exceptional user experience for both learners and experts. Users will enjoy a seamless and intuitive process for creating profiles, joining skill-sharing sessions, and managing their learning progress.
-
 ## Data Model
 
 ### User Journey
+
 The user journey for the Skill-Sharing Platform includes the following key steps:
+
 1. **Registration**: New users create an account by providing their details and areas of expertise or interest.
 2. **Login**: Registered users log in to access the platform's features.
 3. **Profile Creation**: Users create and customize their profiles, highlighting skills and experiences.
@@ -233,7 +209,9 @@ The user journey for the Skill-Sharing Platform includes the following key steps
 9. **Review and Feedback**: After sessions, users can leave reviews and provide feedback.
 
 ### Database Scheme
+
 The database scheme will include tables for users, profiles, sessions, mentorships, forum posts, and payments:
+
 - **Users**: Stores user authentication information.
 - **Profiles**: Stores detailed user information, skills, and experiences.
 - **Sessions**: Stores information about skill-sharing sessions, including host, participants, and details.
@@ -244,30 +222,37 @@ The database scheme will include tables for users, profiles, sessions, mentorshi
 ### Models
 
 #### User Model
+
 - **Fields**: id, username, email, password
 - **Relationships**: One-to-One relationship with Profile, One-to-Many relationships with Session, Mentorship, ForumPost, and Payment
 
 #### Profile Model
+
 - **Fields**: id, user, bio, skills, experience, achievements, profile_picture, linkedin_profile, github_profile, is_expert
 - **Relationships**: One-to-One relationship with User
 
 #### Session Model
+
 - **Fields**: id, title, description, date, duration, host, category, status, max_participants
 - **Relationships**: Many-to-One relationship with User (host), Many-to-Many relationship with User (participants)
 
 #### Mentorship Model
+
 - **Fields**: id, mentor, mentee, start_date, end_date, goals
 - **Relationships**: Many-to-One relationships with User (mentor and mentee)
 
 #### ForumPost Model
+
 - **Fields**: id, title, content, author, category, created_at, updated_at
 - **Relationships**: Many-to-One relationship with User (author)
 
 #### Payment Model
+
 - **Fields**: id, user, amount, date, session
 - **Relationships**: Many-to-One relationships with User and Session
 
 ### ERD Diagram
+
 An ERD diagram will visually represent the relationships between the different tables in the database.
 
 ![Database Relational Diagram](docs/readme_images/erd_diagram.png)
