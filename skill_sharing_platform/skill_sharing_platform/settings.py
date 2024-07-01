@@ -1,6 +1,7 @@
 import os
+import dj_database_url
 from pathlib import Path
-from decouple import config, Csv
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -11,7 +12,10 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net', cast=Csv())
+ALLOWED_HOSTS = [
+    "8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
+    "localhost",
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -42,6 +46,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "skill_sharing_platform.urls"
@@ -65,16 +70,17 @@ TEMPLATES = [
 WSGI_APPLICATION = "skill_sharing_platform.wsgi.application"
 
 # Database
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT"),
+DATABASES = {"default": dj_database_url.parse(os.environ.get("DATABASE_URL"))}
+
+if "DATABASE_URL" in os.environ:
+    DATABASES = {"default": dj_database_url.parse(os.environ.get("DATABASE_URL"))}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
     }
-}
 
 # Authentication
 AUTHENTICATION_BACKENDS = [
@@ -125,6 +131,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Media files
 MEDIA_URL = "/media/"
@@ -162,6 +169,23 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
     ],
+}
+
+# Logging settings
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "ERROR"),
+        },
+    },
 }
