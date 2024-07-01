@@ -1,30 +1,45 @@
-# Skill-Sharing Platform for Professionals
-
-## MasteryHub
+# Skill-Sharing Platform for Professionals - MasteryHub
 
 ## Table of Contents
 
-- [Skill-Sharing Platform for Professionals](#skill-sharing-platform-for-professionals)
-  - [MasteryHub](#masteryhub)
-  - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Problem Statement](#problem-statement)
-  - [Solution Overview](#solution-overview)
-  - [User Experience](#user-experience)
-  - [Project Goals](#project-goals)
-  - [Agile Methodology](#agile-methodology)
-    - [User Stories](#user-stories)
+- [Skill-Sharing Platform for Professionals - MasteryHub](#skill-sharing-platform-for-professionals---masteryhub)
+  * [Introduction](#introduction)
+  * [Problem Statement](#problem-statement)
+  * [Solution Overview](#solution-overview)
+  * [User Experience](#user-experience)
+  * [Project Goals](#project-goals)
+  * [Agile Methodology](#agile-methodology)
+    + [User Stories](#user-stories)
       - [Developer User Stories](#developer-user-stories)
       - [User Stories for Platform Users](#user-stories-for-platform-users)
-    - [Project Board](#project-board)
-  - [Design](#design)
-    - [Color Scheme](#color-scheme)
-    - [Wireframes](#wireframes)
-  - [Main Technologies](#main-technologies)
-  - [Key Features](#key-features)
-  - [Planned Features](#planned-features)
+    + [Project Board](#project-board)
+  * [Design](#design)
+    + [Color Scheme](#color-scheme)
+    + [Wireframes](#wireframes)
+- [Skill-Sharing Platform for Professionals - MasteryHub](#skill-sharing-platform-for-professionals---masteryhub-1)
+  * [Table of Contents](#table-of-contents-1)
+  * [Introduction](#introduction-1)
+  * [Problem Statement](#problem-statement-1)
+  * [Solution Overview](#solution-overview-1)
+  * [User Experience](#user-experience-1)
+  * [Data Model](#data-model)
+    + [User Journey](#user-journey)
+    + [Database Scheme](#database-scheme)
+    + [Models](#models)
+      - [User Model](#user-model)
+      - [Profile Model](#profile-model)
+      - [Session Model](#session-model)
+      - [Mentorship Model](#mentorship-model)
+      - [ForumPost Model](#forumpost-model)
+      - [Payment Model](#payment-model)
+    + [ERD Diagram](#erd-diagram)
+  * [Main Technologies](#main-technologies)
+  * [Key Features](#key-features)
+  * [Planned Features](#planned-features)
+  * [Security Features](#security-features)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 ## Introduction
 
@@ -177,6 +192,86 @@ Below are wireframe examples for different sections of the Skill-Sharing Platfor
 
 Note: Mobile wireframes will be developed in a future iteration of the project, focusing on responsive design principles to ensure optimal user experience across all devices.
 
+# Skill-Sharing Platform for Professionals - MasteryHub
+
+## Table of Contents
+- [Introduction](#introduction)
+- [Problem Statement](#problem-statement)
+- [Solution Overview](#solution-overview)
+- [User Experience](#user-experience)
+- [Data Model](#data-model)
+  - [User Journey](#user-journey)
+  - [Database Scheme](#database-scheme)
+  - [Models](#models)
+  - [ERD Diagram](#erd-diagram)
+- [Security Features](#security-features)
+
+## Introduction
+In today's rapidly changing job market, professionals often need to acquire new skills or share their expertise with others to stay competitive and advance their careers. The Skill-Sharing Platform for Professionals aims to address this need by providing a web-based platform that connects professionals who want to learn new skills with experts willing to share their knowledge.
+
+## Problem Statement
+Finding the right resources, connecting with experts, and engaging in meaningful skill-sharing can be challenging for professionals looking to enhance their skill sets and career opportunities.
+
+## Solution Overview
+This platform facilitates skill-sharing sessions, workshops, and mentorship opportunities, allowing users to learn from and collaborate with experienced professionals in various domains.
+
+## User Experience
+The primary goal of this project is to provide an exceptional user experience for both learners and experts. Users will enjoy a seamless and intuitive process for creating profiles, joining skill-sharing sessions, and managing their learning progress.
+
+## Data Model
+
+### User Journey
+The user journey for the Skill-Sharing Platform includes the following key steps:
+1. **Registration**: New users create an account by providing their details and areas of expertise or interest.
+2. **Login**: Registered users log in to access the platform's features.
+3. **Profile Creation**: Users create and customize their profiles, highlighting skills and experiences.
+4. **Session Browsing**: Users can search and browse available skill-sharing sessions.
+5. **Session Booking**: Users can register for sessions that interest them.
+6. **Mentorship Matching**: Users can be matched with mentors based on their skills and goals.
+7. **Forum Participation**: Users can engage in Q&A and discussion forums.
+8. **Skill Assessment**: Users can assess their skills and track their progress over time.
+9. **Review and Feedback**: After sessions, users can leave reviews and provide feedback.
+
+### Database Scheme
+The database scheme will include tables for users, profiles, sessions, mentorships, forum posts, and payments:
+- **Users**: Stores user authentication information.
+- **Profiles**: Stores detailed user information, skills, and experiences.
+- **Sessions**: Stores information about skill-sharing sessions, including host, participants, and details.
+- **Mentorships**: Stores mentorship relationships between users.
+- **ForumPosts**: Stores user posts and comments in discussion forums.
+- **Payments**: Stores payment information for premium content and sessions.
+
+### Models
+
+#### User Model
+- **Fields**: id, username, email, password
+- **Relationships**: One-to-One relationship with Profile, One-to-Many relationships with Session, Mentorship, ForumPost, and Payment
+
+#### Profile Model
+- **Fields**: id, user, bio, skills, experience, achievements, profile_picture, linkedin_profile, github_profile, is_expert
+- **Relationships**: One-to-One relationship with User
+
+#### Session Model
+- **Fields**: id, title, description, date, duration, host, category, status, max_participants
+- **Relationships**: Many-to-One relationship with User (host), Many-to-Many relationship with User (participants)
+
+#### Mentorship Model
+- **Fields**: id, mentor, mentee, start_date, end_date, goals
+- **Relationships**: Many-to-One relationships with User (mentor and mentee)
+
+#### ForumPost Model
+- **Fields**: id, title, content, author, category, created_at, updated_at
+- **Relationships**: Many-to-One relationship with User (author)
+
+#### Payment Model
+- **Fields**: id, user, amount, date, session
+- **Relationships**: Many-to-One relationships with User and Session
+
+### ERD Diagram
+An ERD diagram will visually represent the relationships between the different tables in the database.
+
+![Database Relational Diagram](docs/readme_images/erd_diagram.png)
+
 ## Main Technologies
 
 - **Frontend**: HTML, CSS, JavaScript
@@ -195,3 +290,14 @@ Note: Mobile wireframes will be developed in a future iteration of the project, 
 - **Skill Assessment and Tracking**: Implement features for users to assess their skills, track their progress, and receive feedback from experts. Provide tools for setting learning goals and measuring achievements.
 - **Payment and Subscription**: Integrate a payment system for users to purchase access to premium content, courses, or one-on-one mentorship sessions. Offer subscription plans for ongoing access to resources and experts.
 - **SEO and Marketing**: Implement SEO best practices to improve the platform's visibility in search engine results. Develop marketing strategies to attract professionals and experts to the platform, such as content marketing, social media campaigns, and email marketing.
+
+## Security Features
+
+The Skill-Sharing Platform will include the following security features:
+
+- **Data Encryption**: All sensitive data, such as passwords and payment information, will be encrypted using strong encryption algorithms.
+- **Input Validation**: All user inputs will be validated to prevent SQL injection and other common attacks.
+- **Access Control**: User roles (e.g., regular user, expert, admin) and permissions will be implemented to ensure that only authorized users can access certain features and data.
+- **Secure Communication**: All communication between the client and server will be encrypted using HTTPS.
+- **Authentication**: Robust user authentication system will be implemented, potentially including options for two-factor authentication.
+- **Session Management**: Secure session handling to prevent session hijacking and ensure user privacy.
