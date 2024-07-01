@@ -10,6 +10,10 @@ class Profile(models.Model):
     skills = models.CharField(max_length=255, blank=True)
     experience = models.TextField(blank=True)
     achievements = models.TextField(blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    linkedin_profile = models.URLField(blank=True)
+    github_profile = models.URLField(blank=True)
+    is_expert = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
