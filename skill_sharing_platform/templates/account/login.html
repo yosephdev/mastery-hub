@@ -8,7 +8,7 @@
     {% element h1 %}
         {% trans "Sign In" %}
     {% endelement %}
-    <p>Welcome back! Please log in to continue.</p> 
+    <p>Welcome back! Please log in to continue.</p>
     {% if not SOCIALACCOUNT_ONLY %}
         {% setvar link %}
             <a href="{{ signup_url }}">
@@ -28,7 +28,7 @@
                 {{ redirect_field }}
             {% endslot %}
             {% slot actions %}
-                {% element button type="submit" class="btn btn-success" tags="prominent,login" %} 
+                {% element button type="submit" class="btn btn-success" tags="prominent,login" %}
                     {% trans "Sign In" %}
                 {% endelement %}
             {% endslot %}

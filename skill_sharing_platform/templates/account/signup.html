@@ -7,7 +7,7 @@
     {% element h1 %}
         {% trans "Sign Up" %}
     {% endelement %}
-    <p>Join us today! Please fill in the form to create an account.</p> 
+    <p>Join us today! Please fill in the form to create an account.</p>
     {% setvar link %}
         <a href="{{ login_url }}">
         {% endsetvar %}
@@ -27,7 +27,7 @@
                 {{ redirect_field }}
             {% endslot %}
             {% slot actions %}
-                {% element button tags="prominent,signup" type="submit" class="btn btn-primary" %} 
+                {% element button tags="prominent,signup" type="submit" class="btn btn-primary" %}
                     {% trans "Sign Up" %}
                 {% endelement %}
             {% endslot %}
