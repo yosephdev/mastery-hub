@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
     "django_extensions",
     "masteryhub",
     "rest_framework",
@@ -98,6 +99,20 @@ ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 # Login/Logout URLs
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
+
+# Social account settings
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {
+            "access_type": "online",
+        },
+        "OAUTH_PKCE_ENABLED": True,
+    }
+}
 
 # Email settings (for development)
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
