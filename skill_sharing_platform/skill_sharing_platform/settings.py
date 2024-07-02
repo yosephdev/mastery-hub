@@ -91,6 +91,10 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net',
+]
+
 SITE_ID = 1
 
 # AllAuth settings
