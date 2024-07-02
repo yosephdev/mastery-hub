@@ -7,9 +7,7 @@
     {% element h1 %}
         {% trans "Sign Out" %}
     {% endelement %}
-    {% element p %}
-        {% trans 'Are you sure you want to sign out?' %}
-    {% endelement %}
+    <p>We hope to see you again soon! Are you sure you want to sign out?</p> 
     {% url 'account_logout' as action_url %}
     {% element form method="post" action=action_url no_visible_fields=True %}
         {% slot body %}
@@ -17,7 +15,7 @@
             {{ redirect_field }}
         {% endslot %}
         {% slot actions %}
-            {% element button type="submit" %}
+            {% element button type="submit" class="btn btn-danger" %} 
                 {% trans 'Sign Out' %}
             {% endelement %}
         {% endslot %}
