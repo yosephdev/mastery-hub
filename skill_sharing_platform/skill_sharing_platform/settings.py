@@ -32,7 +32,12 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "stripe",
+    "crispy_forms",
+    "crispy_bootstrap4",
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -97,7 +102,7 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 
 ACCOUNT_FORMS = {
-    'signup': 'masteryhub.forms.CustomSignupForm',
+    "signup": "masteryhub.forms.CustomSignupForm",
 }
 
 # Login/Logout URLs
