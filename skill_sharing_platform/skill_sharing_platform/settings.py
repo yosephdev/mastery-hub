@@ -12,10 +12,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = [
-    "8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
-    "localhost",
-]
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost").split(",")
 
 # Application definition
 INSTALLED_APPS = [
@@ -70,7 +67,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "skill_sharing_platform.wsgi.application"
 
 # Database
-DATABASES = {"default": dj_database_url.parse(os.environ.get("DATABASE_URL"))}
+DATABASES = {"default": dj_database_url.parse(config("DATABASE_URL"))}
 
 if "DATABASE_URL" in os.environ:
     DATABASES = {"default": dj_database_url.parse(os.environ.get("DATABASE_URL"))}
