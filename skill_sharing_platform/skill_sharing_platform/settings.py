@@ -96,6 +96,10 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 
+ACCOUNT_FORMS = {
+    'signup': 'masteryhub.forms.CustomSignupForm',
+}
+
 # Login/Logout URLs
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
