@@ -5,4 +5,7 @@ from django.http import HttpResponse
 
 
 def home(request):
+    """
+    A view to return the home page for the masteryhub app
+    """
     return HttpResponse("Welcome to MasteryHub!")
