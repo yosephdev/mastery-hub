@@ -1,6 +1,204 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
 {% block content %}
-    <h1 class="display-4 text-success">Home Page - It works</h1>
+<div class="container-fluid mt-5 pt-5">
+    <!-- Main Content -->
+    <div class="text-center mt-5 pt-5 main-background">
+        <h1>Unlock Your Professional Potential with MasteryHub</h1>
+        <p>Connect, Learn, and Grow with Expert-Led Skill-Sharing Sessions</p>
+        <button class="btn btn-primary">Find a Skill</button>
+        <button class="btn btn-secondary">Share Your Expertise</button>
+    </div>
+
+    <div class="container-fluid mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="image-scroll-container">
+                    <div class="image-scroll">
+                        <figure class="p-2 text-center">
+                            <img src="{% static 'images/web-development.jpeg' %}" class="img-fluid"
+                                alt="Web Development">
+                            <figcaption>Web Development</figcaption>
+                        </figure>
+                        <figure class="p-2 text-center">
+                            <img src="{% static 'images/graphic-design.jpeg' %}" class="img-fluid" alt="Graphic Design">
+                            <figcaption>Graphic Design</figcaption>
+                        </figure>
+                        <figure class="p-2 text-center">
+                            <img src="{% static 'images/digital-marketing.jpeg' %}" class="img-fluid"
+                                alt="Digital Marketing">
+                            <figcaption>Digital Marketing</figcaption>
+                        </figure>
+                        <figure class="p-2 text-center">
+                            <img src="{% static 'images/data-science.jpeg' %}" class="img-fluid" alt="Data Science">
+                            <figcaption>Data Science</figcaption>
+                        </figure>
+                        <figure class="p-2 text-center">
+                            <img src="{% static 'images/leadership.jpeg' %}" class="img-fluid" alt="Leadership">
+                            <figcaption>Leadership</figcaption>
+                        </figure>
+                        <figure class="p-2 text-center">
+                            <img src="{% static 'images/time-management.jpeg' %}" class="img-fluid"
+                                alt="Time Management">
+                            <figcaption>Time Management</figcaption>
+                        </figure>
+                        <figure class="p-2 text-center">
+                            <img src="{% static 'images/career-development.jpeg' %}" class="img-fluid"
+                                alt="Career Development">
+                            <figcaption>Career Development</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="container-fluid how-it-works">
+        <div class="text-center">
+            <h2>How It Works</h2>
+            <p>Step 1: Create your profile</p>
+            <p>Step 2: Explore skills or offer your expertise</p>
+            <p>Step 3: Connect with mentors or mentees</p>
+            <p>Step 4: Participate in sessions and track your progress</p>
+            <div class="icon-box">
+                <div>
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <div>Learn from Experts</div>
+                </div>
+                <div>
+                    <i class="fas fa-clock"></i>
+                    <div>Flexible Schedule</div>
+                </div>
+                <div>
+                    <i class="fas fa-globe"></i>
+                    <div>Diverse Topics</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Skills Section -->
+    <div class="container-fluid featured-skills">
+        <div class="text-center">
+            <h2>Featured Skills and Categories</h2>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card mb-4">
+                        <img src="{% static 'images/technology.jpeg' %}" class="card-img-top" alt="Technology">
+                        <div class="card-body">
+                            <h5 class="card-title">Technology</h5>
+                            <button class="btn btn-warning">Join Now</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card mb-4">
+                        <img src="{% static 'images/business.jpeg' %}" class="card-img-top" alt="Business">
+                        <div class="card-body">
+                            <h5 class="card-title">Business</h5>
+                            <button class="btn btn-warning">Join Now</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card mb-4">
+                        <img src="{% static 'images/creative.jpeg' %}" class="card-img-top" alt="Creative">
+                        <div class="card-body">
+                            <h5 class="card-title">Creative</h5>
+                            <button class="btn btn-warning">Join Now</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card mb-4">
+                        <img src="{% static 'images/soft-skills.jpeg' %}" class="card-img-top" alt="Soft Skills">
+                        <div class="card-body">
+                            <h5 class="card-title">Soft Skills</h5>
+                            <button class="btn btn-warning">Join Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Creative Mentors Section -->
+    <div class="container-fluid creative-mentors">
+        <div class="text-center">
+            <h2>Learn from Creative Mentors</h2>
+            <div class="d-flex justify-content-center flex-wrap">
+                <div class="mentor-card">
+                    <img src="{% static 'images/mentor1.jpeg' %}" alt="John Bennet">
+                    <h5>John Bennet</h5>
+                    <p>Web Development</p>
+                    <button class="btn btn-warning">Join Now</button>
+                </div>               
+                <div class="mentor-card">
+                    <img src="{% static 'images/mentor3.jpeg' %}" alt="James Morgan">
+                    <h5>James Morgan</h5>
+                    <p>Data Science</p>
+                    <button class="btn btn-warning">Join Now</button>
+                </div>
+                <div class="mentor-card">
+                    <img src="{% static 'images/mentor4.jpeg' %}" alt="Kent Smith">
+                    <h5>Kent Smith</h5>
+                    <p>Graphic Design</p>
+                    <button class="btn btn-warning">Join Now</button>
+                </div>
+                <div class="mentor-card">
+                    <img src="{% static 'images/mentor5.jpeg' %}" alt="Alex Johnson">
+                    <h5>Alex Johnson</h5>
+                    <p>Digital Marketing</p>
+                    <button class="btn btn-warning">Join Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials Section -->
+    <div class="container-fluid testimonials">
+        <div class="text-center">
+            <h2>Why Learners Love MasteryHub</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <img src="{% static 'images/testimonial1.jpeg' %}" class="card-img-top" alt="Testimonial 1">
+                        <div class="card-body">
+                            <p class="card-text">"MasteryHub has transformed my career! The mentors are incredibly
+                                knowledgeable and supportive." - Emily R.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <img src="{% static 'images/testimonial2.jpeg' %}" class="card-img-top" alt="Testimonial 2">
+                        <div class="card-body">
+                            <p class="card-text">"I've learned so much in such a short time. The platform is easy to use
+                                and the sessions are very engaging." - Michael T.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action Section -->
+    <div class="container-fluid call-to-action">
+        <div class="text-center">
+            <h2>Ready to Take Your Career to the Next Level?</h2>
+            <p>Create an account to access expert-led sessions, workshops, and mentorship opportunities.</p>
+            <a href="{% url 'account_signup' %}" class="btn btn-warning">Sign Up</a>
+            <a href="#" class="btn btn-secondary">
+                <i class="fab fa-google"></i> Sign Up with Google
+            </a>
+            
+        </div>
+    </div>
+</div>
 {% endblock %}
