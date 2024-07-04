@@ -12,7 +12,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost").split(",")
+ALLOWED_HOSTS = [ '8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net', 'mastery-hub-535644f63849.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
@@ -93,7 +93,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
+    "https://8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net", "https://mastery-hub-535644f63849.herokuapp.com",
 ]
 
 SITE_ID = 1
@@ -188,6 +188,7 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://mastery-hub-535644f63849.herokuapp.com",
 ]
 
 # REST Framework settings
