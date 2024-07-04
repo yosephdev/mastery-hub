@@ -21,3 +21,4 @@ python-decouple==3.8
 sqlparse==0.5.0
 stripe==10.1.0
 whitenoise==6.7.0
+cryptography
