@@ -185,10 +185,10 @@ Below are wireframe examples for different sections of the Skill-Sharing Platfor
 
    ![Dashboard Page-Desktop Wireframe](docs/wireframes/Dashboard-Desktop.png)
 
-9. **Payment and Subscription Wireframe:**
-   - The payment and subscription system includes pages for selecting subscription plans, a checkout process, and account management for subscriptions.
+9. **Payment Wireframe:**
+   - The payment system includes page for a checkout process, and account management for subscriptions.
 
-     ![Dashboard Page-Desktop Wireframe](docs/wireframes/Payment-Subscription.png)
+     ![Dashboard Page-Desktop Wireframe](docs/wireframes/Payment.png)
 
 Note: Mobile wireframes will be developed in a future iteration of the project, focusing on responsive design principles to ensure optimal user experience across all devices.
 
