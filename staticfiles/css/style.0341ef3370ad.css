@@ -1,0 +1,409 @@
+/* Global Styles */
+html,
+body {
+  height: 100%;
+  font-family: "GT Walsheim Pro", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-weight: 700;
+  color: #333333;
+}
+
+body {
+  height: calc(100vh - 164px);
+}
+
+.navbar {
+  background-color: rgba(52, 168, 83, 0.9);
+}
+
+.navbar-brand,
+.nav-link {
+  color: #FFFFFF !important;
+}
+
+.main-background {
+  position: relative;
+  background: url("../images/background.fa445d2deaf3.jpeg") no-repeat center center fixed;
+  background-size: cover;
+  padding: 50px 0;
+  color: #FFFFFF;
+  width: 100%;
+}
+
+.main-background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.main-background>* {
+  position: relative;
+  z-index: 2;
+}
+
+.image-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.image-scroll {
+  display: flex;
+  flex-wrap: nowrap;
+  padding-bottom: 20px;
+}
+
+.image-scroll figure {
+  flex: 0 0 auto;
+  width: 250px;
+  margin-right: 20px;
+}
+
+.image-scroll img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+/* Custom scrollbar styles */
+.image-scroll-container::-webkit-scrollbar {
+  height: 8px;
+  display: block;
+}
+
+.image-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+
+.image-scroll-container::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+/* Bulma icon styling */
+.icon {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.main-logo-link {
+  width: fit-content;
+}
+
+.btn-black {
+  background: black;
+  color: white;
+}
+
+.btn-outline-black {
+  background: white;
+  color: black !important;
+  border: 1px solid black;
+}
+
+.btn-outline-black:hover,
+.btn-outline-black:active,
+.btn-outline-black:focus {
+  background: black;
+  color: white !important;
+}
+
+.btn-black:hover,
+.btn-black:active,
+.btn-black:focus {
+  background: #222;
+  color: white;
+}
+
+.text-black {
+  color: #000 !important;
+}
+
+.border-black {
+  border: 1px solid black !important;
+}
+
+.bg-black {
+  background: #000 !important;
+}
+
+.overlay {
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: fixed;
+  background: white;
+  z-index: -1;
+}
+
+a.category-badge>span.badge:hover {
+  background: #212529 !important;
+  color: #fff !important;
+}
+
+.btt-button {
+  height: 42px;
+  width: 42px;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+}
+
+.btt-link {
+  cursor: pointer;
+}
+
+/* Section: How It Works */
+.how-it-works {
+  background-color: #f9f9f9;
+  padding: 50px 0;
+}
+
+.how-it-works h2 {
+  color: #FBBC05;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.how-it-works p {
+  font-size: 1.1em;
+  margin-bottom: 10px;
+}
+
+.icon-box {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.icon-box div {
+  margin: 0 15px;
+  text-align: center;
+  font-size: 1.2em;
+}
+
+.icon-box i {
+  font-size: 2em;
+  color: #FBBC05;
+  margin-bottom: 10px;
+}
+
+/* Section: Featured Skills */
+.featured-skills {
+  background-color: #f9f9f9;
+  padding: 50px 0;
+}
+
+.featured-skills h2 {
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.card {
+  border: none;
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.card-title {
+  font-size: 1.2em;
+  margin-bottom: 15px;
+}
+
+.btn-warning {
+  background-color: #FBBC05;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+/* Section: Creative Mentors */
+.creative-mentors {
+  background-color: #f9f9f9;
+  padding: 50px 0;
+}
+
+.creative-mentors h2 {
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.mentor-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 10px;
+  text-align: center;
+  transition: transform 0.3s;
+  width: 300px;
+}
+
+.mentor-card:hover {
+  transform: translateY(-10px);
+}
+
+.mentor-card img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.mentor-card h5 {
+  font-size: 1.4em;
+  margin-bottom: 10px;
+}
+
+/* Section: Testimonials */
+.testimonials {
+  background-color: #f9f9f9;
+  padding: 50px 0;
+}
+
+.testimonials h2 {
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+}
+
+.card-img-top {
+  height: 250px;
+  object-fit: cover;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.card-text {
+  font-size: 1.1em;
+  color: #555;
+}
+
+/* Section: Call to Action */
+.call-to-action {
+  background-color: #f9f9f9;
+  padding: 50px 0;
+}
+
+.call-to-action h2 {
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.call-to-action p {
+  font-size: 1.1em;
+  margin-bottom: 30px;
+  color: #555;
+}
+
+.btn-warning {
+  background-color: #FBBC05;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.btn-secondary {
+  background-color: #555;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+}
+
+.btn-secondary:hover {
+  background-color: #444;
+}
+
+.btn-secondary i {
+  margin-right: 5px;
+}
+
+/* Media Queries */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 80%;
+  }
+}
+
+/* Fixed top navbar only on medium and up */
+@media (min-width: 992px) {
+  .fixed-top-desktop-only {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+  }
+
+  .header-container {
+    padding-top: 164px;
+  }
+}
+
+/* Adjustments for mobile screens */
+@media (max-width: 991px) {
+  .header-container {
+    padding-top: 116px;
+  }
+
+  body {
+    height: calc(100vh - 116px);
+  }
+
+  .display-4.logo-font.text-black {
+    font-size: 2rem;
+  }
+
+  .nav-link {
+    padding: 0.15rem;
+  }
+
+  .nav-link i.fa-lg {
+    font-size: 1rem;
+  }
+
+  .navbar-toggler {
+    padding: .6rem .6rem;
+    font-size: 1rem;
+  }
+}
