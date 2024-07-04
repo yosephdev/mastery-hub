@@ -97,20 +97,6 @@ class Payment(models.Model):
         return f"{self.user.username} - {self.amount} on {self.date}"
 
 
-class Subscription(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    plan = models.CharField(
-        max_length=20,
-        choices=[("free", "Free"), ("basic", "Basic"), ("premium", "Premium")],
-        default="free",
-    )
-    start_date = models.DateField(auto_now_add=True)
-    end_date = models.DateField(null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.user.username}'s {self.plan} subscription"
-
-
 class Forum(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
