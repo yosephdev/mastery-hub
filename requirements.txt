@@ -9,6 +9,8 @@ django-cors-headers==4.4.0
 django-crispy-forms==2.2
 django-extensions==3.2.3
 djangorestframework==3.15.2
+graphviz==0.20.3
+gunicorn==22.0.0
 pathspec==0.12.1
 pillow==10.4.0
 psycopg2==2.9.9
