@@ -37,11 +37,12 @@
     {% block extra_js %}
     {% endblock %}
 
-    <title>Mastery Hub {% block extra_title %}{% endblock %}</title>
+    <title>MasteryHub {% block extra_title %}{% endblock %}</title>
 </head>
 
 <body>
     <header class="container-fluid fixed-top">
+        {% include 'includes/mobile-top-header.html' %}        
         <div id="topnav" class="row bg-white pt-lg-2 d-none d-lg-flex">
             <div class="col-12 col-lg-4 my-auto py-1 py-lg-0 text-center text-lg-left">
                 <a href="{% url 'home' %}" class="nav-link main-logo-link">
@@ -106,7 +107,9 @@
                     aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                {% include 'includes/main-nav.html' %}               
+                <div class="collapse navbar-collapse" id="main-nav">
+                    {% include 'includes/main-nav.html' %}
+                </div>
             </nav>
         </div>
     </header>
@@ -122,7 +125,13 @@
     {% block page_header %}
     {% endblock %}
 
-    {% block content %}
+    {% block content %}   
+    <div class="text-center mt-5 pt-5 main-background" style="margin-top: 100px;">
+        <h1>Unlock Your Professional Potential with MasteryHub</h1>
+        <p>Connect, Learn, and Grow with Expert-Led Skill-Sharing Sessions</p>
+        <button class="btn btn-primary">Find a Skill</button>
+        <button class="btn btn-secondary">Share Your Expertise</button>
+    </div>
     {% endblock %}
 
     <footer class="footer mt-5 py-4">
