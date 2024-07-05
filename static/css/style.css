@@ -81,7 +81,6 @@ h1 {
   object-fit: cover;
 }
 
-
 /* Navigation Links and Buttons */
 .btn-black {
   background: black;
@@ -118,6 +117,10 @@ h1 {
 
 .bg-black {
   background: #000 !important;
+}
+
+.header-container {
+  padding-top: 90px;
 }
 
 /* Section: How It Works */
@@ -318,8 +321,9 @@ h1 {
   background-color: #444;
 }
 
-@media (max-width: 768px) {
+/* Media Queries */
 
+@media (max-width: 768px) {
   /* Adjust navigation for mobile screens */
   .main-logo-link {
     text-align: center;
@@ -333,7 +337,7 @@ h1 {
     flex-wrap: wrap;
   }
 
-  icon-box>div {
+  .icon-box > div {
     flex: 0 0 calc(50% - 30px);
     max-width: calc(50% - 30px);
   }
@@ -341,10 +345,73 @@ h1 {
   .image-scroll figure {
     margin-right: 5px;
   }
+
+  form.login .btn {
+    width: 100%;
+    margin: 5px 0;
+  }
+}
+
+@media (max-width: 991px) {
+  .header-container {
+    padding-top: 116px;
+  }
+}
+
+/* Slightly larger container on xl screens */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 80%;
+  }
+}
+
+/* Allauth form formatting */
+.allauth-form-inner-content p {
+  margin-top: 1.5rem; 
+  color: #333333; 
+}
+
+.allauth-form-inner-content input {
+  border-color: #000;
+  border-radius: 0;
+}
+
+.allauth-form-inner-content input::placeholder {
+  color: #aab7c4;
+}
+
+.allauth-form-inner-content button,
+.allauth-form-inner-content input[type='submit'] {
+  display: inline-block;
+  font-weight: 400;
+  color: #fff;
+  text-align: center;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: #4285F4; 
+  border: 1px solid #4285F4; 
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out; /* standard bootstrap btn transitions */
+}
+
+.allauth-form-inner-content button:hover,
+.allauth-form-inner-content input[type='submit']:hover {
+  background-color: #3367D6; 
+  border-color: #3367D6; 
+}
+
+.allauth-form-inner-content a {
+  color: #17A853; 
 }
 
 @media (max-width: 480px) {
-  .icon-box>div {
+  .icon-box > div {
     flex: 0 0 100%;
     max-width: 100%;
     margin-bottom: 15px;
