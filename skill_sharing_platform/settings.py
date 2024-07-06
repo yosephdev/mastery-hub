@@ -131,6 +131,9 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
+SOCIALACCOUNT_GOOGLE_CLIENT_ID = os.getenv('SOCIALACCOUNT_GOOGLE_CLIENT_ID')
+SOCIALACCOUNT_GOOGLE_SECRET = os.getenv('SOCIALACCOUNT_GOOGLE_SECRET')
+
 # Email settings (for development)
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
