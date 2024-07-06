@@ -2,6 +2,8 @@ import os
 import dj_database_url
 from pathlib import Path
 from decouple import config
+from django.contrib.messages import constants as messages
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,7 +14,12 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = [ '8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net', 'mastery-hub-535644f63849.herokuapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    "8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
+    "mastery-hub-535644f63849.herokuapp.com",
+    "localhost",
+    "127.0.0.1",
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -71,6 +78,8 @@ TEMPLATES = [
     },
 ]
 
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
 WSGI_APPLICATION = "skill_sharing_platform.wsgi.application"
 
 # Database
@@ -93,7 +102,8 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net", "https://mastery-hub-535644f63849.herokuapp.com",
+    "https://8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
+    "https://mastery-hub-535644f63849.herokuapp.com",
 ]
 
 SITE_ID = 1
@@ -131,8 +141,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SOCIALACCOUNT_GOOGLE_CLIENT_ID = os.getenv('SOCIALACCOUNT_GOOGLE_CLIENT_ID')
-SOCIALACCOUNT_GOOGLE_SECRET = os.getenv('SOCIALACCOUNT_GOOGLE_SECRET')
+SOCIALACCOUNT_GOOGLE_CLIENT_ID = os.getenv("SOCIALACCOUNT_GOOGLE_CLIENT_ID")
+SOCIALACCOUNT_GOOGLE_SECRET = os.getenv("SOCIALACCOUNT_GOOGLE_SECRET")
 
 # Email settings (for development)
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -204,6 +214,13 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly",
     ],
+}
+
+MESSAGE_TAGS = {
+    messages.INFO: "alert-info",
+    messages.SUCCESS: "alert-success",
+    messages.WARNING: "alert-warning",
+    messages.ERROR: "alert-danger",
 }
 
 # Logging settings
