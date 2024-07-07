@@ -6,6 +6,8 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from .forms import CustomSignupForm, CustomUserChangeForm
+from .forms import ProfileForm
+from .models import Profile
 
 
 # Create your views here.
@@ -66,3 +68,31 @@ class CustomLogoutView(LogoutView):
 
     def get_next_page(self):
         return str(self.next_page)
+
+
+@login_required
+def view_profile(request, username=None):
+    if username:
+        profile = get_object_or_404(Profile, user__username=username)
+    else:
+        profile = request.user.profile
+    return render(request, "masteryhub/view_profile.html", {"profile": profile})
+
+
+@login_required
+def edit_profile(request):
+    profile = request.user.profile
+    if request.method == "POST":
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been updated successfully.")
+            return redirect("view_profile")
+    else:
+        form = ProfileForm(instance=profile)
+    return render(request, "masteryhub/edit_profile.html", {"form": form})
+
+
+def view_mentor_profile(request, username):
+    profile = get_object_or_404(Profile, user__username=username, is_expert=True)
+    return render(request, "masteryhub/view_mentor_profile.html", {"profile": profile})
