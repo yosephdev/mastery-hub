@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "django_extensions",
-    "masteryhub",
+    "masteryhub.apps.MasteryhubConfig",
     "rest_framework",
     "corsheaders",
     "stripe",
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "crispy_bootstrap4",
     "home",
 ]
+
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
@@ -100,6 +101,8 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
+
+ACCOUNT_SIGNUP_FORM_CLASS = 'masteryhub.forms.CustomSignupForm'
 
 CSRF_TRUSTED_ORIGINS = [
     "https://8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
@@ -222,6 +225,8 @@ MESSAGE_TAGS = {
     messages.WARNING: "alert-warning",
     messages.ERROR: "alert-danger",
 }
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # Logging settings
 LOGGING = {
