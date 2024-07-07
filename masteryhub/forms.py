@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
+from .models import Profile
 
 User = get_user_model()
 
@@ -42,3 +43,25 @@ class CustomUserChangeForm(UserChangeForm):
         self.helper = FormHelper()
         self.helper.form_method = "post"
         self.helper.add_input(Submit("submit", "Update Profile"))
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = [
+            "bio",
+            "skills",
+            "experience",
+            "achievements",
+            "profile_picture",
+            "linkedin_profile",
+            "github_profile",
+            "is_expert",
+            "mentor_since",
+            "mentorship_areas",
+            "availability",
+            "preferred_mentoring_method",
+        ]
+        widgets = {
+            "mentor_since": forms.DateInput(attrs={"type": "date"}),
+        }
