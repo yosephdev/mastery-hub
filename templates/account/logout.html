@@ -13,17 +13,23 @@
       <hr>
       <h2 class="logo-font mb-4 text-center">{% trans "Sign Out" %}</h2>
       <hr>
-      <p class="text-center">{% trans "We hope to see you again soon! Are you sure you want to sign out?" %}</p>
-      
-      {% url 'account_logout' as action_url %}
-      <form method="post" action="{{ action_url }}">
-        {% csrf_token %}
-        {{ redirect_field }}
-
+      {% if request.user.is_authenticated %}
+        <p class="text-center">{% trans "We hope to see you again soon! Are you sure you want to sign out?" %}</p>
+        {% url 'account_logout' as action_url %}
+        <form method="post" action="{{ action_url }}">
+          {% csrf_token %}
+          {{ redirect_field }}
+          <div class="d-flex justify-content-center mt-4">
+            <button type="submit" class="btn btn-danger">{% trans 'Sign Out' %}</button>
+            <a href="{% url 'home' %}" class="btn btn-secondary ml-2">{% trans "Cancel" %}</a>
+          </div>
+        </form>
+      {% else %}
+        <p class="text-center">{% trans "You are already logged out." %}</p>
         <div class="d-flex justify-content-center mt-4">
-          <button type="submit" class="btn btn-danger">{% trans 'Sign Out' %}</button>
+          <a href="{% url 'home' %}" class="btn btn-primary">{% trans "Go to Home" %}</a>
         </div>
-      </form>
+      {% endif %}
     </div>
   </div>
 </div>
