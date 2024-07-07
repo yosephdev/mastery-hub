@@ -169,9 +169,13 @@ Note: Mobile wireframes will be developed in a future iteration of the project, 
 
 - Home Page: Completed
 - User Login and Authentication: Completed
+- User Sign Up and Authentication: Completed
 
 ### Home Page Preview
 ![Home Page Preview](docs/readme_images/homepage-preview-image.png)
 
 ### User Login and Authentication Preview
 ![Login Page Preview](docs/readme_images/login-preview-image.png)
+
+### User Sign Up and Authentication Preview
+![Sign up Page Preview](docs/readme_images/signup-preview-image.png)
