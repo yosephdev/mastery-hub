@@ -1,9 +1,8 @@
 import os
-import dj_database_url
 from pathlib import Path
+import dj_database_url
 from decouple import config
 from django.contrib.messages import constants as messages
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,7 +43,6 @@ INSTALLED_APPS = [
     "home",
 ]
 
-
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
@@ -84,17 +82,37 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 WSGI_APPLICATION = "skill_sharing_platform.wsgi.application"
 
 # Database
-DATABASES = {"default": dj_database_url.parse(config("DATABASE_URL"))}
-
-if "DATABASE_URL" in os.environ:
-    DATABASES = {"default": dj_database_url.parse(os.environ.get("DATABASE_URL"))}
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
+}
+
+if "AZURE_DATABASE_URL" in os.environ:
+    azure_db_url = os.environ.get("AZURE_DATABASE_URL")
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("AZURE_DB_NAME", default="postgres"),
+        "USER": config("AZURE_DB_USER", default=""),
+        "PASSWORD": config("AZURE_DB_PASSWORD", default=""),
+        "HOST": config("AZURE_DB_HOST", default=""),
+        "PORT": config("AZURE_DB_PORT", default="5432"),
+        "OPTIONS": {
+            "sslmode": "require",
+        },
+    }
+
+elif "DATABASE_URL" in os.environ:
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.postgresql",
+        **dj_database_url.parse(os.environ.get("DATABASE_URL")),
+    }
+
+
+if DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql":
+    DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
+
 
 # Authentication
 AUTHENTICATION_BACKENDS = [
@@ -102,7 +120,7 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-ACCOUNT_SIGNUP_FORM_CLASS = 'masteryhub.forms.CustomSignupForm'
+ACCOUNT_SIGNUP_FORM_CLASS = "masteryhub.forms.CustomSignupForm"
 
 CSRF_TRUSTED_ORIGINS = [
     "https://8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
@@ -226,7 +244,7 @@ MESSAGE_TAGS = {
     messages.ERROR: "alert-danger",
 }
 
-MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
 # Logging settings
 LOGGING = {
