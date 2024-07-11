@@ -5,51 +5,55 @@
 
 {% block head_title %}{% trans "Sign Up" %}{% endblock %}
 
-{% block inner_content %}
-<div class="container py-5">
-    <div class="row">
-        <div class="col-md-12 offset-md-8">
-            <h2 class="logo-font mb-4 text-center">Join MasteryHub for Free</h2>
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center">
+  <div class="row justify-content-center">
+    <div class="col-md-12 mx-auto" style="max-width: 500px;">
+      <div class="card shadow">
+        <div class="card-body p-5">
+          <h2 class="text-center mb-4">Join us for Free</h2>
 
-            
-            <p class="mt-3 text-center">
-                Already have an account? <a href="{% url 'account_login' %}">Log in</a>
-            </p>
+          <p class="text-center mb-4">
+            Already have an account? <a href="{% url 'account_login' %}" class="text-success">Log in</a>
+          </p>
 
-            <p>Sign up quickly with Google or fill in the form below:</p>
-
-            {% get_providers as socialaccount_providers %}
-            {% if socialaccount_providers %}
-                <div class="mb-3">
-                    {% for provider in socialaccount_providers %}
-                        {% if provider.id == "google" %}
-                            <a href="{% provider_login_url provider.id process='signup' %}" class="btn btn-outline-dark w-100 mb-3">
-                                <i class="fab fa-google"></i> Sign up with Google
-                            </a>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+          {% get_providers as socialaccount_providers %}
+          {% if socialaccount_providers %}
+          <div class="mb-3">
+            {% for provider in socialaccount_providers %}
+            {% if provider.id == "google" %}
+            <a href="{% provider_login_url provider.id process='signup' %}" class="btn btn-outline-dark w-100 mb-3">
+              <i class="fab fa-google"></i> Sign up with Google
+            </a>
             {% endif %}
+            {% endfor %}
+          </div>
+          <p class="text-center">or</p>
+          {% endif %}
 
-            <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
-                {% csrf_token %}
-                {{ form|crispy }}
-                <div class="form-group">
-                    <div class="form-check">
-                        <input type="checkbox" name="terms" class="form-check-input" id="id_terms" required>
-                        <label for="id_terms" class="form-check-label">
-                            I have read and agree to MasteryHub's <a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a>
-                        </label>
-                    </div>
-                </div>
-                {% if redirect_field_value %}
-                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-                {% endif %}
-                <a class="btn btn-outline-black rounded-0" href="{% url 'account_login' %}">Back to Login</a>
-                <button type="submit">{% trans "Sign Up" %}</button>
-            </form>
-
+          <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="form-group">
+              <div class="form-check">
+                <input type="checkbox" name="terms" class="form-check-input" id="id_terms" required>
+                <label for="id_terms" class="form-check-label">
+                  I have read and agree to MasteryHub's <a href="#" class="text-success">Privacy Policy</a> and <a
+                    href="#" class="text-success">Terms of Service</a>
+                </label>
+              </div>
+            </div>
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+            <div class="d-flex justify-content-between mt-4">
+              <a class="btn btn-outline-secondary" href="{% url 'account_login' %}">Back to Login</a>
+              <button type="submit" class="btn btn-primary">{% trans "Sign Up" %}</button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

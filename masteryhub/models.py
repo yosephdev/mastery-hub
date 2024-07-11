@@ -16,7 +16,6 @@ class Profile(models.Model):
     linkedin_profile = models.URLField(blank=True)
     github_profile = models.URLField(blank=True)
     is_expert = models.BooleanField(default=False)
-
     mentor_since = models.DateField(null=True, blank=True)
     mentorship_areas = models.TextField(
         blank=True, help_text="Areas you're willing to mentor in, separated by commas"
@@ -71,25 +70,31 @@ class Category(models.Model):
 
 
 class Mentorship(models.Model):
-    mentor = models.ForeignKey(User, related_name="mentorships_as_mentor", on_delete=models.CASCADE)
-    mentee = models.ForeignKey(User, related_name="mentorships_as_mentee", on_delete=models.CASCADE)
+    mentor = models.ForeignKey(
+        User, related_name="mentorships_as_mentor", on_delete=models.CASCADE
+    )
+    mentee = models.ForeignKey(
+        User, related_name="mentorships_as_mentee", on_delete=models.CASCADE
+    )
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(blank=True, null=True)
     goals = models.TextField(blank=True)
     status = models.CharField(
         max_length=20,
         choices=[
-            ('pending', 'Pending'),
-            ('accepted', 'Accepted'),
-            ('rejected', 'Rejected'),
-            ('completed', 'Completed')
+            ("pending", "Pending"),
+            ("accepted", "Accepted"),
+            ("rejected", "Rejected"),
+            ("completed", "Completed"),
         ],
-        default='pending'
+        default="pending",
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.mentor.username} mentoring {self.mentee.username} - {self.status}"
+        return (
+            f"{self.mentor.username} mentoring {self.mentee.username} - {self.status}"
+        )
 
 
 class Review(models.Model):

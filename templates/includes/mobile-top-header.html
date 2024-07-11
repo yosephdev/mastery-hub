@@ -1,15 +1,28 @@
 <div class="row d-lg-none bg-dark text-white py-2">
     <div class="container-fluid">
-        <div class="row">
+        <div class="row align-items-center">
             <div class="col-6">
-                <a href="{% url 'home' %}" class="text-white">
-                    <h2 class="logo-font"><strong>MasteryHub</strong></h2>
+                <a href="{% url 'home' %}" class="text-white text-decoration-none">
+                    <h2 class="logo-font m-0"><strong>MasteryHub</strong></h2>
                 </a>
             </div>
-            <div class="col-6 text-right py-2">
-                <a href="{% url 'account_login' %}" class="text-white"><i class="fas fa-user fa-lg"></i></a>
-                <a href="{% url 'account_signup' %}" class="text-white ml-3"><i class="fas fa-user-plus fa-lg"></i></a>
-                <a href="#" class="text-white ml-3"><i class="fas fa-shopping-bag fa-lg"></i></a>
+            <div class="col-6 text-end" style="display: flex; justify-content: flex-end; align-items: center;">
+                <a href="{% url 'account_login' %}" class="text-white" aria-label="Login" style="margin-right: 1rem;">
+                    <i class="fas fa-user fa-lg"></i>
+                </a>
+                <a href="{% url 'account_signup' %}" class="text-white" aria-label="Sign Up"
+                    style="margin-right: 1rem;">
+                    <i class="fas fa-user-plus fa-lg"></i>
+                </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'view_own_profile' %}" class="text-white" aria-label="View Profile"
+                    style="margin-right: 1rem;">
+                    <i class="fas fa-user-circle fa-lg"></i>
+                </a>
+                {% endif %}
+                <a href="#" class="text-white" aria-label="Shopping Bag" style="margin-right: 0;">
+                    <i class="fas fa-shopping-bag fa-lg"></i>
+                </a>
             </div>
         </div>
     </div>

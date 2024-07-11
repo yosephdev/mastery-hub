@@ -1,13 +1,16 @@
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.shortcuts import render, redirect
-from .forms import CustomSignupForm, CustomUserChangeForm
-from .forms import ProfileForm
-from .models import Profile
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from django.contrib.auth.models import User
+
+from .forms import CustomSignupForm, CustomUserChangeForm, ProfileForm, SessionForm, ForumPostForm
+from .models import Profile, Mentorship, Session, Forum
 
 
 # Create your views here.
@@ -21,7 +24,7 @@ def signup_view(request):
     if request.method == "POST":
         form = CustomSignupForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save(request=request)
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password1")
             user = authenticate(username=username, password=password)
@@ -30,6 +33,9 @@ def signup_view(request):
                 request, f"Welcome, {user.username}! Registration successful!"
             )
             return redirect("home")
+        else:
+            for field, error in form.errors.items():
+                messages.error(request, f"{field}: {error}")
     else:
         form = CustomSignupForm()
     return render(request, "account/signup.html", {"form": form})
@@ -39,19 +45,14 @@ class CustomLoginView(LoginView):
     template_name = "account/login.html"
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        existing_messages = [
-            m for m in messages.get_messages(self.request) if "Welcome back" in str(m)
-        ]
-        if not existing_messages:
-            messages.success(
-                self.request, f"Welcome back, {self.request.user.username}!"
-            )
-        return response
-
-    def form_invalid(self, form):
-        messages.error(self.request, "Invalid username or password.")
-        return super().form_invalid(form)
+        auth_login(self.request, form.get_user())
+        messages.success(self.request, f"Welcome back, {self.request.user.username}!")
+        if self.request.user.is_superuser:
+            return redirect("admin:index")
+        elif self.request.user.profile.is_expert:
+            return redirect("view_mentor_profile", username=self.request.user.username)
+        else:
+            return redirect("view_profile", username=self.request.user.username)
 
 
 class CustomLogoutView(LogoutView):
@@ -70,13 +71,35 @@ class CustomLogoutView(LogoutView):
         return str(self.next_page)
 
 
+def get_user_profile(username):
+    return get_object_or_404(Profile, user__username=username)
+
+
 @login_required
 def view_profile(request, username=None):
-    if username:
-        profile = get_object_or_404(Profile, user__username=username)
+    profile = get_user_profile(username) if username else request.user.profile
+    is_own_profile = request.user.username == username
+    context = {
+        "profile": profile,
+        "is_own_profile": is_own_profile,
+        "has_profile_picture": bool(profile.profile_picture),
+    }
+    if profile.is_expert:
+        return render(request, "masteryhub/view_mentor_profile.html", context)
     else:
-        profile = request.user.profile
-    return render(request, "masteryhub/view_profile.html", {"profile": profile})
+        return render(request, "masteryhub/view_mentee_profile.html", context)
+
+
+@login_required
+def view_mentor_profile(request, username):
+    profile = get_object_or_404(Profile, user__username=username, is_expert=True)
+    is_own_profile = request.user.username == username
+    context = {
+        "profile": profile,
+        "is_own_profile": is_own_profile,
+        "has_profile_picture": bool(profile.profile_picture),
+    }
+    return render(request, "masteryhub/view_mentor_profile.html", context)
 
 
 @login_required
@@ -87,12 +110,172 @@ def edit_profile(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Your profile has been updated successfully.")
-            return redirect("view_profile")
+            return redirect("view_profile", username=profile.user.username)
     else:
         form = ProfileForm(instance=profile)
     return render(request, "masteryhub/edit_profile.html", {"form": form})
 
 
-def view_mentor_profile(request, username):
-    profile = get_object_or_404(Profile, user__username=username, is_expert=True)
-    return render(request, "masteryhub/view_mentor_profile.html", {"profile": profile})
+def search_mentors(request):
+    query = request.GET.get("q")
+    mentors = Profile.objects.filter(is_mentor=True)
+    if query:
+        mentors = mentors.filter(mentorship_areas__icontains=query)
+    return render(
+        request, "masteryhub/search_mentors.html", {"mentors": mentors, "query": query}
+    )
+
+
+@login_required
+def request_mentorship(request, mentor_id):
+    if request.method == "POST":
+        mentor = get_object_or_404(User, id=mentor_id)
+        mentorship, created = Mentorship.objects.get_or_create(
+            mentor=mentor, mentee=request.user, status="pending"
+        )
+        if created:
+            messages.success(request, f"Mentorship request sent to {mentor.username}")
+        else:
+            messages.info(
+                request, f"You already have a pending request with {mentor.username}"
+            )
+    return redirect("view_mentor_profile", username=mentor.username)
+
+
+@login_required
+def manage_mentorship_requests(request):
+    pending_requests = Mentorship.objects.filter(mentor=request.user, status="pending")
+    return render(
+        request,
+        "masteryhub/manage_mentorship_requests.html",
+        {"pending_requests": pending_requests},
+    )
+
+
+def list_mentors(request):
+    mentors = Profile.objects.filter(is_expert=True)
+    return render(request, "masteryhub/list_mentors.html", {"mentors": mentors})
+
+
+@login_required
+def my_mentorships(request):
+    mentorships_as_mentor = Mentorship.objects.filter(mentor=request.user)
+    mentorships_as_mentee = Mentorship.objects.filter(mentee=request.user)
+    context = {
+        "mentorships_as_mentor": mentorships_as_mentor,
+        "mentorships_as_mentee": mentorships_as_mentee,
+    }
+    return render(request, "masteryhub/my_mentorships.html", context)
+
+
+@login_required
+def accept_mentorship(request, mentorship_id):
+    mentorship = get_object_or_404(Mentorship, id=mentorship_id, mentor=request.user)
+    mentorship.status = "accepted"
+    mentorship.start_date = timezone.now().date()
+    mentorship.save()
+    messages.success(request, f"Mentorship with {mentorship.mentee.username} accepted")
+    return redirect("manage_mentorship_requests")
+
+
+@login_required
+def reject_mentorship(request, mentorship_id):
+    mentorship = get_object_or_404(Mentorship, id=mentorship_id, mentor=request.user)
+    mentorship.status = "rejected"
+    mentorship.save()
+    messages.success(request, f"Mentorship with {mentorship.mentee.username} rejected")
+    return redirect("manage_mentorship_requests")
+
+
+@login_required
+def list_sessions(request):
+    sessions = Session.objects.all()
+    return render(request, "masteryhub/list_sessions.html", {"sessions": sessions})
+
+
+@login_required
+def view_session(request, session_id):
+    session = get_object_or_404(Session, id=session_id)
+    return render(request, "masteryhub/view_session.html", {"session": session})
+
+
+@login_required
+def create_session(request):
+    if request.method == "POST":
+        form = SessionForm(request.POST)
+        if form.is_valid():
+            session = form.save(commit=False)
+            session.host = request.user
+            session.save()
+            messages.success(request, "Session created successfully.")
+            return redirect("view_session", session_id=session.id)
+    else:
+        form = SessionForm()
+    return render(request, "masteryhub/create_session.html", {"form": form})
+
+
+@login_required
+def edit_session(request, session_id):
+    session = get_object_or_404(Session, id=session_id, host=request.user)
+    if request.method == "POST":
+        form = SessionForm(request.POST, instance=session)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Session updated successfully.")
+            return redirect("view_session", session_id=session.id)
+    else:
+        form = SessionForm(instance=session)
+    return render(
+        request, "masteryhub/edit_session.html", {"form": form, "session": session}
+    )
+
+
+@login_required
+def forum_list(request):
+    posts = Forum.objects.filter(parent_post=None)
+    return render(request, "masteryhub/forum_list.html", {"posts": posts})
+
+
+@login_required
+def create_forum_post(request):
+    if request.method == "POST":
+        form = ForumPostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            messages.success(request, "Forum post created successfully.")
+            return redirect("view_forum_post", post_id=post.id)
+    else:
+        form = ForumPostForm()
+    return render(request, "masteryhub/create_forum_post.html", {"form": form})
+
+
+@login_required
+def view_forum_post(request, post_id):
+    post = get_object_or_404(Forum, id=post_id)
+    comments = post.comments.all()
+    return render(
+        request, "masteryhub/view_forum_post.html", {"post": post, "comments": comments}
+    )
+
+
+@login_required
+def reply_forum_post(request, post_id):
+    parent_post = get_object_or_404(Forum, id=post_id)
+    if request.method == "POST":
+        form = ForumPostForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.author = request.user
+            reply.parent_post = parent_post
+            reply.save()
+            messages.success(request, "Reply posted successfully.")
+            return redirect("view_forum_post", post_id=parent_post.id)
+    else:
+        form = ForumPostForm()
+    return render(
+        request,
+        "masteryhub/reply_forum_post.html",
+        {"form": form, "parent_post": parent_post},
+    )

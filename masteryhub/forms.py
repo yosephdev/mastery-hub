@@ -1,9 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
-from .models import Profile
+
+from .models import Profile, Session, Forum
+
 
 User = get_user_model()
 
@@ -45,6 +48,23 @@ class CustomUserChangeForm(UserChangeForm):
         self.helper.add_input(Submit("submit", "Update Profile"))
 
 
+class SessionForm(forms.ModelForm):
+    class Meta:
+        model = Session
+        fields = [
+            "title",
+            "description",
+            "date",
+            "duration",
+            "category",
+            "max_participants",
+        ]
+        widgets = {
+            "date": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            "duration": forms.TimeInput(attrs={"type": "time"}),
+        }
+
+
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
@@ -63,5 +83,18 @@ class ProfileForm(forms.ModelForm):
             "preferred_mentoring_method",
         ]
         widgets = {
+            "bio": forms.Textarea(attrs={"rows": 4}),
+            "skills": forms.TextInput(
+                attrs={"placeholder": "Enter skills separated by commas"}
+            ),
+            "experience": forms.Textarea(attrs={"rows": 4}),
+            "areas_of_expertise": forms.Textarea(attrs={"rows": 3}),
+            "achievements": forms.Textarea(attrs={"rows": 4}),
             "mentor_since": forms.DateInput(attrs={"type": "date"}),
         }
+
+
+class ForumPostForm(forms.ModelForm):
+    class Meta:
+        model = Forum
+        fields = ["title", "content", "category"]

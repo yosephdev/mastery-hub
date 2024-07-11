@@ -19,7 +19,7 @@
     {% endblock %}
 
     {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">  
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     {% endblock %}
 
     {% block corejs %}
@@ -35,13 +35,13 @@
     <script src="{% static 'js/custom.js' %}"></script>
     {% endblock %}
 
-    {% block extra_js %}    
+    {% block extra_js %}
     {% endblock %}
 
     <title>MasteryHub {% block extra_title %}{% endblock %}</title>
 </head>
 
-<body>
+<body d-flex h-100 main-bg>
     <header class="container-fluid fixed-top">
         {% include 'includes/mobile-top-header.html' %}
         <div id="topnav" class="row bg-white pt-lg-2 d-none d-lg-flex">
@@ -76,10 +76,14 @@
                         <div class="dropdown-menu border-0" aria-labelledby="user-options">
                             {% if request.user.is_authenticated %}
                             {% if request.user.is_superuser %}
-                            <a href="#" class="dropdown-item">Dashboard</a>
+                            <a href="{% url 'admin_dashboard' %}" class="dropdown-item">Dashboard</a>
                             {% endif %}
-                            <a href="#" class="dropdown-item">My Profile</a>
+                            <a href="{% url 'view_own_profile' %}" class="dropdown-item">My Profile</a>
                             <a href="{% url 'account_logout' %}" class="dropdown-item">Logout</a>
+                            {% if request.user.profile.is_expert %}
+                            <a href="{% url 'manage_mentorship_requests' %}" class="dropdown-item">Manage Mentorship
+                                Requests</a>
+                            {% endif %}
                             {% else %}
                             <a href="{% url 'account_login' %}" class="dropdown-item">Login</a>
                             <a href="{% url 'account_signup' %}" class="dropdown-item">Sign Up</a>
@@ -94,7 +98,9 @@
                                 <p class="my-0">
                                     {% if grand_total %}
                                     ${{ grand_total|floatformat:2 }}
-                                    {% else %} $0.00 {% endif %}
+                                    {% else %}
+                                    $0.00
+                                    {% endif %}
                                 </p>
                             </div>
                         </a>
@@ -116,9 +122,9 @@
     </header>
 
 
-     <!-- Django Messages -->
-     {% if messages %}
-     <div class="container">
+    <!-- Django Messages -->
+    {% if messages %}
+    <div class="container">
         <div class="row">
             <div class="col-md-8 offset-md-2">
                 {% for message in messages %}
@@ -136,11 +142,13 @@
     {% endblock %}
 
     {% block content %}
-    <div class="text-center mt-5 pt-5 main-background" style="margin-top: 100px;">
-        <h1>Unlock Your Professional Potential with MasteryHub</h1>
-        <p>Connect, Learn, and Grow with Expert-Led Skill-Sharing Sessions</p>
-        <button class="btn btn-primary">Find a Skill</button>
-        <button class="btn btn-secondary">Share Your Expertise</button>
+    <div class="container-fluid">
+        <div class="text-center mt-5 pt-5 main-background" style="margin-top: 100px;">
+            <h1>Unlock Your Professional Potential with MasteryHub</h1>
+            <p>Connect, Learn, and Grow with Expert-Led Skill-Sharing Sessions</p>
+            <button class="btn btn-primary">Find a Skill</button>
+            <button class="btn btn-secondary">Share Your Expertise</button>
+        </div>
     </div>
     {% endblock %}
 
@@ -152,7 +160,7 @@
                     <ul class="list-unstyled">
                         <li><a href="#">About</a></li>
                         <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Payment & Subscription</a></li>
+                        <li><a href="#">Payment</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
