@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Manage Mentorship Requests</h2>
+                    {% if pending_requests %}
+                    <div class="list-group">
+                        {% for request in pending_requests %}
+                        <div class="list-group-item list-group-item-action flex-column align-items-start">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ request.mentee.username }}</h5>
+                                <small>Requested on {{ request.created_at|date:"F d, Y" }}</small>
+                            </div>
+                            <p class="mb-1">{{ request.goals|truncatechars:100 }}</p>
+                            <div class="mt-2">
+                                <form method="post" action="{% url 'accept_mentorship' mentorship_id=request.id %}"
+                                    class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                                </form>
+                                <form method="post" action="{% url 'reject_mentorship' mentorship_id=request.id %}"
+                                    class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info" role="alert">
+                        No pending mentorship requests.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

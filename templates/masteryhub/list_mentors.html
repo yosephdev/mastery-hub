@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Available Mentors</h2>
+    <div class="row">
+        {% for mentor in mentors %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                {% if mentor.profile_picture %}
+                <img src="{{ mentor.profile_picture.url }}" class="card-img-top" alt="{{ mentor.user.username }}">
+                {% else %}
+                <img src="{% static 'images/default_profile.png' %}" class="card-img-top"
+                    alt="{{ mentor.user.username }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ mentor.user.get_full_name }}</h5>
+                    <p class="card-text">{{ mentor.bio|truncatewords:20 }}</p>
+                    <a href="{% url 'view_mentor_profile' username=mentor.user.username %}" class="btn btn-primary">View
+                        Profile</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

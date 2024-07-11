@@ -1,0 +1,76 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ title }} | {% trans "MasteryHub Admin" %}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        {% trans "MasteryHub Administration" %}
+    </a>
+</h1>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    :root {
+        --primary-color: #4285F4;
+        --secondary-color: #34A853;
+    }
+    
+    #header {
+        background: var(--primary-color);
+        color: #fff;
+    }
+    
+    #branding h1, #branding h1 a:link, #branding h1 a:visited {
+        color: #fff;
+    }
+    
+    .module h2, .module caption, .inline-group h2 {
+        background: var(--secondary-color);
+    }
+    
+    div.breadcrumbs {
+        background: var(--secondary-color);
+    }
+    
+    a:link, a:visited {
+        color: var(--primary-color);
+    }
+    
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background: var(--primary-color);
+    }
+    
+    .button:active, input[type=submit]:active, input[type=button]:active, .button:focus, input[type=submit]:focus, input[type=button]:focus, .button:hover, input[type=submit]:hover, input[type=button]:hover {
+        background: #0056b3;
+    }
+    
+    .object-tools a:focus, .object-tools a:hover {
+        background-color: var(--primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block nav-global %}
+<div class="custom-nav">
+    <a href="{% url 'admin_dashboard' %}" class="nav-link">Custom Dashboard</a>
+    <a href="{% url 'home' %}" class="nav-link">MasteryHub Home</a>
+</div>
+<style>
+    .custom-nav {
+        float: right;
+        margin-right: 20px;
+    }
+    .custom-nav .nav-link {
+        color: #fff;
+        margin-left: 15px;
+        text-decoration: none;
+    }
+    .custom-nav .nav-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}

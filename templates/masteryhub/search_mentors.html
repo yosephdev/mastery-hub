@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Search Mentors</h2>
+<form method="get">
+    <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search mentorship areas">
+    <button type="submit">Search</button>
+</form>
+
+{% for mentor in mentors %}
+<div>
+    <h3>{{ mentor.user.username }}</h3>
+    <p>Areas: {{ mentor.mentorship_areas }}</p>
+    <a href="{% url 'view_profile' mentor.user.username %}">View Profile</a>
+</div>
+{% empty %}
+<p>No mentors found.</p>
+{% endfor %}
+{% endblock %}
