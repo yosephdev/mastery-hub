@@ -90,7 +90,6 @@ DATABASES = {
 }
 
 if "AZURE_DATABASE_URL" in os.environ:
-    azure_db_url = os.environ.get("AZURE_DATABASE_URL")
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": config("AZURE_DB_NAME", default="postgres"),
@@ -109,10 +108,8 @@ elif "DATABASE_URL" in os.environ:
         **dj_database_url.parse(os.environ.get("DATABASE_URL")),
     }
 
-
 if DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql":
     DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
-
 
 # Authentication
 AUTHENTICATION_BACKENDS = [
