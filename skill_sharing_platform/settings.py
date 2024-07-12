@@ -82,34 +82,17 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 WSGI_APPLICATION = "skill_sharing_platform.wsgi.application"
 
 # Database
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+if "DATABASE_URL" in os.environ:
+    DATABASES = {
+        "default": dj_database_url.parse(os.environ.get("DATABASE_URL")),
     }
-}
-
-if "AZURE_DATABASE_URL" in os.environ:
-    DATABASES["default"] = {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("AZURE_DB_NAME", default="postgres"),
-        "USER": config("AZURE_DB_USER", default=""),
-        "PASSWORD": config("AZURE_DB_PASSWORD", default=""),
-        "HOST": config("AZURE_DB_HOST", default=""),
-        "PORT": config("AZURE_DB_PORT", default="5432"),
-        "OPTIONS": {
-            "sslmode": "require",
-        },
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
     }
-
-elif "DATABASE_URL" in os.environ:
-    DATABASES["default"] = {
-        "ENGINE": "django.db.backends.postgresql",
-        **dj_database_url.parse(os.environ.get("DATABASE_URL")),
-    }
-
-if DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql":
-    DATABASES["default"]["OPTIONS"] = {"sslmode": "require"}
 
 # Authentication
 AUTHENTICATION_BACKENDS = [
