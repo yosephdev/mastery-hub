@@ -41,7 +41,6 @@ db.sqlite3
 media
 
 # Django migrations
-# */migrations/
 
 
 # Flask stuff:
