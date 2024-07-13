@@ -28,6 +28,7 @@ class Profile(models.Model):
         blank=True,
         help_text="e.g., One-on-one, Group sessions, Online, In-person",
     )
+    dummy_field = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
