@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
     "django_extensions",
     "masteryhub.apps.MasteryhubConfig",
+    "masteryhub",
     "rest_framework",
     "corsheaders",
     "stripe",
