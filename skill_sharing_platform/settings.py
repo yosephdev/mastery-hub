@@ -82,14 +82,9 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 WSGI_APPLICATION = "skill_sharing_platform.wsgi.application"
 
 # Database
-if "DATABASE_URL" in os.environ:
-    DATABASES = {
-        "default": dj_database_url.parse(os.environ.get("DATABASE_URL")),
-    }
-else:
-    DATABASES = {
-        "default": dj_database_url.parse(os.environ.get("HEROKU_POSTGRESQL_WHITE_URL")),
-    }
+DATABASES = {
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+}
 
 # Authentication
 AUTHENTICATION_BACKENDS = [
