@@ -4,82 +4,20 @@
 
 {% block extrastyle %}
 {{ block.super }}
-<style>
-    .dashboard-grid {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-        margin-top: 20px;
-    }
 
-    .profile-card,
-    .actions-container {
-        flex: 1 1 calc(50% - 10px);
-        max-width: calc(50% - 10px);
-    }
-
-    .profile-picture {
-        max-width: 150px;
-    }
-
-    .card {
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-
-    .card-body ul {
-        list-style: none;
-        padding: 0;
-    }
-
-    .card-body ul li {
-        margin-bottom: 10px;
-    }
-
-    .btn {
-        display: inline-block;
-        padding: 6px 12px;
-        margin-bottom: 0;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 1.42857143;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: middle;
-        cursor: pointer;
-        border: 1px solid transparent;
-        border-radius: 4px;
-    }
-
-    .btn-outline-primary {
-        color: #007bff;
-        background-color: transparent;
-        border-color: #007bff;
-    }
-
-    .btn-outline-dark {
-        color: #343a40;
-        background-color: transparent;
-        border-color: #343a40;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
 <div id="content-main">
-    <h1>{% trans "MasteryHub Administration" %}</h1>
+    <h1 class="h3 mb-4 text-gray-800">{% trans "MasteryHub Administration" %}</h1>
 
     <div class="dashboard-grid">
-        <div class="profile-card card">
-            <div class="card-body text-center">
+        <div class="profile-card card text-center">
+            <div class="card-body">
                 {% if user.profile.profile_picture %}
-                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture"
-                    class="rounded-circle img-fluid mb-3 profile-picture">
+                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-picture">
                 {% else %}
-                <img src="{% static 'images/josie.jpg' %}" alt="Default Profile Picture"
-                    class="rounded-circle img-fluid mb-3 profile-picture">
+                <img src="{% static 'images/josie.jpg' %}" alt="Default Profile Picture" class="profile-picture">
                 {% endif %}
                 <h3 class="card-title">{{ user.username }}</h3>
                 <p class="text-muted">{{ user.profile.bio|truncatewords:30 }}</p>
@@ -105,8 +43,8 @@
                     <li><a href="{% url 'manage_mentorship_requests' %}">{% trans "Manage Mentorship Requests" %}</a>
                     </li>
                     <li><a href="{% url 'view_profile' username=user.username %}">{% trans "View User Profile" %}</a>
-                    </li>                    
-                    <li><a href="{% url 'account_logout' %}">{% trans "Logout" %}</a></li>                 
+                    </li>
+                    <li><a href="{% url 'account_logout' %}">{% trans "Logout" %}</a></li>
                 </ul>
             </div>
         </div>
