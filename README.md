@@ -36,14 +36,21 @@ This platform facilitates skill-sharing sessions, workshops, and mentorship oppo
 
 ## User Experience
 
-The primary goal of this project is to provide an exceptional user experience for both learners and experts. Users will enjoy a seamless and intuitive process for creating profiles, joining skill-sharing sessions, and managing their learning progress. The system will be designed with a clean and modern interface, ensuring ease of use and accessibility across various devices.
+The primary goal of this project is to provide an exceptional user experience for learners, mentors, and administrators. Users will enjoy a seamless and intuitive process for creating profiles, joining skill-sharing sessions, and managing their learning progress. The system will be designed with a clean and modern interface, ensuring ease of use and accessibility across various devices.
 
-Experts will benefit from a comprehensive administrative interface that streamlines the management of their sessions, participants, and feedback. The interface will be user-friendly and efficient, allowing experts to quickly access and update relevant data, ensuring smooth operations and excellent service.
+### Mentees
+Mentees can create profiles to specify their learning goals, browse available sessions, join mentorship programs, and track their skill development progress.
+
+### Mentors
+Mentors can set up profiles showcasing their expertise, create and manage skill-sharing sessions, and provide guidance to mentees through structured mentorship programs.
+
+### Admins
+Admins have access to an administrative interface to manage user accounts, oversee platform activities, and ensure the smooth operation of the platform.
 
 ## Project Goals
 
 1. Develop a user-friendly skill-sharing platform
-2. Provide an administrative interface
+2. Provide comprehensive profiles for mentees, mentors, and admins
 3. Ensure data integrity and security
 4. Enhance user experience
 5. Optimize for performance and scalability
@@ -68,12 +75,14 @@ A template is created to help write user stories in a consistent format: "As a [
 
 #### User Stories for Platform Users
 
-1. Profile Creation
-2. Skill-Sharing Sessions
-3. Mentor-Mentee Matching
-4. Q&A and Discussion Forums
-5. Skill Assessment and Tracking
-6. Access to Premium Content
+1. Mentee Profile Creation
+2. Mentor Profile Creation
+3. Admin Profile Creation
+4. Skill-Sharing Sessions
+5. Mentor-Mentee Matching
+6. Q&A and Discussion Forums
+7. Skill Assessment and Tracking
+8. Access to Premium Content
 
 ### Project Board
 
@@ -144,7 +153,7 @@ Note: Mobile wireframes will be developed in a future iteration of the project, 
 
 ## Key Features
 
-1. User Profiles
+1. User Profiles for Mentees, Mentors, and Admins
 2. Skill-Sharing Sessions
 3. Mentor-Mentee Matching
 4. Q&A and Discussion Forums
@@ -179,3 +188,12 @@ Note: Mobile wireframes will be developed in a future iteration of the project, 
 
 ### User Sign Up and Authentication Preview
 ![Sign up Page Preview](docs/readme_images/signup-preview-image.png)
+
+### Mentee Profile Preview
+![Mentee Profile Preview](docs/readme_images/mentee-profile-preview.png)
+
+### Mentor Profile Preview
+![Mentor Profile Preview](docs/readme_images/mentor-profile-preview.png)
+
+### Admin Profile Preview
+![Admin Profile Preview](docs/readme_images/admin-profile-preview.png)
