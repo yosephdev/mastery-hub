@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "django_extensions",
-    "masteryhub.apps.MasteryhubConfig",  
+    "masteryhub.apps.MasteryhubConfig",
     "rest_framework",
     "corsheaders",
     "stripe",
@@ -82,8 +82,11 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 WSGI_APPLICATION = "skill_sharing_platform.wsgi.application"
 
 # Database
+
+sqlite_db = "sqlite:///" + str(BASE_DIR / "db.sqlite3")
+
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+    "default": dj_database_url.config(default=os.environ.get("DATABASE_URL", sqlite_db))
 }
 
 # Authentication
