@@ -2,32 +2,30 @@
 {% load static %}
 {% load custom_filters %}
 
-{% block meta %}
-    <title>Skill-Sharing Sessions - MasteryHub</title>
-{% endblock %}
-
 {% block content %}
-<div class="container">
+<div class="skill-sessions">
     <div class="header-content">
-        <h1>1-on-1 Sessions</h1>
-        <h2>Skill-Sharing Sessions</h2>
+        <h1>Skill-Sharing Sessions</h1>
+        <h2>Connect, Learn, and Grow with Expert-Led 1-on-1 Sessions</h2>
         <p>Explore various skill-sharing sessions and register for the ones that interest you.</p>
     </div>
 
     <div class="main-content">
         <div class="left-column">
             <div class="search-section">
-                <form method="get" action="{% url 'session_list' %}">
+                <form method="GET" action="{% url 'session_list' %}">
                     <input type="text" name="q" placeholder="Search skill-sharing sessions" value="{{ request.GET.q }}">
                     <button type="submit">Search</button>
                 </form>
             </div>
 
-            <h3>Explore Skill Sharing Sessions</h3>
             <div class="categories-section">
-                <a href="{% url 'session_list' %}" class="category-link {% if not selected_category %}active{% endif %}">All categories</a>
+                <a href="{% url 'session_list' %}"
+                    class="category-link {% if not selected_category %}active{% endif %}">All categories</a>
                 {% for category in categories %}
-                    <a href="{% url 'session_list' %}?category={{ category.name }}" class="category-link {% if selected_category == category.name %}active{% endif %}">{{ category.name }}</a>
+                <a href="{% url 'session_list' %}?category={{ category.name }}"
+                    class="category-link {% if selected_category == category.name %}active{% endif %}">{{ category.name
+                    }}</a>
                 {% endfor %}
             </div>
 
@@ -36,10 +34,12 @@
                 <div class="session-card">
                     <div class="thumbnail">Thumbnail {{ forloop.counter }}</div>
                     <h4>{{ session.title }}</h4>
-                    <p>{{ session.description|truncatewords:10 }}</p>
-                    <p class="session-details">{{ session.classes_count }} classes ({{ session.total_duration|time:"G\h i\m" }})</p>
-                    <p>Available spots: {{ session.max_participants|sub:session.participants.count }}</p>
-                    <a href="{% url 'session_register' session.id %}" class="btn btn-primary">Register</a>
+                    <p>{{ session.description|truncatewords:15 }}</p>
+                    <div class="session-details">
+                        <p>{{ session.classes_count }} classes ({{ session.total_duration|time:"G\h i\m" }})</p>
+                        <p>Available spots: {{ session.max_participants|sub:session.participants.count }}</p>
+                    </div>
+                    <a href="{% url 'session_register' session.id %}" class="btn-register">Register</a>
                 </div>
                 {% empty %}
                 <p>No sessions found.</p>
@@ -51,12 +51,11 @@
             <div class="signup-form">
                 <h3>Ready to take your career to the next level?</h3>
                 <p>Create an account to access expert-led sessions, workshops, and mentorship opportunities.</p>
-                <form method="post" action="{% url 'signup' %}">
+                <form method="post" action="{% url 'account_signup' %}">
                     {% csrf_token %}
                     <input type="email" name="email" placeholder="Your email" required>
                     <button type="submit">Sign Up</button>
                 </form>
-                <p>or sign up quickly with <a href="{% url 'google_signup' %}">Google</a></p>
             </div>
         </div>
     </div>
