@@ -27,7 +27,7 @@ class Profile(models.Model):
         max_length=100,
         blank=True,
         help_text="e.g., One-on-one, Group sessions, Online, In-person",
-    ) 
+    )
 
     def __str__(self):
         return self.user.username
@@ -56,9 +56,26 @@ class Session(models.Model):
         default="scheduled",
     )
     max_participants = models.PositiveIntegerField(default=10)
+    image = models.ImageField(upload_to="session_images/", null=True, blank=True)
 
     def __str__(self):
         return self.title
+
+    @property
+    def current_participants(self):
+        return self.participants.count()
+
+    @property
+    def available_spots(self):
+        return self.max_participants - self.current_participants
+
+    @property
+    def classes_count(self):
+        return 1
+
+    @property
+    def total_duration(self):
+        return self.duration * self.classes_count
 
 
 class Category(models.Model):
