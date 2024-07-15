@@ -533,6 +533,107 @@ h1 {
   margin-right: 10px;
 }
 
+/* Skill Sessions */
+
+.header-content {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.main-content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.left-column {
+  width: 70%;
+}
+
+.right-column {
+  width: 25%;
+}
+
+.search-section {
+  margin-bottom: 20px;
+}
+
+.search-section input[type="text"] {
+  width: 70%;
+  padding: 10px;
+}
+
+.search-section button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.categories-section {
+  margin-bottom: 20px;
+}
+
+.category-link {
+  display: inline-block;
+  margin-right: 10px;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  text-decoration: none;
+  color: #333;
+}
+
+.category-link.active {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.session-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.session-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+}
+
+.thumbnail {
+  background-color: #f0f0f0;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.session-details {
+  background-color: #f0f0f0;
+  padding: 5px;
+  text-align: center;
+}
+
+.signup-form {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border: 1px solid #ddd;
+}
+
+.signup-form input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.signup-form button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
 
 /* Media Queries */
 
