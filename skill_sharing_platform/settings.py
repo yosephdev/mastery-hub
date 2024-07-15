@@ -8,17 +8,14 @@ from django.contrib.messages import constants as messages
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config("DEBUG", default=False, cast=bool)
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = [
-    "8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
-    "mastery-hub-535644f63849.herokuapp.com",
-    "localhost",
-    "127.0.0.1",
-]
+ALLOWED_HOSTS = os.environ.get(
+    "ALLOWED_HOSTS", "8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net"
+).split(",")
 
 # Application definition
 INSTALLED_APPS = [
@@ -191,6 +188,10 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = "DENY"
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = False
