@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block meta %}
     <title>Skill-Sharing Sessions - MasteryHub</title>
@@ -37,6 +38,7 @@
                     <h4>{{ session.title }}</h4>
                     <p>{{ session.description|truncatewords:10 }}</p>
                     <p class="session-details">{{ session.classes_count }} classes ({{ session.total_duration|time:"G\h i\m" }})</p>
+                    <p>Available spots: {{ session.max_participants|sub:session.participants.count }}</p>
                 </div>
                 {% empty %}
                 <p>No sessions found.</p>
