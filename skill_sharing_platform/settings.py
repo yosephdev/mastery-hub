@@ -14,7 +14,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = os.environ.get(
-    "ALLOWED_HOSTS", "8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net"
+    "ALLOWED_HOSTS",
+    "skill-sharing.herokuapp.com,localhost,127.0.0.1, 8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
 ).split(",")
 
 # Application definition
@@ -96,7 +97,7 @@ ACCOUNT_SIGNUP_FORM_CLASS = "masteryhub.forms.CustomSignupForm"
 
 CSRF_TRUSTED_ORIGINS = [
     "https://8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
-    "https://mastery-hub-535644f63849.herokuapp.com",
+    "https://skill-sharing.herokuapp.com",
 ]
 
 SITE_ID = 1
