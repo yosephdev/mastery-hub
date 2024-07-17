@@ -7,6 +7,7 @@ Django==5.0.7
 django-allauth==0.63.3
 django-cors-headers==4.4.0
 django-crispy-forms==2.2
+django-environ==0.11.2
 django-extensions==3.2.3
 djangorestframework==3.15.2
 graphviz==0.20.3
@@ -18,7 +19,7 @@ pydotplus==2.0.2
 PyJWT==2.8.0
 pyparsing==3.1.2
 python-decouple==3.8
+python-dotenv==1.0.1
 sqlparse==0.5.0
 stripe==10.1.0
 whitenoise==6.7.0
-cryptography
