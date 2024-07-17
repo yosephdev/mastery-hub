@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -58,7 +57,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
-                        to="masteryhub.category",
+                        to="masteryhub.Category",
                     ),
                 ),
                 (
@@ -68,7 +67,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="comments",
-                        to="masteryhub.forum",
+                        to="masteryhub.Forum",
                     ),
                 ),
             ],
@@ -217,7 +216,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
-                        to="masteryhub.category",
+                        to="masteryhub.Category",
                     ),
                 ),
                 (
@@ -270,7 +269,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="reviews",
-                        to="masteryhub.session",
+                        to="masteryhub.Session",
                     ),
                 ),
             ],
@@ -302,7 +301,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.SET_NULL,
-                        to="masteryhub.session",
+                        to="masteryhub.Session",
                     ),
                 ),
             ],
