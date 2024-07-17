@@ -1,4 +1,3 @@
-import environ
 import os
 from pathlib import Path
 import dj_database_url
@@ -8,27 +7,16 @@ from django.contrib.messages import constants as messages
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Initialise environment variables
-env = environ.Env(DEBUG=(bool, False))
-
-# Reading .env file
-environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
-
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = env.list(
+ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
-    default=[
-        "localhost",
-        "127.0.0.1",
-        "8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
-        ".herokuapp.com",
-    ],
-)
+    "localhost,127.0.0.1,8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net,.herokuapp.com",
+).split(",")
 
 # Application definition
 INSTALLED_APPS = [
@@ -92,7 +80,15 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 WSGI_APPLICATION = "skill_sharing_platform.wsgi.application"
 
 # Database configuration
-DATABASES = {"default": env.db("DATABASE_URL", default="sqlite:///db.sqlite3")}
+if "DATABASE_URL" in os.environ:
+    DATABASES = {"default": dj_database_url.config(conn_max_age=600, ssl_require=True)}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # Authentication
 AUTHENTICATION_BACKENDS = [
@@ -142,8 +138,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SOCIALACCOUNT_GOOGLE_CLIENT_ID = env("SOCIALACCOUNT_GOOGLE_CLIENT_ID")
-SOCIALACCOUNT_GOOGLE_SECRET = env("SOCIALACCOUNT_GOOGLE_SECRET")
+SOCIALACCOUNT_GOOGLE_CLIENT_ID = os.getenv("SOCIALACCOUNT_GOOGLE_CLIENT_ID")
+SOCIALACCOUNT_GOOGLE_SECRET = os.getenv("SOCIALACCOUNT_GOOGLE_SECRET")
 
 # Email settings (for development)
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -184,9 +180,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Stripe settings
-STRIPE_PUBLIC_KEY = env("STRIPE_PUBLIC_KEY")
-STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY")
-STRIPE_WEBHOOK_SECRET = env("STRIPE_WEBHOOK_SECRET")
+STRIPE_PUBLIC_KEY = os.getenv("STRIPE_PUBLIC_KEY")
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 
 # Security settings
 if not DEBUG:
@@ -242,7 +238,7 @@ LOGGING = {
     "loggers": {
         "django": {
             "handlers": ["console"],
-            "level": env("DJANGO_LOG_LEVEL", default="ERROR"),
+            "level": os.getenv("DJANGO_LOG_LEVEL", default="ERROR"),
         },
     },
 }
