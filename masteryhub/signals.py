@@ -1,4 +1,5 @@
 from django.db.models.signals import post_save
+from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from allauth.account.signals import user_logged_in, user_logged_out
 from django.contrib import messages
@@ -14,6 +15,11 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
         profile = getattr(instance, "profile", None)
         if profile:
             profile.save()
+
+
+@receiver(post_delete, sender=User)
+def delete_user_profile(sender, instance, **kwargs):
+    instance.profile.delete()
 
 
 @receiver(user_logged_in)
