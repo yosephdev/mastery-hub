@@ -21,23 +21,28 @@
             </div>
 
             <div class="categories-section">
-                <a href="{% url 'session_list' %}"
-                    class="category-link {% if not selected_category %}active{% endif %}">All categories</a>
+                <a href="{% url 'session_list' %}" class="category-link {% if not selected_category %}active{% endif %}">All categories</a>
                 {% for category in categories %}
-                <a href="{% url 'session_list' %}?category={{ category.name }}"
-                    class="category-link {% if selected_category == category.name %}active{% endif %}">{{ category.name
-                    }}</a>
+                    <a href="{% url 'session_list' %}?category={{ category.name }}" class="category-link {% if selected_category == category.name %}active{% endif %}">{{ category.name }}</a>
                 {% endfor %}
             </div>
 
             <div class="session-grid">
                 {% for session in sessions %}
                 <div class="session-card">
-                    <div class="thumbnail">Thumbnail {{ forloop.counter }}</div>
+                    {% if session.image %}
+                    <div class="thumbnail">
+                        <img src="{{ session.image.url }}" alt="{{ session.title }}">
+                    </div>
+                    {% else %}
+                    <div class="thumbnail">
+                        <p>No Image Available</p>
+                    </div>
+                    {% endif %}
                     <h4>{{ session.title }}</h4>
                     <p>{{ session.description|truncatewords:15 }}</p>
                     <div class="session-details">
-                        <p>{{ session.classes_count }} classes ({{ session.total_duration|time:"G\h i\m" }})</p>
+                        <p>{{ session.classes_count }} class{{ session.classes_count|pluralize }} ({{ session.total_duration }})</p>
                         <p>Available spots: {{ session.max_participants|sub:session.participants.count }}</p>
                     </div>
                     <a href="{% url 'session_register' session.id %}" class="btn-register">Register</a>
