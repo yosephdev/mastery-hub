@@ -159,6 +159,7 @@ Note: Mobile wireframes will be developed in a future iteration of the project, 
 4. Q&A and Discussion Forums
 5. Skill Assessment and Tracking
 6. Payment Integration
+7. **Session Registration and Management**
 
 ## Security Features
 
@@ -179,6 +180,7 @@ Note: Mobile wireframes will be developed in a future iteration of the project, 
 - Home Page: Completed
 - User Login and Authentication: Completed
 - User Sign Up and Authentication: Completed
+- **Sessions and User Registration: Completed**
 
 ### Home Page Preview
 ![Home Page Preview](docs/readme_images/homepage-preview-image.png)
@@ -197,3 +199,6 @@ Note: Mobile wireframes will be developed in a future iteration of the project, 
 
 ### Admin Profile Preview
 ![Admin Profile Preview](docs/readme_images/admin-profile-preview.png)
+
+### Session Registration Preview
+![Session Registration Preview](docs/readme_images/session-registration-preview.png)
