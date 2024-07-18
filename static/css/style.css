@@ -670,6 +670,11 @@ h1 {
   justify-content: center;
 }
 
+.thumbnail img {
+  max-width: 100%;
+  height: auto;
+}
+
 .session-card h4 {
   font-size: 1.2rem;
   margin: 15px;
@@ -701,6 +706,7 @@ h1 {
 
 .btn-register:hover {
   background-color: #45a049;
+  color: #FBBC05;
 }
 
 .signup-form {
