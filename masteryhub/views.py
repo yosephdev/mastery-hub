@@ -10,7 +10,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-from .forms import CustomSignupForm, CustomUserChangeForm, ProfileForm, SessionForm, ForumPostForm
+from .forms import (
+    CustomSignupForm,
+    CustomUserChangeForm,
+    ProfileForm,
+    SessionForm,
+    ForumPostForm,
+)
 from .models import Profile, Mentorship, Session, Forum, Category
 
 
@@ -189,27 +195,33 @@ def reject_mentorship(request, mentorship_id):
 
 
 def session_list(request):
-    query = request.GET.get('q')
-    category = request.GET.get('category')
-    sessions = Session.objects.filter(status='scheduled')
+    query = request.GET.get("q")
+    selected_category = request.GET.get("category")
+    sessions = Session.objects.filter(status="scheduled")
     categories = Category.objects.all()
-    
+
     if query:
-        sessions = sessions.filter(Q(title__icontains=query) | Q(description__icontains=query))
-    if category:
-        sessions = sessions.filter(category__name=category)
-    
+        sessions = sessions.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
+
+    if selected_category:
+        sessions = sessions.filter(category__name=selected_category)
+
     context = {
-        'sessions': sessions,
-        'categories': categories,
-        'selected_category': category,
+        "sessions": sessions,
+        "categories": categories,
+        "selected_category": selected_category,
     }
-    return render(request, 'masteryhub/session_list.html', context)
+
+    return render(request, "masteryhub/session_list.html", context)
+
 
 @login_required
 def view_session(request, session_id):
     session = get_object_or_404(Session, id=session_id)
     return render(request, "masteryhub/view_session.html", {"session": session})
+
 
 @login_required
 def create_session(request):
@@ -225,6 +237,7 @@ def create_session(request):
         form = SessionForm()
     return render(request, "masteryhub/create_session.html", {"form": form})
 
+
 @login_required
 def edit_session(request, session_id):
     session = get_object_or_404(Session, id=session_id, host=request.user)
@@ -236,7 +249,10 @@ def edit_session(request, session_id):
             return redirect("view_session", session_id=session.id)
     else:
         form = SessionForm(instance=session)
-    return render(request, "masteryhub/edit_session.html", {"form": form, "session": session})
+    return render(
+        request, "masteryhub/edit_session.html", {"form": form, "session": session}
+    )
+
 
 @login_required
 def session_register(request, session_id):
@@ -244,10 +260,11 @@ def session_register(request, session_id):
     if session.available_spots > 0:
         session.participants.add(request.user)
         messages.success(request, "You have successfully registered for this session.")
-        return redirect('session_list')
+        return redirect("session_list")
     else:
         messages.error(request, "This session is full.")
-        return render(request, 'masteryhub/session_full.html')
+        return render(request, "masteryhub/session_full.html")
+
 
 @login_required
 def forum_list(request):
