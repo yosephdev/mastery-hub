@@ -8,6 +8,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
     skills = models.CharField(max_length=255, blank=True)
+    goals = models.TextField(blank=True)
     experience = models.TextField(blank=True)
     achievements = models.TextField(blank=True)
     profile_picture = models.ImageField(
