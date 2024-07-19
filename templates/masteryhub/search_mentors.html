@@ -1,19 +1,39 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<h2>Search Mentors</h2>
-<form method="get">
-    <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search mentorship areas">
-    <button type="submit">Search</button>
-</form>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <h2>Search Mentors</h2>
+            <div class="search mb-4">
+                <form method="GET" class="form-inline">
+                    <div class="input-group w-100">
+                        <input type="text" name="q" value="{{ query|default:'' }}" class="form-control"
+                            placeholder="Search mentors by skill or industry">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-success">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
 
-{% for mentor in mentors %}
-<div>
-    <h3>{{ mentor.user.username }}</h3>
-    <p>Areas: {{ mentor.mentorship_areas }}</p>
-    <a href="{% url 'view_profile' mentor.user.username %}">View Profile</a>
+            {% for mentor in mentors %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h3 class="card-title">{{ mentor.user.username }}</h3>
+                    <p class="card-text"><strong>Areas:</strong> {{ mentor.mentorship_areas }}</p>
+                    <p class="card-text"><strong>Rating:</strong> {{ mentor.rating|default:"Not Rated" }}</p>
+                    <p class="card-text">
+                        <strong>Availability:</strong> {{ mentor.availability|default:"Not Specified" }}
+                    </p>
+                    <a href="{% url 'view_profile' mentor.user.username %}" class="btn btn-secondary">View Profile</a>
+                </div>
+            </div>
+            {% empty %}
+            <p class="alert alert-warning">No mentors found.</p>
+            {% endfor %}
+        </div>
+    </div>
 </div>
-{% empty %}
-<p>No mentors found.</p>
-{% endfor %}
 {% endblock %}
