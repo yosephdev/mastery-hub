@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="matching-results">
+    <h1>Matching Results</h1>
+    {% if matches %}
+    <ul>
+        {% for match in matches %}
+        <li>
+            <h2>{{ match.mentor.username }}</h2>
+            <p>Skill Match: {{ match.skill_match }}</p>
+            <p>Goal Match: {{ match.goal_match }}</p>
+            <p>Total Match: {{ match.total_match }}</p>
+            <a href="{% url 'view_profile' match.mentor.id %}">View Profile</a>
+            <a href="{% url 'request_mentorship' match.mentor.id %}">Request Mentorship</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No matches found.</p>
+    {% endif %}
+</div>
+{% endblock %}
