@@ -1,34 +1,51 @@
 {% extends 'base.html' %}
+
 {% block content %}
 <div class="container mt-5">
-    <h2>My Mentorships</h2>
+    <h2 class="mb-4">My Mentorships</h2>
 
-    <h3>As Mentor</h3>
-    <ul class="list-group mb-4">
-        {% for mentorship in mentorships_as_mentor %}
-        <li class="list-group-item">
-            Mentee: {{ mentorship.mentee.username }} | Status: {{ mentorship.status }}
-            {% if mentorship.start_date %}
-            | Started: {{ mentorship.start_date }}
-            {% endif %}
-        </li>
-        {% empty %}
-        <li class="list-group-item">You are not mentoring anyone at the moment.</li>
-        {% endfor %}
-    </ul>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>As Mentor</h3>
+            <ul class="list-group mb-4">
+                {% for mentorship in mentorships_as_mentor %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span>Mentee: {{ mentorship.mentee.username }}</span>
+                            <span class="ml-3">Status: {{ mentorship.status }}</span>
+                            {% if mentorship.start_date %}
+                            <span class="ml-3">Started: {{ mentorship.start_date }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="list-group-item">You are not mentoring anyone at the moment.</li>
+                {% endfor %}
+            </ul>
+        </div>
 
-    <h3>As Mentee</h3>
-    <ul class="list-group">
-        {% for mentorship in mentorships_as_mentee %}
-        <li class="list-group-item">
-            Mentor: {{ mentorship.mentor.username }} | Status: {{ mentorship.status }}
-            {% if mentorship.start_date %}
-            | Started: {{ mentorship.start_date }}
-            {% endif %}
-        </li>
-        {% empty %}
-        <li class="list-group-item">You are not being mentored at the moment.</li>
-        {% endfor %}
-    </ul>
+        <div class="col-md-6">
+            <h3>As Mentee</h3>
+            <ul class="list-group">
+                {% for mentorship in mentorships_as_mentee %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span>Mentor: {{ mentorship.mentor.username }}</span>
+                            <span class="ml-3">Status: {{ mentorship.status }}</span>
+                            {% if mentorship.start_date %}
+                            <span class="ml-3">Started: {{ mentorship.start_date }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+                {% empty %}
+                <li class="list-group-item">You are not being mentored at the moment.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 </div>
 {% endblock %}
