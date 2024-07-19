@@ -16,6 +16,7 @@ from .forms import (
     ProfileForm,
     SessionForm,
     ForumPostForm,
+    MentorApplicationForm
 )
 from .models import Profile, Mentorship, Session, Forum, Category
 
@@ -125,7 +126,7 @@ def edit_profile(request):
 
 def search_mentors(request):
     query = request.GET.get("q")
-    mentors = Profile.objects.filter(is_mentor=True)
+    mentors = Profile.objects.filter(is_expert=True)
     if query:
         mentors = mentors.filter(mentorship_areas__icontains=query)
     return render(
@@ -135,8 +136,9 @@ def search_mentors(request):
 
 @login_required
 def request_mentorship(request, mentor_id):
+    mentor = get_object_or_404(User, id=mentor_id)
+
     if request.method == "POST":
-        mentor = get_object_or_404(User, id=mentor_id)
         mentorship, created = Mentorship.objects.get_or_create(
             mentor=mentor, mentee=request.user, status="pending"
         )
@@ -146,7 +148,9 @@ def request_mentorship(request, mentor_id):
             messages.info(
                 request, f"You already have a pending request with {mentor.username}"
             )
-    return redirect("view_mentor_profile", username=mentor.username)
+        return redirect("view_mentor_profile", username=mentor.username)
+
+    return render(request, "masteryhub/request_mentorship.html", {"mentor": mentor})
 
 
 @login_required
@@ -315,3 +319,52 @@ def reply_forum_post(request, post_id):
         "masteryhub/reply_forum_post.html",
         {"form": form, "parent_post": parent_post},
     )
+
+
+def become_mentor(request):
+    if request.method == "POST":
+        form = MentorApplicationForm(request.POST)
+        if form.is_valid():
+            return redirect("success")
+    else:
+        form = MentorApplicationForm()
+
+    return render(request, "masteryhub/become_mentor.html", {"form": form})
+
+
+def match_mentor_mentee(mentee):
+    mentee_profile = Profile.objects.get(user=mentee)
+    mentee_skills = set(mentee_profile.skills.split(","))
+    mentee_goals = set(mentee_profile.goals.split(","))
+
+    potential_mentors = Profile.objects.filter(is_expert=True)
+    matches = []
+
+    for mentor_profile in potential_mentors:
+        mentor_skills = set(mentor_profile.skills.split(","))
+        mentor_areas = set(mentor_profile.mentorship_areas.split(","))
+
+        skill_match = mentee_skills & mentor_skills
+        goal_match = mentee_goals & mentor_areas
+
+        if skill_match or goal_match:
+            matches.append(
+                {
+                    "mentor": mentor_profile.user,
+                    "skill_match": len(skill_match),
+                    "goal_match": len(goal_match),
+                    "total_match": len(skill_match) + len(goal_match),
+                }
+            )
+
+    matches.sort(key=lambda x: x["total_match"], reverse=True)
+    return matches
+
+
+def mentor_matching_view(request):
+    if request.user.is_authenticated:
+        mentee = request.user
+        matches = match_mentor_mentee(mentee)
+        return render(request, "matching_results.html", {"matches": matches})
+    else:
+        return redirect("login")
