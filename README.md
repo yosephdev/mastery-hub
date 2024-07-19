@@ -156,6 +156,7 @@ Note: Mobile wireframes will be developed in a future iteration of the project, 
 1. User Profiles for Mentees, Mentors, and Admins
 2. Skill-Sharing Sessions
 3. Mentor-Mentee Matching
+  - **Algorithm:** Matches mentees with mentors based on shared skills and goals. Matches are ranked by the total match score, which combines skill and goal matches.
 4. Q&A and Discussion Forums
 5. Skill Assessment and Tracking
 6. Payment Integration
@@ -202,3 +203,6 @@ Note: Mobile wireframes will be developed in a future iteration of the project, 
 
 ### Session Registration Preview
 ![Session Registration Preview](docs/readme_images/session-registration-preview.png)
+
+### Mentor-Mentee Matching Preview
+![Mentor-Mentee Matching Preview](docs/readme_images/mentor-mentee-matching-preview.png)
