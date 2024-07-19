@@ -16,7 +16,7 @@ from .forms import (
     ProfileForm,
     SessionForm,
     ForumPostForm,
-    MentorApplicationForm
+    MentorApplicationForm,
 )
 from .models import Profile, Mentorship, Session, Forum, Category
 
@@ -53,14 +53,23 @@ class CustomLoginView(LoginView):
     template_name = "account/login.html"
 
     def form_valid(self, form):
-        auth_login(self.request, form.get_user())
-        messages.success(self.request, f"Welcome back, {self.request.user.username}!")
-        if self.request.user.is_superuser:
+        user = form.get_user()
+        auth_login(self.request, user)
+        if not self.request.session.get("message_sent", False):
+            messages.success(self.request, f"Welcome back, {user.username}!")
+            self.request.session["message_sent"] = True
+        if user.is_superuser:
             return redirect("admin:index")
-        elif self.request.user.profile.is_expert:
-            return redirect("view_mentor_profile", username=self.request.user.username)
+        elif user.profile.is_expert:
+            return redirect("view_mentor_profile", username=user.username)
         else:
-            return redirect("view_profile", username=self.request.user.username)
+            return redirect("view_profile", username=user.username)
+
+    def form_invalid(self, form):
+        messages.error(
+            self.request, "Login failed. Please check your username and password."
+        )
+        return self.render_to_response(self.get_context_data(form=form))
 
 
 class CustomLogoutView(LogoutView):
@@ -69,7 +78,9 @@ class CustomLogoutView(LogoutView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.method == "POST":
-            messages.success(request, "You have been logged out successfully.")
+            if not self.request.session.get("message_sent", False):
+                messages.success(request, "You have been logged out successfully.")
+                self.request.session["message_sent"] = True
             logout(request)
             return HttpResponseRedirect(self.get_next_page())
         elif request.method == "GET":
