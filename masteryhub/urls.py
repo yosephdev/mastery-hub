@@ -23,6 +23,8 @@ urlpatterns = [
         "mentor/<str:username>/", views.view_mentor_profile, name="view_mentor_profile"
     ),
     path("search-mentors/", views.search_mentors, name="search_mentors"),
+    path("sessions/", views.session_list, name="session_list"),
+    path("become-mentor/", views.become_mentor, name="become_mentor"),
     # Mentorship URLs
     path(
         "request-mentorship/<int:mentor_id>/",
@@ -50,7 +52,11 @@ urlpatterns = [
     path("sessions/<int:session_id>/", views.view_session, name="view_session"),
     path("sessions/create/", views.create_session, name="create_session"),
     path("sessions/<int:session_id>/edit/", views.edit_session, name="edit_session"),
-    path("sessions/<int:session_id>/register/", views.session_register, name="session_register"),
+    path(
+        "sessions/<int:session_id>/register/",
+        views.session_register,
+        name="session_register",
+    ),
     # Forum URLs
     path("forum/", views.forum_list, name="forum_list"),
     path("forum/create/", views.create_forum_post, name="create_forum_post"),
