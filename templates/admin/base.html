@@ -1,0 +1,24 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{{ title }} | {% trans "MasteryHub Admin" %}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        {% trans "MasteryHub Administration" %}
+    </a>
+</h1>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'css/admin_custom.css' %}">
+{% endblock %}
+
+{% block nav-global %}
+<div class="custom-nav">
+    <a href="{% url 'admin_dashboard' %}" class="nav-link">Custom Dashboard</a>
+    <a href="{% url 'home' %}" class="nav-link">MasteryHub Home</a>
+</div>
+{% endblock %}
