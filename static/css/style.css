@@ -347,17 +347,6 @@ h1 {
   background-color: #444;
 }
 
-.btn-close {
-  font-size: 0.8rem;
-  opacity: 0.5;
-  transition: opacity 0.3s ease;
-  cursor: pointer;
-}
-
-.btn-close:hover {
-  opacity: 1;
-}
-
 .alert {
   padding: 15px;
   margin-bottom: 10px;
