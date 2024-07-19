@@ -121,22 +121,32 @@
         </div>
     </header>
 
+   <!-- Django Messages -->
+{% if message_sent %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    Your message has been sent successfully. We will get back to you shortly.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{% endif %}
 
-    <!-- Django Messages -->
-    {% if messages %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message | safe}}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">X</button>
-                </div>
-                {% endfor %}
+{% if messages %}
+<div class="container mt-3">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message|safe }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            {% endfor %}
         </div>
     </div>
-    {% endif %}
+</div>
+{% endif %}
 
     {% block page_header %}
     {% endblock %}
@@ -160,13 +170,13 @@
                     <ul class="list-unstyled">
                         <li><a href="#">About</a></li>
                         <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Payment</a></li>
+                        <li><a href="#">Pricing</a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">
                     <h5>Community</h5>
                     <ul class="list-unstyled">
-                        <li><a href="#">Search a Mentor</a></li>
+                        <li><a href="{% url 'search_mentors' %}">Search a mentor</a></li>
                         <li><a href="#">Q&A and Discussion Forums</a></li>
                         <li><a href="#">Report a concern</a></li>
                     </ul>
@@ -174,7 +184,7 @@
                 <div class="col-md-3">
                     <h5>Mentor Services</h5>
                     <ul class="list-unstyled">
-                        <li><a href="#">Become a Mentor</a></li>
+                        <li><a href="{% url 'become_mentor' %}">Become a Mentor</a></li>
                         <li><a href="#">Mentor Help Center</a></li>
                         <li><a href="#">Mentor Rules & Requirements</a></li>
                     </ul>
