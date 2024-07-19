@@ -18,13 +18,11 @@
                             </div>
                             <p class="mb-1">{{ request.goals|truncatechars:100 }}</p>
                             <div class="mt-2">
-                                <form method="post" action="{% url 'accept_mentorship' mentorship_id=request.id %}"
-                                    class="d-inline">
+                                <form method="post" action="{% url 'accept_mentorship' request.id %}" class="d-inline">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-success btn-sm">Accept</button>
                                 </form>
-                                <form method="post" action="{% url 'reject_mentorship' mentorship_id=request.id %}"
-                                    class="d-inline">
+                                <form method="post" action="{% url 'reject_mentorship' request.id %}" class="d-inline">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-danger btn-sm">Reject</button>
                                 </form>
@@ -33,7 +31,7 @@
                         {% endfor %}
                     </div>
                     {% else %}
-                    <div class="alert alert-info" role="alert">
+                    <div class="alert alert-info text-center" role="alert">
                         No pending mentorship requests.
                     </div>
                     {% endif %}
