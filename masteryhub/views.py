@@ -398,3 +398,31 @@ def mentor_matching_view(request):
         return render(request, "matching_results.html", {"matches": matches})
     else:
         return redirect("login")
+
+
+def about(request):
+    return render(request, "masteryhub/about.html")
+
+
+def contact(request):
+    return render(request, "masteryhub/contact.html")
+
+
+def pricing(request):
+    return render(request, "masteryhub/pricing.html")
+
+
+def forums(request):
+    return render(request, "masteryhub/forums.html")
+
+
+def report_concern(request):
+    return render(request, "masteryhub/report_concern.html")
+
+
+def mentor_help(request):
+    return render(request, "masteryhub/mentor_help.html")
+
+
+def mentor_rules(request):
+    return render(request, "masteryhub/mentor_rules.html")
