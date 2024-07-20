@@ -400,14 +400,6 @@ def mentor_matching_view(request):
         return redirect("login")
 
 
-def about(request):
-    return render(request, "masteryhub/about.html")
-
-
-def contact(request):
-    return render(request, "masteryhub/contact.html")
-
-
 def pricing(request):
     return render(request, "masteryhub/pricing.html")
 
