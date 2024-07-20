@@ -11,6 +11,9 @@ urlpatterns = [
     path("signup/", views.signup_view, name="account_signup"),
     path("login/", CustomLoginView.as_view(), name="account_login"),
     path("logout/", CustomLogoutView.as_view(), name="account_logout"),
+    path("about/", views.about, name="about"),
+    path("contact/", views.contact, name="contact"),
+    path("report-concern/", views.report_concern, name="report_concern"),
     # Admin Dashboard
     path("admin/dashboard/", admin_dashboard, name="admin_dashboard"),
     # Profile URLs
@@ -25,6 +28,8 @@ urlpatterns = [
     path("search-mentors/", views.search_mentors, name="search_mentors"),
     path("sessions/", views.session_list, name="session_list"),
     path("become-mentor/", views.become_mentor, name="become_mentor"),
+    path("mentor-help/", views.mentor_help, name="mentor_help"),
+    path("mentor-rules/", views.mentor_rules, name="mentor_rules"),
     # Mentorship URLs
     path(
         "request-mentorship/<int:mentor_id>/",
@@ -57,9 +62,11 @@ urlpatterns = [
         views.session_register,
         name="session_register",
     ),
+    path("pricing/", views.pricing, name="pricing"),
     # Forum URLs
     path("forum/", views.forum_list, name="forum_list"),
     path("forum/create/", views.create_forum_post, name="create_forum_post"),
     path("forum/<int:post_id>/", views.view_forum_post, name="view_forum_post"),
     path("forum/<int:post_id>/reply/", views.reply_forum_post, name="reply_forum_post"),
+    path("forums/", views.forums, name="forums"),
 ]
