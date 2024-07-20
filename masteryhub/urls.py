@@ -7,12 +7,9 @@ from .admin_views import admin_dashboard
 
 urlpatterns = [
     # Home and Authentication
-    path("", views.home, name="home"),
     path("signup/", views.signup_view, name="account_signup"),
     path("login/", CustomLoginView.as_view(), name="account_login"),
     path("logout/", CustomLogoutView.as_view(), name="account_logout"),
-    path("about/", views.about, name="about"),
-    path("contact/", views.contact, name="contact"),
     path("report-concern/", views.report_concern, name="report_concern"),
     # Admin Dashboard
     path("admin/dashboard/", admin_dashboard, name="admin_dashboard"),
