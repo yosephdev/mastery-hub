@@ -9,6 +9,9 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.models import User
+from .forms import MentorApplicationForm
+from django.contrib.admin.models import LogEntry, ADDITION
+from django.contrib.contenttypes.models import ContentType
 
 from .forms import (
     CustomSignupForm,
@@ -336,10 +339,26 @@ def become_mentor(request):
     if request.method == "POST":
         form = MentorApplicationForm(request.POST)
         if form.is_valid():
-            return redirect("success")
+            name = form.cleaned_data["name"]
+            email = form.cleaned_data["email"]
+            areas_of_expertise = form.cleaned_data["areas_of_expertise"]
+
+            admin_user = User.objects.filter(is_superuser=True).first()
+            if admin_user:
+                LogEntry.objects.log_action(
+                    user_id=admin_user.pk,
+                    content_type_id=ContentType.objects.get_for_model(User).pk,
+                    object_id=admin_user.pk,
+                    object_repr=f"Mentor Application: {name} ({email})",
+                    action_flag=ADDITION,
+                    change_message=areas_of_expertise,
+                )
+            messages.success(
+                request, "Your mentor application has been submitted successfully."
+            )
+            return redirect("home")
     else:
         form = MentorApplicationForm()
-
     return render(request, "masteryhub/become_mentor.html", {"form": form})
 
 
