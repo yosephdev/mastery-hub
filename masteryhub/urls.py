@@ -4,6 +4,7 @@ from . import views
 from .views import CustomLoginView, CustomLogoutView
 from .admin_views import admin_dashboard
 from .views import expert_dashboard, mentee_dashboard, mentor_matching_view, view_profile, edit_profile
+from .views import forum_list, create_forum_post, view_forum_post, reply_forum_post
 
 
 urlpatterns = [
@@ -65,9 +66,8 @@ urlpatterns = [
     ),
     path("pricing/", views.pricing, name="pricing"),
     # Forum URLs
-    path("forum/", views.forum_list, name="forum_list"),
-    path("forum/create/", views.create_forum_post, name="create_forum_post"),
-    path("forum/<int:post_id>/", views.view_forum_post, name="view_forum_post"),
-    path("forum/<int:post_id>/reply/", views.reply_forum_post, name="reply_forum_post"),
-    path("forums/", views.forums, name="forums"),
+    path('forums/', forum_list, name='forum_list'),
+    path('forums/new/', create_forum_post, name='create_forum_post'),
+    path('forums/<int:post_id>/', view_forum_post, name='view_forum_post'),
+    path('forums/<int:post_id>/reply/', reply_forum_post, name='reply_forum_post'),
 ]

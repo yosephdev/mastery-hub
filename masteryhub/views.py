@@ -166,24 +166,33 @@ def request_mentorship(request, mentor_id):
             mentor=mentor_profile, mentee=mentee_profile, status="pending"
         )
         if created:
-            messages.success(request, f"Mentorship request sent to {mentor_user.username}")
+            messages.success(
+                request, f"Mentorship request sent to {mentor_user.username}"
+            )
         else:
             messages.info(
-                request, f"You already have a pending request with {mentor_user.username}"
+                request,
+                f"You already have a pending request with {mentor_user.username}",
             )
         return redirect("view_mentor_profile", username=mentor_user.username)
 
-    return render(request, "masteryhub/request_mentorship.html", {"mentor": mentor_user})
+    return render(
+        request, "masteryhub/request_mentorship.html", {"mentor": mentor_user}
+    )
+
 
 @login_required
 def manage_mentorship_requests(request):
     mentor_profile = Profile.objects.get(user=request.user)
-    pending_requests = Mentorship.objects.filter(mentor=mentor_profile, status="pending")
+    pending_requests = Mentorship.objects.filter(
+        mentor=mentor_profile, status="pending"
+    )
     return render(
         request,
         "masteryhub/manage_mentorship_requests.html",
         {"pending_requests": pending_requests},
     )
+
 
 def list_mentors(request):
     mentors = Profile.objects.filter(is_expert=True)
@@ -294,8 +303,13 @@ def session_register(request, session_id):
 
 @login_required
 def forum_list(request):
+    categories = Category.objects.all()
     posts = Forum.objects.filter(parent_post=None)
-    return render(request, "masteryhub/forum_list.html", {"posts": posts})
+    return render(
+        request,
+        "masteryhub/forum_list.html",
+        {"categories": categories, "posts": posts},
+    )
 
 
 @login_required
@@ -304,7 +318,7 @@ def create_forum_post(request):
         form = ForumPostForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
-            post.author = request.user
+            post.author = request.user.profile
             post.save()
             messages.success(request, "Forum post created successfully.")
             return redirect("view_forum_post", post_id=post.id)
@@ -329,7 +343,7 @@ def reply_forum_post(request, post_id):
         form = ForumPostForm(request.POST)
         if form.is_valid():
             reply = form.save(commit=False)
-            reply.author = request.user
+            reply.author = request.user.profile
             reply.parent_post = parent_post
             reply.save()
             messages.success(request, "Reply posted successfully.")
@@ -346,15 +360,17 @@ def reply_forum_post(request, post_id):
 @login_required
 def expert_dashboard(request):
     expert_profile = Profile.objects.get(user=request.user)
-    participants = Profile.objects.filter(mentorship_areas__icontains=expert_profile.mentorship_areas)
+    participants = Profile.objects.filter(
+        mentorship_areas__icontains=expert_profile.mentorship_areas
+    )
     feedbacks = Feedback.objects.filter(mentor=expert_profile)
     sessions = Session.objects.filter(host=expert_profile)
-    
+
     labels = []
     data = []
     for session in sessions:
-        labels.append(session.date.strftime("%B %Y"))  # Format the date to "Month Year"
-        data.append(1)  
+        labels.append(session.date.strftime("%B %Y"))
+        data.append(1)
 
     context = {
         "username": request.user.username,
@@ -437,26 +453,25 @@ def mentor_matching_view(request):
 def mentee_dashboard(request):
     mentee_profile = Profile.objects.get(user=request.user)
     feedbacks = Feedback.objects.filter(mentee=mentee_profile)
-    sessions = Session.objects.filter(participants=mentee_profile)    
-   
+    sessions = Session.objects.filter(participants=mentee_profile)
+
     labels = []
-    data = []    
-    
+    data = []
+
     session_counts = (
-        sessions
-        .values('date__month')
-        .annotate(count=Count('id'))
-        .order_by('date__month')
+        sessions.values("date__month")
+        .annotate(count=Count("id"))
+        .order_by("date__month")
     )
-    
+
     for entry in session_counts:
-        month_name = entry['date__month']
-        labels.append(f"{month_name:02d}") 
-        data.append(entry['count'])
-    
+        month_name = entry["date__month"]
+        labels.append(f"{month_name:02d}")
+        data.append(entry["count"])
+
     skills = mentee_profile.skills.split(",") if mentee_profile.skills else []
     goals = mentee_profile.goals.split(",") if mentee_profile.goals else []
-    
+
     context = {
         "username": request.user.username,
         "mentee_profile": mentee_profile,
@@ -466,7 +481,7 @@ def mentee_dashboard(request):
         "labels": labels,
         "data": data,
     }
-    return render(request, 'masteryhub/mentee_dashboard.html', context)
+    return render(request, "masteryhub/mentee_dashboard.html", context)
 
 
 def pricing(request):
@@ -474,7 +489,7 @@ def pricing(request):
 
 
 def forums(request):
-    return render(request, "masteryhub/forums.html")
+    return render(request, "masteryhub/forum_list.html")
 
 
 def report_concern(request):
