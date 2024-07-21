@@ -32,6 +32,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'js/custom.js' %}"></script>
     {% endblock %}
 
@@ -76,11 +77,16 @@
                         <div class="dropdown-menu border-0" aria-labelledby="user-options">
                             {% if request.user.is_authenticated %}
                             {% if request.user.is_superuser %}
-                            <a href="{% url 'admin_dashboard' %}" class="dropdown-item">Dashboard</a>
+                            <a href="{% url 'admin_dashboard' %}" class="dropdown-item">Admin Dashboard</a>
                             {% endif %}
+                            {% if not request.user.profile.is_expert %}
+                            <a href="{% url 'mentee_dashboard' %}" class="dropdown-item">Mentee Dashboard</a>
+                            {% endif %}
+                            <a href="{% url 'mentor_matching' %}" class="dropdown-item">Mentor Matching</a>
                             <a href="{% url 'view_own_profile' %}" class="dropdown-item">My Profile</a>
                             <a href="{% url 'account_logout' %}" class="dropdown-item">Logout</a>
                             {% if request.user.profile.is_expert %}
+                            <a href="{% url 'expert_dashboard' %}" class="dropdown-item">Expert Dashboard</a>
                             <a href="{% url 'manage_mentorship_requests' %}" class="dropdown-item">Manage Mentorship
                                 Requests</a>
                             {% endif %}
@@ -196,7 +202,7 @@
                         method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate"
                         target="_blank">
                         <div id="mc_embed_signup_scroll">
-                            <p>Get exclusive offers and discount codes by subscribing to our monthly newsletter</p>                           
+                            <p>Get exclusive offers and discount codes by subscribing to our monthly newsletter</p>
                             <div class="mc-field-group">
                                 <label for="mce-EMAIL">Email Address <span class="asterisk">*</span></label>
                                 <input type="email" name="EMAIL" class="required email" id="mce-EMAIL" required="">
