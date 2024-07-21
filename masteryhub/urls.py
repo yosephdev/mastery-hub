@@ -3,6 +3,7 @@ from django.urls import path
 from . import views
 from .views import CustomLoginView, CustomLogoutView
 from .admin_views import admin_dashboard
+from .views import expert_dashboard, mentee_dashboard, mentor_matching_view, view_profile, edit_profile
 
 
 urlpatterns = [
@@ -14,9 +15,9 @@ urlpatterns = [
     # Admin Dashboard
     path("admin/dashboard/", admin_dashboard, name="admin_dashboard"),
     # Profile URLs
-    path("profile/", views.view_profile, name="view_own_profile"),
-    path("profile/edit/", views.edit_profile, name="edit_profile"),
-    path("profile/<str:username>/", views.view_profile, name="view_profile"),
+    path("profile/", view_profile, name="view_own_profile"),
+    path("profile/edit/", edit_profile, name="edit_profile"),
+    path("profile/<str:username>/", view_profile, name="view_profile"),
     # Mentor URLs
     path("mentors/", views.list_mentors, name="list_mentors"),
     path(
@@ -28,6 +29,9 @@ urlpatterns = [
     path("mentor-help/", views.mentor_help, name="mentor_help"),
     path("mentor-rules/", views.mentor_rules, name="mentor_rules"),
     # Mentorship URLs
+    path("expert-dashboard/", expert_dashboard, name="expert_dashboard"),
+    path("mentee-dashboard/", mentee_dashboard, name="mentee_dashboard"),
+    path("mentor-matching/", mentor_matching_view, name="mentor_matching"),
     path(
         "request-mentorship/<int:mentor_id>/",
         views.request_mentorship,
