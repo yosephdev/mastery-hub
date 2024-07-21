@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView, LogoutView
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from .forms import MentorApplicationForm
 from django.contrib.admin.models import LogEntry, ADDITION
 from django.contrib.contenttypes.models import ContentType
+from .models import Profile, Feedback, Session, Mentorship
 
 from .forms import (
     CustomSignupForm,
@@ -21,7 +22,7 @@ from .forms import (
     ForumPostForm,
     MentorApplicationForm,
 )
-from .models import Profile, Mentorship, Session, Forum, Category
+from .models import Profile, Mentorship, Session, Forum, Category, Feedback
 
 
 # Create your views here.
@@ -99,13 +100,19 @@ def get_user_profile(username):
 
 @login_required
 def view_profile(request, username=None):
-    profile = get_user_profile(username) if username else request.user.profile
-    is_own_profile = request.user.username == username
+    if username:
+        profile = get_object_or_404(Profile, user__username=username)
+        is_own_profile = request.user.username == username
+    else:
+        profile = request.user.profile
+        is_own_profile = True
+
     context = {
         "profile": profile,
         "is_own_profile": is_own_profile,
         "has_profile_picture": bool(profile.profile_picture),
     }
+
     if profile.is_expert:
         return render(request, "masteryhub/view_mentor_profile.html", context)
     else:
@@ -150,32 +157,33 @@ def search_mentors(request):
 
 @login_required
 def request_mentorship(request, mentor_id):
-    mentor = get_object_or_404(User, id=mentor_id)
+    mentor_user = get_object_or_404(User, id=mentor_id)
+    mentor_profile = get_object_or_404(Profile, user=mentor_user)
+    mentee_profile = get_object_or_404(Profile, user=request.user)
 
     if request.method == "POST":
         mentorship, created = Mentorship.objects.get_or_create(
-            mentor=mentor, mentee=request.user, status="pending"
+            mentor=mentor_profile, mentee=mentee_profile, status="pending"
         )
         if created:
-            messages.success(request, f"Mentorship request sent to {mentor.username}")
+            messages.success(request, f"Mentorship request sent to {mentor_user.username}")
         else:
             messages.info(
-                request, f"You already have a pending request with {mentor.username}"
+                request, f"You already have a pending request with {mentor_user.username}"
             )
-        return redirect("view_mentor_profile", username=mentor.username)
+        return redirect("view_mentor_profile", username=mentor_user.username)
 
-    return render(request, "masteryhub/request_mentorship.html", {"mentor": mentor})
-
+    return render(request, "masteryhub/request_mentorship.html", {"mentor": mentor_user})
 
 @login_required
 def manage_mentorship_requests(request):
-    pending_requests = Mentorship.objects.filter(mentor=request.user, status="pending")
+    mentor_profile = Profile.objects.get(user=request.user)
+    pending_requests = Mentorship.objects.filter(mentor=mentor_profile, status="pending")
     return render(
         request,
         "masteryhub/manage_mentorship_requests.html",
         {"pending_requests": pending_requests},
     )
-
 
 def list_mentors(request):
     mentors = Profile.objects.filter(is_expert=True)
@@ -335,6 +343,30 @@ def reply_forum_post(request, post_id):
     )
 
 
+@login_required
+def expert_dashboard(request):
+    expert_profile = Profile.objects.get(user=request.user)
+    participants = Profile.objects.filter(mentorship_areas__icontains=expert_profile.mentorship_areas)
+    feedbacks = Feedback.objects.filter(mentor=expert_profile)
+    sessions = Session.objects.filter(host=expert_profile)
+    
+    labels = []
+    data = []
+    for session in sessions:
+        labels.append(session.date.strftime("%B %Y"))  # Format the date to "Month Year"
+        data.append(1)  
+
+    context = {
+        "username": request.user.username,
+        "participants": participants,
+        "feedbacks": feedbacks,
+        "sessions": sessions,
+        "labels": labels,
+        "data": data,
+    }
+    return render(request, "masteryhub/expert_dashboard.html", context)
+
+
 def become_mentor(request):
     if request.method == "POST":
         form = MentorApplicationForm(request.POST)
@@ -391,13 +423,50 @@ def match_mentor_mentee(mentee):
     return matches
 
 
+@login_required
 def mentor_matching_view(request):
     if request.user.is_authenticated:
         mentee = request.user
         matches = match_mentor_mentee(mentee)
-        return render(request, "matching_results.html", {"matches": matches})
+        return render(request, "masteryhub/matching_results.html", {"matches": matches})
     else:
         return redirect("login")
+
+
+@login_required
+def mentee_dashboard(request):
+    mentee_profile = Profile.objects.get(user=request.user)
+    feedbacks = Feedback.objects.filter(mentee=mentee_profile)
+    sessions = Session.objects.filter(participants=mentee_profile)    
+   
+    labels = []
+    data = []    
+    
+    session_counts = (
+        sessions
+        .values('date__month')
+        .annotate(count=Count('id'))
+        .order_by('date__month')
+    )
+    
+    for entry in session_counts:
+        month_name = entry['date__month']
+        labels.append(f"{month_name:02d}") 
+        data.append(entry['count'])
+    
+    skills = mentee_profile.skills.split(",") if mentee_profile.skills else []
+    goals = mentee_profile.goals.split(",") if mentee_profile.goals else []
+    
+    context = {
+        "username": request.user.username,
+        "mentee_profile": mentee_profile,
+        "feedbacks": feedbacks,
+        "skills": skills,
+        "goals": goals,
+        "labels": labels,
+        "data": data,
+    }
+    return render(request, 'masteryhub/mentee_dashboard.html', context)
 
 
 def pricing(request):
