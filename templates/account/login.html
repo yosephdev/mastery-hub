@@ -7,12 +7,14 @@
 {% block head_title %}{% trans "Sign In" %}{% endblock %}
 
 {% block content %}
-<div class="container d-flex align-items-center justify-content-center">
-  <div class="row justify-content-center">
-    <div class="col-md-12 mx-auto" style="max-width: 500px;">
-      <div class="card shadow">
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+  <div class="row justify-content-center w-100">
+    <div class="col-md-6 col-lg-5">
+      <div class="card shadow-sm">
         <div class="card-body p-5">
-          <h2 class="text-center mb-4">Welcome back!</h2>
+          <h2 class="text-center mb-4">{% trans "Welcome back!" %}</h2>
+          <p class="text-center mb-4">{% trans "Don't have an account?" %} 
+            <a href="{% url 'account_signup' %}">{% trans "Sign up" %}</a></p>
           <hr class="my-4">
 
           {% get_providers as socialaccount_providers %}
@@ -26,14 +28,14 @@
             {% for provider in socialaccount_providers %}
             {% if provider.id == "google" %}
             <a href="{% provider_login_url provider.id process='login' %}" class="btn btn-outline-secondary mx-2">
-              <i class="fab fa-google"></i> Sign in with Google
+              <i class="fab fa-google"></i> {% trans "Sign in with Google" %}
             </a>
             {% endif %}
             {% endfor %}
           </div>
 
           <div class="text-center mb-4">
-            <span class="bg-white px-3">{% trans 'or' %}</span>
+            <span class="bg-white px-3">{% trans "or" %}</span>
           </div>
           {% endif %}
 
@@ -44,17 +46,14 @@
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
             {% endif %}
             <div class="d-grid gap-2 mt-4">
-              <button class="btn btn-primary btn-lg" type="submit">{% trans "Sign In" %}</button>
-              <a class="btn btn-outline-secondary" href="{% url 'home' %}">Back to Home</a>
+              <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>
+              <a class="btn btn-outline-dark btn-block" href="{% url 'home' %}">{% trans "Back to Home" %}</a>
             </div>
           </form>
           <div class="text-center mt-4">
             <a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
           </div>
         </div>
-      </div>
-      <div class="text-center mt-4">
-        <p>Don't have an account? <a href="{% url 'account_signup' %}">Sign up</a></p>
       </div>
     </div>
   </div>
