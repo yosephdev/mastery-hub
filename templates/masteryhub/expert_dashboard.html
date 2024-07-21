@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#dashboard" class="list-group-item list-group-item-action active">Dashboard</a>
+                <a href="#my-sessions" class="list-group-item list-group-item-action">My Sessions</a>
+                <a href="#participants" class="list-group-item list-group-item-action">Participants</a>
+                <a href="#feedback" class="list-group-item list-group-item-action">Feedback</a>
+                <a href="#analytics" class="list-group-item list-group-item-action">Analytics</a>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div id="dashboard" class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Welcome back {{ username }}</h5>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Active participants</th>
+                                <th>Total sessions</th>
+                                <th>Average rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for participant in participants %}
+                            <tr>
+                                <td>{{ participant.user.username }}</td>
+                                <td>{{ participant.sessions.count }}</td>
+                                <td>{{ participant.average_rating }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="my-sessions" class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Upcoming sessions</h5>
+                    <ul class="list-unstyled">
+                        {% for session in sessions %}
+                        <li>{{ session.date }} - {{ session.topic }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div id="feedback" class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Feedback</h5>
+                    <div class="row">
+                        {% for feedback in feedbacks %}
+                        <div class="col-md-3">
+                            <div class="feedback-card">
+                                <p>"{{ feedback.comment }}" - {{ feedback.mentee.user.username }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div id="analytics" class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Performance Insights</h5>                    
+                    <canvas id="performance-graph"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var ctx = document.getElementById('performance-graph').getContext('2d');
+        var performanceGraph = new Chart(ctx, {
+            type: 'bar', 
+            data: {
+                labels: ["January", "February", "March", "April", "May", "June"], 
+                datasets: [{
+                    label: 'Sessions Completed',
+                    data: [5, 10, 3, 8, 6, 7], 
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
