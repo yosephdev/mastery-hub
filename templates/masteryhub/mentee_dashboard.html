@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#dashboard" class="list-group-item list-group-item-action active">Dashboard</a>
+                <a href="#assessment" class="list-group-item list-group-item-action">My Assessment</a>
+                <a href="#goals" class="list-group-item list-group-item-action">My Goals</a>
+                <a href="#feedback" class="list-group-item list-group-item-action">Feedback</a>
+                <a href="#analytics" class="list-group-item list-group-item-action">Analytics</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <!-- Dashboard Overview -->
+            <div id="dashboard" class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Skill Assessment and Tracking</h5>
+                    <p>Welcome, {{ username }}. Here is an overview of your skills, goals, and feedback.</p>
+                </div>
+            </div>
+
+            <!-- Skill Assessment -->
+            <div id="assessment" class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Skill Assessment</h5>
+                    <ul class="list-unstyled">
+                        {% for skill in skills %}
+                        <li><i class="fas fa-chalkboard-teacher"></i> {{ skill }}</li>
+                        {% empty %}
+                        <li>No skills listed</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Goal Setting -->
+            <div id="goal" class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Goal Setting</h5>
+                    <ul class="list-unstyled">
+                        {% for goal in goals %}
+                        <li><i class="fas fa-calendar-alt"></i> {{ goal }}</li>
+                        {% empty %}
+                        <li>No goals listed</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Expert Feedback -->
+            <div id="feedback" class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Expert Feedback</h5>
+                    {% for feedback in feedbacks %}
+                    <div class="mb-2">
+                        <p><strong>"{{ feedback.comment }}"</strong> - {{ feedback.mentor.user.username }}</p>
+                    </div>
+                    {% empty %}
+                    <p>No feedback available</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Progress Tracking -->
+            <div id="progress" class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Progress Tracking</h5>
+                    <div class="row">
+                        {% for progress in mentee_profile.progress_set.all %}
+                        <div class="col-md-6 mb-3">
+                            <div class="progress-card p-3 border rounded">
+                                <h6>{{ progress.name }}</h6>
+                                <p>{{ progress.description }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p>No progress records found</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div id="analytics" class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Performance Insights</h5>
+                    <canvas id="performance-graph" width="400" height="200"></canvas>
+                    <script>
+                        var ctx = document.getElementById('performance-graph').getContext('2d');
+                        var chart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                                datasets: [{
+                                    label: 'Performance',
+                                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                                    borderColor: 'rgba(0, 123, 255, 1)',
+                                    data: [10, 20, 30, 40, 50, 60, 70]
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    x: {
+                                        display: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Month'
+                                        }
+                                    },
+                                    y: {
+                                        display: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Performance'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
