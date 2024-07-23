@@ -622,3 +622,114 @@ def report_concern(request):
 
 def mentor_help(request):
     return render(request, "mentor_help.html")
+
+class CreateCheckoutSessionView(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            session_id = data.get('session_id')
+            session = get_object_or_404(Session, id=session_id)
+            
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=[{
+                    'price_data': {
+                        'currency': 'usd',
+                        'unit_amount': int(session.price * 100),
+                        'product_data': {
+                            'name': session.title,
+                        },
+                    },
+                    'quantity': 1,
+                }],
+                mode='payment',
+                success_url=request.build_absolute_uri(reverse('payment_success')) + f'?session_id={session.id}',
+                cancel_url=request.build_absolute_uri(reverse('payment_cancel')),
+                metadata={'session_id': str(session.id)},
+            )
+            return JsonResponse({'id': checkout_session.id})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+def payment_success(request):
+    session_id = request.GET.get('session_id')
+    if session_id:
+        session = get_object_or_404(Session, id=session_id)
+        user_profile = get_object_or_404(Profile, user=request.user)
+
+        if not session.is_full():
+            session.participants.add(user_profile)
+            session.save()
+            messages.success(request, f"You have successfully registered for the session: {session.title}")
+        else:
+            messages.error(request, "The session is already full.")
+    
+    return redirect('view_session', session_id=session_id)
+
+def payment_cancel(request):
+    messages.warning(request, "Your registration was cancelled.")
+    return redirect('session_list')
+
+@require_POST
+def add_to_bag(request):
+    try:
+        data = json.loads(request.body)
+        session_id = data.get('session_id')
+        title = data.get('title')
+        price = float(data.get('price'))
+
+        bag = request.session.get('bag', [])
+        bag.append({'session': {'id': session_id, 'title': title, 'price': price}})
+        request.session['bag'] = bag
+
+        total = sum(item['session']['price'] for item in bag)
+
+        return JsonResponse({'success': True, 'total': total})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+@login_required
+def view_bag(request):
+    bag = request.session.get('bag', [])
+    total = sum(float(item['session']['price']) for item in bag)
+    
+    context = {
+        'bag_items': bag,
+        'total': total,
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+    }
+    
+    return render(request, 'masteryhub/bag.html', context)
+
+@require_POST
+def remove_from_bag(request):
+    try:
+        data = json.loads(request.body)
+        session_id = data.get('session_id')
+
+        bag = request.session.get('bag', [])
+        bag = [item for item in bag if item['session']['id'] != session_id]
+        request.session['bag'] = bag
+
+        total = sum(item['session']['price'] for item in bag)
+
+        return JsonResponse({'success': True, 'total': total})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+def payment_success(request):
+    session_id = request.GET.get('session_id')
+    if session_id:
+        session = get_object_or_404(Session, id=session_id)
+        user_profile = get_object_or_404(Profile, user=request.user)
+
+        if not session.is_full():
+            session.participants.add(user_profile)
+            session.save()
+            messages.success(request, f"You have successfully registered for the session: {session.title}")
+        else:
+            messages.error(request, "The session is already full.")
+    else:
+        messages.error(request, "Invalid session ID.")
+    
+    return redirect('view_session', session_id=session_id if session_id else 'session_list')

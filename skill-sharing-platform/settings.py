@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 import dj_database_url
 from django.contrib.messages import constants as messages
@@ -61,7 +62,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
-ROOT_URLCONF = "skill_sharing_platform.urls"
+ROOT_URLCONF = "skill-sharing-platform.urls"
 
 TEMPLATES = [
     {
@@ -81,7 +82,7 @@ TEMPLATES = [
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
-WSGI_APPLICATION = "skill_sharing_platform.wsgi.application"
+WSGI_APPLICATION = "skill-sharing-platform.wsgi.application"
 
 # Database configuration
 DATABASES = {
@@ -93,6 +94,15 @@ DATABASES = {
 }
 
 DATABASES["default"]["ENGINE"] = "django.db.backends.postgresql"
+
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
+
 
 # Authentication
 AUTHENTICATION_BACKENDS = [

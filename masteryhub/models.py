@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from datetime import timedelta, datetime
 
 # Create your models here.
 
@@ -41,8 +42,8 @@ class Profile(models.Model):
 class Session(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    date = models.DateTimeField()
-    duration = models.DurationField()
+    date = models.DateTimeField(auto_now_add=True) 
+    duration = models.DurationField(default=timedelta(hours=1))
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     host = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="sessions_hosted"

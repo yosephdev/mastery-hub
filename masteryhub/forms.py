@@ -58,8 +58,7 @@ class SessionForm(forms.ModelForm):
         model = Session
         fields = [
             "title",
-            "description",
-            "date",
+            "description",            
             "duration",
             "category",
             "max_participants",

@@ -44,8 +44,10 @@
                     <div class="session-details">
                         <p>{{ session.classes_count }} class{{ session.classes_count|pluralize }} ({{ session.total_duration }})</p>
                         <p>Available spots: {{ session.max_participants|sub:session.participants.count }}</p>
+                        <p>Price: ${{ session.price }}</p>
                     </div>
-                    <a href="#" class="btn-register">Register</a>
+                    <button onclick="addToBag('{{ session.id }}', '{{ session.title }}', '{{ session.price }}')" class="btn-register">Add to Bag</button>
+                    <!-- <button onclick="registerForSession('{{ session.id }}')" class="btn-register">Register</button> -->
                 </div>
                 {% empty %}
                 <p>No sessions found.</p>
@@ -66,4 +68,40 @@
         </div>
     </div>
 </div>
+
+<script>
+    function addToBag(sessionId, title, price) {
+        fetch('{% url "add_to_bag" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                session_id: sessionId,
+                title: title,
+                price: price
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the bag icon in the navbar
+                const bagLink = document.querySelector('.nav-link .fa-shopping-bag').closest('a');
+                const totalElement = bagLink.querySelector('p.my-0');
+                
+                bagLink.classList.remove('text-black');
+                bagLink.classList.add('text-info', 'font-weight-bold');
+                
+                totalElement.textContent = '$' + data.total.toFixed(2);
+                
+                // Show success message
+                alert('Session added to bag!');
+            } else {
+                alert('Error adding session to bag');
+            }
+        });
+    }
+</script>
+
 {% endblock %}
