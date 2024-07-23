@@ -1,18 +1,26 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
+from django.views import View
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.contrib.auth.views import LoginView, LogoutView
-from django.db.models import Q, Count
-from django.urls import reverse_lazy
+from django.db.models import Q, Count, Sum
+from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.models import User
-from .forms import MentorApplicationForm
+from .forms import MentorApplicationForm, ConcernReportForm
 from django.contrib.admin.models import LogEntry, ADDITION
 from django.contrib.contenttypes.models import ContentType
-from .models import Profile, Feedback, Session, Mentorship
+from .models import Profile, Feedback, Session, Mentorship, Payment
+import stripe
+import json
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 from .forms import (
     CustomSignupForm,
@@ -23,9 +31,6 @@ from .forms import (
     MentorApplicationForm,
 )
 from .models import Profile, Mentorship, Session, Forum, Category, Feedback
-
-
-# Create your views here.
 
 
 def home(request):
@@ -45,9 +50,8 @@ def signup_view(request):
                 request, f"Welcome, {user.username}! Registration successful!"
             )
             return redirect("home")
-        else:
-            for field, error in form.errors.items():
-                messages.error(request, f"{field}: {error}")
+        for field, error in form.errors.items():
+            messages.error(request, f"{field}: {error}")
     else:
         form = CustomSignupForm()
     return render(request, "account/signup.html", {"form": form})
@@ -87,8 +91,7 @@ class CustomLogoutView(LogoutView):
                 self.request.session["message_sent"] = True
             logout(request)
             return HttpResponseRedirect(self.get_next_page())
-        elif request.method == "GET":
-            return self.render_to_response(self.get_context_data())
+        return self.render_to_response(self.get_context_data())
 
     def get_next_page(self):
         return str(self.next_page)
@@ -113,22 +116,21 @@ def view_profile(request, username=None):
         "has_profile_picture": bool(profile.profile_picture),
     }
 
-    if profile.is_expert:
-        return render(request, "masteryhub/view_mentor_profile.html", context)
-    else:
-        return render(request, "masteryhub/view_mentee_profile.html", context)
+    template = (
+        "masteryhub/view_mentor_profile.html"
+        if profile.is_expert
+        else "masteryhub/view_mentee_profile.html"
+    )
+    return render(request, template, context)
 
 
-@login_required
 def view_mentor_profile(request, username):
-    profile = get_object_or_404(Profile, user__username=username, is_expert=True)
-    is_own_profile = request.user.username == username
-    context = {
-        "profile": profile,
-        "is_own_profile": is_own_profile,
-        "has_profile_picture": bool(profile.profile_picture),
-    }
-    return render(request, "masteryhub/view_mentor_profile.html", context)
+    mentor_profile = get_object_or_404(MentorProfile, user__username=username)
+    return render(
+        request,
+        "masteryhub/view_mentor_profile.html",
+        {"mentor_profile": mentor_profile},
+    )
 
 
 @login_required
@@ -143,244 +145,6 @@ def edit_profile(request):
     else:
         form = ProfileForm(instance=profile)
     return render(request, "masteryhub/edit_profile.html", {"form": form})
-
-
-def search_mentors(request):
-    query = request.GET.get("q")
-    mentors = Profile.objects.filter(is_expert=True)
-    if query:
-        mentors = mentors.filter(mentorship_areas__icontains=query)
-    return render(
-        request, "masteryhub/search_mentors.html", {"mentors": mentors, "query": query}
-    )
-
-
-@login_required
-def request_mentorship(request, mentor_id):
-    mentor_user = get_object_or_404(User, id=mentor_id)
-    mentor_profile = get_object_or_404(Profile, user=mentor_user)
-    mentee_profile = get_object_or_404(Profile, user=request.user)
-
-    if request.method == "POST":
-        mentorship, created = Mentorship.objects.get_or_create(
-            mentor=mentor_profile, mentee=mentee_profile, status="pending"
-        )
-        if created:
-            messages.success(
-                request, f"Mentorship request sent to {mentor_user.username}"
-            )
-        else:
-            messages.info(
-                request,
-                f"You already have a pending request with {mentor_user.username}",
-            )
-        return redirect("view_mentor_profile", username=mentor_user.username)
-
-    return render(
-        request, "masteryhub/request_mentorship.html", {"mentor": mentor_user}
-    )
-
-
-@login_required
-def manage_mentorship_requests(request):
-    mentor_profile = Profile.objects.get(user=request.user)
-    pending_requests = Mentorship.objects.filter(
-        mentor=mentor_profile, status="pending"
-    )
-    return render(
-        request,
-        "masteryhub/manage_mentorship_requests.html",
-        {"pending_requests": pending_requests},
-    )
-
-
-def list_mentors(request):
-    mentors = Profile.objects.filter(is_expert=True)
-    return render(request, "masteryhub/list_mentors.html", {"mentors": mentors})
-
-
-@login_required
-def my_mentorships(request):
-    mentorships_as_mentor = Mentorship.objects.filter(mentor=request.user)
-    mentorships_as_mentee = Mentorship.objects.filter(mentee=request.user)
-    context = {
-        "mentorships_as_mentor": mentorships_as_mentor,
-        "mentorships_as_mentee": mentorships_as_mentee,
-    }
-    return render(request, "masteryhub/my_mentorships.html", context)
-
-
-@login_required
-def accept_mentorship(request, mentorship_id):
-    mentorship = get_object_or_404(Mentorship, id=mentorship_id, mentor=request.user)
-    mentorship.status = "accepted"
-    mentorship.start_date = timezone.now().date()
-    mentorship.save()
-    messages.success(request, f"Mentorship with {mentorship.mentee.username} accepted")
-    return redirect("manage_mentorship_requests")
-
-
-@login_required
-def reject_mentorship(request, mentorship_id):
-    mentorship = get_object_or_404(Mentorship, id=mentorship_id, mentor=request.user)
-    mentorship.status = "rejected"
-    mentorship.save()
-    messages.success(request, f"Mentorship with {mentorship.mentee.username} rejected")
-    return redirect("manage_mentorship_requests")
-
-
-def session_list(request):
-    query = request.GET.get("q")
-    selected_category = request.GET.get("category")
-    sessions = Session.objects.filter(status="scheduled")
-    categories = Category.objects.all()
-
-    if query:
-        sessions = sessions.filter(
-            Q(title__icontains=query) | Q(description__icontains=query)
-        )
-
-    if selected_category:
-        sessions = sessions.filter(category__name=selected_category)
-
-    context = {
-        "sessions": sessions,
-        "categories": categories,
-        "selected_category": selected_category,
-    }
-
-    return render(request, "masteryhub/session_list.html", context)
-
-
-@login_required
-def view_session(request, session_id):
-    session = get_object_or_404(Session, id=session_id)
-    return render(request, "masteryhub/view_session.html", {"session": session})
-
-
-@login_required
-def create_session(request):
-    if request.method == "POST":
-        form = SessionForm(request.POST)
-        if form.is_valid():
-            session = form.save(commit=False)
-            session.host = request.user
-            session.save()
-            messages.success(request, "Session created successfully.")
-            return redirect("view_session", session_id=session.id)
-    else:
-        form = SessionForm()
-    return render(request, "masteryhub/create_session.html", {"form": form})
-
-
-@login_required
-def edit_session(request, session_id):
-    session = get_object_or_404(Session, id=session_id, host=request.user)
-    if request.method == "POST":
-        form = SessionForm(request.POST, instance=session)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Session updated successfully.")
-            return redirect("view_session", session_id=session.id)
-    else:
-        form = SessionForm(instance=session)
-    return render(
-        request, "masteryhub/edit_session.html", {"form": form, "session": session}
-    )
-
-
-@login_required
-def session_register(request, session_id):
-    session = get_object_or_404(Session, id=session_id)
-    if session.available_spots > 0:
-        session.participants.add(request.user)
-        messages.success(request, "You have successfully registered for this session.")
-        return redirect("session_list")
-    else:
-        messages.error(request, "This session is full.")
-        return render(request, "masteryhub/session_full.html")
-
-
-@login_required
-def forum_list(request):
-    categories = Category.objects.all()
-    posts = Forum.objects.filter(parent_post=None)
-    return render(
-        request,
-        "masteryhub/forum_list.html",
-        {"categories": categories, "posts": posts},
-    )
-
-
-@login_required
-def create_forum_post(request):
-    if request.method == "POST":
-        form = ForumPostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user.profile
-            post.save()
-            messages.success(request, "Forum post created successfully.")
-            return redirect("view_forum_post", post_id=post.id)
-    else:
-        form = ForumPostForm()
-    return render(request, "masteryhub/create_forum_post.html", {"form": form})
-
-
-@login_required
-def view_forum_post(request, post_id):
-    post = get_object_or_404(Forum, id=post_id)
-    comments = post.comments.all()
-    return render(
-        request, "masteryhub/view_forum_post.html", {"post": post, "comments": comments}
-    )
-
-
-@login_required
-def reply_forum_post(request, post_id):
-    parent_post = get_object_or_404(Forum, id=post_id)
-    if request.method == "POST":
-        form = ForumPostForm(request.POST)
-        if form.is_valid():
-            reply = form.save(commit=False)
-            reply.author = request.user.profile
-            reply.parent_post = parent_post
-            reply.save()
-            messages.success(request, "Reply posted successfully.")
-            return redirect("view_forum_post", post_id=parent_post.id)
-    else:
-        form = ForumPostForm()
-    return render(
-        request,
-        "masteryhub/reply_forum_post.html",
-        {"form": form, "parent_post": parent_post},
-    )
-
-
-@login_required
-def expert_dashboard(request):
-    expert_profile = Profile.objects.get(user=request.user)
-    participants = Profile.objects.filter(
-        mentorship_areas__icontains=expert_profile.mentorship_areas
-    )
-    feedbacks = Feedback.objects.filter(mentor=expert_profile)
-    sessions = Session.objects.filter(host=expert_profile)
-
-    labels = []
-    data = []
-    for session in sessions:
-        labels.append(session.date.strftime("%B %Y"))
-        data.append(1)
-
-    context = {
-        "username": request.user.username,
-        "participants": participants,
-        "feedbacks": feedbacks,
-        "sessions": sessions,
-        "labels": labels,
-        "data": data,
-    }
-    return render(request, "masteryhub/expert_dashboard.html", context)
 
 
 def become_mentor(request):
@@ -439,6 +203,57 @@ def match_mentor_mentee(mentee):
     return matches
 
 
+def search_mentors(request):
+    query = request.GET.get("q")
+    mentors = Profile.objects.filter(is_expert=True)
+    if query:
+        mentors = mentors.filter(mentorship_areas__icontains=query)
+    return render(
+        request, "masteryhub/search_mentors.html", {"mentors": mentors, "query": query}
+    )
+
+
+@login_required
+def request_mentorship(request, mentor_id):
+    mentor_user = get_object_or_404(User, id=mentor_id)
+    mentor_profile = get_object_or_404(Profile, user=mentor_user)
+    mentee_profile = get_object_or_404(Profile, user=request.user)
+
+    if request.method == "POST":
+        mentorship, created = Mentorship.objects.get_or_create(
+            mentor=mentor_profile, mentee=mentee_profile, status="pending"
+        )
+        message = (
+            f"Mentorship request sent to {mentor_user.username}"
+            if created
+            else f"You already have a pending request with {mentor_user.username}"
+        )
+        messages.success(request, message)
+        return redirect("view_mentor_profile", username=mentor_user.username)
+
+    return render(
+        request, "masteryhub/request_mentorship.html", {"mentor": mentor_user}
+    )
+
+
+@login_required
+def manage_mentorship_requests(request):
+    mentor_profile = get_object_or_404(Profile, user=request.user)
+    pending_requests = Mentorship.objects.filter(
+        mentor=mentor_profile, status="pending"
+    )
+    return render(
+        request,
+        "masteryhub/manage_mentorship_requests.html",
+        {"pending_requests": pending_requests},
+    )
+
+
+def list_mentors(request):
+    mentors = Profile.objects.filter(is_expert=True)
+    return render(request, "masteryhub/list_mentors.html", {"mentors": mentors})
+
+
 @login_required
 def mentor_matching_view(request):
     if request.user.is_authenticated:
@@ -447,6 +262,32 @@ def mentor_matching_view(request):
         return render(request, "masteryhub/matching_results.html", {"matches": matches})
     else:
         return redirect("login")
+
+
+@login_required
+def expert_dashboard(request):
+    expert_profile = Profile.objects.get(user=request.user)
+    participants = Profile.objects.filter(
+        mentorship_areas__icontains=expert_profile.mentorship_areas
+    )
+    feedbacks = Feedback.objects.filter(mentor=expert_profile)
+    sessions = Session.objects.filter(host=expert_profile)
+
+    labels = []
+    data = []
+    for session in sessions:
+        labels.append(session.date.strftime("%B %Y"))
+        data.append(1)
+
+    context = {
+        "username": request.user.username,
+        "participants": participants,
+        "feedbacks": feedbacks,
+        "sessions": sessions,
+        "labels": labels,
+        "data": data,
+    }
+    return render(request, "masteryhub/expert_dashboard.html", context)
 
 
 @login_required
@@ -472,6 +313,9 @@ def mentee_dashboard(request):
     skills = mentee_profile.skills.split(",") if mentee_profile.skills else []
     goals = mentee_profile.goals.split(",") if mentee_profile.goals else []
 
+    payments = Payment.objects.filter(user=mentee_profile)
+    grand_total = payments.aggregate(Sum("amount"))["amount__sum"] or 0.00
+
     context = {
         "username": request.user.username,
         "mentee_profile": mentee_profile,
@@ -480,25 +324,301 @@ def mentee_dashboard(request):
         "goals": goals,
         "labels": labels,
         "data": data,
+        "sessions": sessions,
+        "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
+        "grand_total": grand_total,
     }
     return render(request, "masteryhub/mentee_dashboard.html", context)
+
+
+@login_required
+def my_mentorships(request):
+    user_profile = request.user.profile
+    mentorships_as_mentor = Mentorship.objects.filter(mentor=user_profile)
+    mentorships_as_mentee = Mentorship.objects.filter(mentee=user_profile)
+    context = {
+        "mentorships_as_mentor": mentorships_as_mentor,
+        "mentorships_as_mentee": mentorships_as_mentee,
+    }
+    return render(request, "masteryhub/my_mentorships.html", context)
+
+
+@login_required
+def accept_mentorship(request, mentorship_id):
+    mentorship = get_object_or_404(
+        Mentorship, id=mentorship_id, mentor=request.user.profile
+    )
+    mentorship.status = "accepted"
+    mentorship.start_date = timezone.now().date()
+    mentorship.save()
+    messages.success(
+        request, f"Mentorship with {mentorship.mentee.user.username} accepted"
+    )
+    return redirect("manage_mentorship_requests")
+
+
+@login_required
+def reject_mentorship(request, mentorship_id):
+    mentorship = get_object_or_404(
+        Mentorship, id=mentorship_id, mentor=request.user.profile
+    )
+    mentorship.status = "rejected"
+    mentorship.save()
+    messages.success(
+        request, f"Mentorship with {mentorship.mentee.user.username} rejected"
+    )
+    return redirect("manage_mentorship_requests")
+
+
+def session_list(request):
+    """A view that renders the list of sessions with optional filtering."""
+    query = request.GET.get("q")
+    selected_category = request.GET.get("category")
+    
+    # Start with all scheduled sessions
+    sessions = Session.objects.filter(status="scheduled")
+    
+    # Apply search query filter
+    if query:
+        sessions = sessions.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )
+    
+    # Apply category filter
+    if selected_category:
+        sessions = sessions.filter(category__name=selected_category)
+    
+    # Fetch all categories for the filter dropdown
+    categories = Category.objects.all()
+    
+    # Optional: Debugging information (use logging in production)
+    for session in sessions:
+        print(f"Session ID: {session.id}, Price: {session.price}")
+
+    context = {
+        "sessions": sessions,
+        "categories": categories,
+        "selected_category": selected_category,
+        "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
+    }
+    
+    return render(request, "masteryhub/session_list.html", context)
+
+
+@login_required
+def view_session(request, session_id):
+    session = get_object_or_404(Session, id=session_id)
+    context = {
+        "session": session,
+        "is_participant": request.user.profile in session.participants.all(),
+    }
+    return render(request, "masteryhub/view_session.html", context)
+
+
+@login_required
+def create_session(request):
+    if request.method == "POST":
+        form = SessionForm(request.POST)
+        if form.is_valid():
+            session = form.save(commit=False)
+            session.host = request.user
+            session.price = form.cleaned_data["price"]
+            session.save()
+            messages.success(request, "Session created successfully.")
+            return redirect("view_session", session_id=session.id)
+    else:
+        form = SessionForm()
+    return render(request, "masteryhub/create_session.html", {"form": form})
+
+
+@login_required
+def edit_session(request, session_id):
+    session = get_object_or_404(Session, id=session_id, host=request.user)
+    if request.method == "POST":
+        form = SessionForm(request.POST, instance=session)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Session updated successfully.")
+            return redirect("view_session", session_id=session.id)
+    else:
+        form = SessionForm(instance=session)
+    return render(request, "masteryhub/edit_session.html", {"form": form})
+
+
+@login_required
+def delete_session(request, session_id):
+    session = get_object_or_404(Session, id=session_id, host=request.user)
+    if request.method == "POST":
+        session.delete()
+        messages.success(request, "Session deleted successfully.")
+        return redirect("session_list")
+    return render(request, "masteryhub/delete_session.html", {"session": session})
+
+
+@login_required
+def create_feedback(request, session_id):
+    session = get_object_or_404(Session, id=session_id)
+    if request.method == "POST":
+        feedback_content = request.POST.get("feedback")
+        Feedback.objects.create(
+            session=session, user=request.user, content=feedback_content
+        )
+        messages.success(request, "Thank you for your feedback!")
+        return redirect("view_session", session_id=session_id)
+    return render(request, "masteryhub/create_feedback.html", {"session": session})
+
+
+def forum_posts(request):
+    posts = Forum.objects.all()
+    return render(request, "masteryhub/forum_posts.html", {"posts": posts})
+
+
+@login_required
+def forum_list(request):
+    categories = Category.objects.all()
+    posts = Forum.objects.filter(parent_post=None)
+    return render(
+        request,
+        "masteryhub/forum_list.html",
+        {"categories": categories, "posts": posts},
+    )
+
+
+@login_required
+def create_forum_post(request):
+    if request.method == "POST":
+        form = ForumPostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            messages.success(request, "Forum post created successfully.")
+            return redirect("forum_posts")
+    else:
+        form = ForumPostForm()
+    return render(request, "masteryhub/create_forum_post.html", {"form": form})
+
+
+@login_required
+@login_required
+def view_forum_post(request, post_id):
+    post = get_object_or_404(Forum, id=post_id)
+    comments = post.comments.all()
+    return render(
+        request, "masteryhub/view_forum_post.html", {"post": post, "comments": comments}
+    )
+
+
+@login_required
+def reply_forum_post(request, post_id):
+    parent_post = get_object_or_404(Forum, id=post_id)
+    if request.method == "POST":
+        form = ForumPostForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.author = request.user.profile
+            reply.parent_post = parent_post
+            reply.save()
+            messages.success(request, "Reply posted successfully.")
+            return redirect("view_forum_post", post_id=parent_post.id)
+    else:
+        form = ForumPostForm()
+    return render(
+        request,
+        "masteryhub/reply_forum_post.html",
+        {"form": form, "parent_post": parent_post},
+    )
+
+
+@login_required
+def edit_forum_post(request, post_id):
+    post = get_object_or_404(Forum, id=post_id, author=request.user)
+    if request.method == "POST":
+        form = ForumPostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Forum post updated successfully.")
+            return redirect("forum_posts")
+    else:
+        form = ForumPostForm(instance=post)
+    return render(request, "masteryhub/edit_forum_post.html", {"form": form})
+
+
+@login_required
+def delete_forum_post(request, post_id):
+    post = get_object_or_404(Forum, id=post_id, author=request.user)
+    if request.method == "POST":
+        post.delete()
+        messages.success(request, "Forum post deleted successfully.")
+        return redirect("forum_posts")
+    return render(request, "masteryhub/delete_forum_post.html", {"post": post})
+
+
+@login_required
+def book_session(request, session_id):
+    session = get_object_or_404(Session, id=session_id)
+    user_profile = request.user.profile
+
+    if session.is_full():
+        messages.error(request, "This session is already full.")
+    elif user_profile in session.participants.all():
+        messages.warning(request, "You are already booked for this session.")
+    else:
+        try:
+            price_in_cents = int(session.price * 100)
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=["card"],
+                line_items=[
+                    {
+                        "price_data": {
+                            "currency": "usd",
+                            "unit_amount": int(session.price * 100),
+                            "product_data": {
+                                "name": session.title,
+                                "description": session.description,
+                            },
+                        },
+                        "quantity": 1,
+                    }
+                ],
+                mode="payment",
+                success_url=request.build_absolute_uri(reverse("payment_success"))
+                + f"?session_id={{CHECKOUT_SESSION_ID}}&django_session_id={session.id}",
+                cancel_url=request.build_absolute_uri(reverse("payment_cancel")),
+                client_reference_id=str(session.id),
+                customer_email=request.user.email,
+            )
+            return redirect(checkout_session.url, code=303)
+        except Exception as e:
+            messages.error(
+                request, "Unable to process booking. Please try again later."
+            )
+            return redirect("session_list")
+
+    return redirect("session_list")
 
 
 def pricing(request):
     return render(request, "masteryhub/pricing.html")
 
-
-def forums(request):
-    return render(request, "masteryhub/forum_list.html")
+def mentor_rules(request):
+    return render(request, "masteryhub/mentor_rules.html")
 
 
 def report_concern(request):
-    return render(request, "masteryhub/report_concern.html")
+    if request.method == "POST":
+        form = ConcernReportForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, "Your concern has been reported. We will review it shortly."
+            )
+            return redirect("home")
+    else:
+        form = ConcernReportForm()
+
+    return render(request, "masteryhub/report_concern.html", {"form": form})
 
 
 def mentor_help(request):
-    return render(request, "masteryhub/mentor_help.html")
-
-
-def mentor_rules(request):
-    return render(request, "masteryhub/mentor_rules.html")
+    return render(request, "mentor_help.html")

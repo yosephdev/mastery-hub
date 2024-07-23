@@ -33,12 +33,17 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
+    class Meta:
+        unique_together = ("user",)
+        indexes = [models.Index(fields=["user"])]
+
 
 class Session(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     date = models.DateTimeField()
     duration = models.DurationField()
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     host = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="sessions_hosted"
     )
@@ -66,17 +71,16 @@ class Session(models.Model):
     def current_participants(self):
         return self.participants.count()
 
+    def is_full(self):
+        return self.current_participants >= self.max_participants
+
     @property
     def available_spots(self):
         return self.max_participants - self.current_participants
 
     @property
-    def classes_count(self):
-        return 1
-
-    @property
     def total_duration(self):
-        return self.duration * self.classes_count
+        return self.duration
 
 
 class Category(models.Model):
@@ -162,3 +166,19 @@ class Feedback(models.Model):
     )
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class ConcernReport(models.Model):
+    CATEGORY_CHOICES = [
+        ("inappropriate_behavior", "Inappropriate Behavior"),
+        ("technical_issue", "Technical Issue"),
+        ("content_quality", "Content Quality"),
+        ("other", "Other"),
+    ]
+
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.get_category_display()} - {self.created_at}"

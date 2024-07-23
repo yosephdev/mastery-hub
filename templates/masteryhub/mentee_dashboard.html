@@ -25,6 +25,19 @@
                 </div>
             </div>
 
+            <!-- Book Session Button -->
+            {% for session in sessions %}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">{{ session.title }}</h5>
+                    <p>{{ session.description }}</p>
+                    <a href="{% url 'book_session' session_id=session.id %}" class="btn btn-primary">Book Session</a>
+                </div>
+            </div>
+            {% empty %}
+            <p>No sessions available</p>
+            {% endfor %}
+
             <!-- Skill Assessment -->
             <div id="assessment" class="card mb-4">
                 <div class="card-body">
@@ -86,6 +99,7 @@
                 </div>
             </div>
 
+            <!-- Performance Insights -->
             <div id="analytics" class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Performance Insights</h5>
@@ -128,4 +142,5 @@
             </div>
         </div>
     </div>
-    {% endblock %}
+</div>
+{% endblock %}

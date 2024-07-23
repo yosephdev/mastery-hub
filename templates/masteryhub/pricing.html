@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Our Pricing Plans</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="text-center">Basic</h3>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title pricing-card-title text-center">$9.99<small class="text-muted">/ mo</small></h2>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Access to 5 sessions per month</li>
+                        <li>Basic mentorship features</li>
+                        <li>Email support</li>
+                    </ul>
+                    <button type="button" class="btn btn-lg btn-block btn-outline-primary">Sign up for Basic</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="text-center">Pro</h3>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title pricing-card-title text-center">$19.99<small class="text-muted">/ mo</small></h2>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Access to 15 sessions per month</li>
+                        <li>Advanced mentorship features</li>
+                        <li>Priority email support</li>
+                    </ul>
+                    <button type="button" class="btn btn-lg btn-block btn-success">Sign up for Pro</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="text-center">Enterprise</h3>
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title pricing-card-title text-center">$49.99<small class="text-muted">/ mo</small></h2>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Unlimited access to sessions</li>
+                        <li>Premium mentorship features</li>
+                        <li>24/7 phone and email support</li>
+                    </ul>
+                    <button type="button" class="btn btn-lg btn-block btn-black">Sign up for Enterprise</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
