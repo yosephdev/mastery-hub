@@ -183,3 +183,12 @@ class ConcernReport(models.Model):
 
     def __str__(self):
         return f"{self.get_category_display()} - {self.created_at}"
+
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
