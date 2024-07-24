@@ -125,11 +125,11 @@ def view_profile(request, username=None):
 
 
 def view_mentor_profile(request, username):
-    mentor_profile = get_object_or_404(MentorProfile, user__username=username)
+    mentor_profile = get_object_or_404(Profile, user__username=username, is_expert=True)
     return render(
         request,
         "masteryhub/view_mentor_profile.html",
-        {"mentor_profile": mentor_profile},
+        {"mentor_profile": mentor_profile}
     )
 
 
