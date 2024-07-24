@@ -1,5 +1,5 @@
 """
-ASGI config for skill_sharing_platform project.
+ASGI config for skill-sharing-platform project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

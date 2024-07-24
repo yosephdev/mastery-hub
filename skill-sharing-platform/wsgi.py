@@ -1,5 +1,5 @@
 """
-WSGI config for skill_sharing_platform project.
+WSGI config for skill-sharing-platform project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
