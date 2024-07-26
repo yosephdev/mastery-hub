@@ -62,7 +62,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
-ROOT_URLCONF = "skill-sharing-platform.urls"
+ROOT_URLCONF = "skill_sharing_platform.urls"
 
 TEMPLATES = [
     {
@@ -75,6 +75,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "masteryhub.context_processors.cart_total",
             ],
         },
     },
@@ -82,7 +83,7 @@ TEMPLATES = [
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
-WSGI_APPLICATION = "skill-sharing-platform.wsgi.application"
+WSGI_APPLICATION = "skill_sharing_platform.wsgi.application"
 
 # Database configuration
 DATABASES = {

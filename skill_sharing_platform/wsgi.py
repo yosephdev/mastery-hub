@@ -1,5 +1,5 @@
 """
-WSGI config for skill-sharing-platform project.
+WSGI config for skill_sharing_platform project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'skill-sharing-platform.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'skill_sharing_platform.settings')
 
 application = get_wsgi_application()

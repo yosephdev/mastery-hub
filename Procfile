@@ -1,4 +1,4 @@
-web: gunicorn skill-sharing-platform.wsgi --log-file -
+web: gunicorn skill_sharing_platform.wsgi --log-file -
 release: python manage.py migrate
 
 
