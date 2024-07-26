@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+
+<div class="container mt-5">
+    <h2 class="logo-font mb-4">Your Cart</h2>
+    {% if cart.cartitem_set.exists %}
+        <div class="card">
+            <div class="card-body">
+                <ul class="list-group mb-3">
+                    {% for item in cart.cartitem_set.all %}
+                        <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center lh-condensed">
+                            <div class="mb-3 mb-md-0">
+                                <h6 class="my-0">{{ item.session.title }}</h6>
+                                <small class="text-muted">Quantity: {{ item.quantity }}</small>
+                            </div>
+                            <div class="btn-group mb-3 mb-md-0" role="group" aria-label="Adjust quantity">
+                                <form action="{% url 'decrease_quantity' item.id %}" method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-black btn-dark">-</button>
+                                </form>
+                                <form action="{% url 'increase_quantity' item.id %}" method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-black btn-dark">+</button>
+                                </form>
+                                <form action="{% url 'remove_from_cart' item.id %}" method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                            </div>
+                            <span class="text-muted">${{ item.session.price }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <div class="d-flex justify-content-between">
+                    <h5>Total:</h5>
+                    <h5>${{ grand_total|floatformat:2 }}</h5>
+                </div>
+                <a href="{% url 'checkout' %}" class="btn btn-dark btn-block mt-4">Proceed to Checkout</a>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-muted">Your cart is empty.</p>
+        <a href="{% url 'session_list' %}" class="btn btn-dark">Browse Sessions</a>
+    {% endif %}
+</div>
+
+{% endblock %}

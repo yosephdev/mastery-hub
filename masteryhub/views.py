@@ -1,6 +1,7 @@
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.views import View
 from django.conf import settings
+from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
@@ -16,9 +17,23 @@ from django.contrib.auth.models import User
 from .forms import MentorApplicationForm, ConcernReportForm
 from django.contrib.admin.models import LogEntry, ADDITION
 from django.contrib.contenttypes.models import ContentType
-from .models import Profile, Feedback, Session, Mentorship, Payment
+from .models import (
+    Profile,
+    Feedback,
+    Session,
+    Category,
+    Mentorship,
+    Payment,
+    Cart,
+    CartItem,
+    Order,
+)
+from .forms import OrderForm
 import stripe
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -34,10 +49,12 @@ from .models import Profile, Mentorship, Session, Forum, Category, Feedback
 
 
 def home(request):
+    """A view that handles the home page."""
     return render(request, "masteryhub/index.html")
 
 
 def signup_view(request):
+    """A view that handles the sign up."""
     if request.method == "POST":
         form = CustomSignupForm(request.POST)
         if form.is_valid():
@@ -58,6 +75,8 @@ def signup_view(request):
 
 
 class CustomLoginView(LoginView):
+    """A view that handles the login."""
+
     template_name = "account/login.html"
 
     def form_valid(self, form):
@@ -81,6 +100,8 @@ class CustomLoginView(LoginView):
 
 
 class CustomLogoutView(LogoutView):
+    """A view that handles the logout."""
+
     template_name = "account/logout.html"
     next_page = reverse_lazy("home")
 
@@ -98,11 +119,13 @@ class CustomLogoutView(LogoutView):
 
 
 def get_user_profile(username):
+    """A view that handles the get user profile."""
     return get_object_or_404(Profile, user__username=username)
 
 
 @login_required
 def view_profile(request, username=None):
+    """A view that handles the view profile."""
     if username:
         profile = get_object_or_404(Profile, user__username=username)
         is_own_profile = request.user.username == username
@@ -125,16 +148,21 @@ def view_profile(request, username=None):
 
 
 def view_mentor_profile(request, username):
+    """A view that handles the view mentor pofile."""
     profile = get_object_or_404(Profile, user__username=username, is_expert=True)
-    is_own_profile = request.user.username == username if request.user.is_authenticated else False
+    is_own_profile = (
+        request.user.username == username if request.user.is_authenticated else False
+    )
     context = {
-        'profile': profile,
-        'is_own_profile': is_own_profile,
+        "profile": profile,
+        "is_own_profile": is_own_profile,
     }
-    return render(request, 'masteryhub/view_mentor_profile.html', context)
+    return render(request, "masteryhub/view_mentor_profile.html", context)
+
 
 @login_required
 def edit_profile(request):
+    """A view that handles the edit profile."""
     profile = request.user.profile
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=profile)
@@ -148,6 +176,7 @@ def edit_profile(request):
 
 
 def become_mentor(request):
+    """A view that handles the become mentor."""
     if request.method == "POST":
         form = MentorApplicationForm(request.POST)
         if form.is_valid():
@@ -175,6 +204,7 @@ def become_mentor(request):
 
 
 def match_mentor_mentee(mentee):
+    """A view that handles the mentee-mentor match."""
     mentee_profile = Profile.objects.get(user=mentee)
     mentee_skills = set(mentee_profile.skills.split(","))
     mentee_goals = set(mentee_profile.goals.split(","))
@@ -204,6 +234,7 @@ def match_mentor_mentee(mentee):
 
 
 def search_mentors(request):
+    """A view that handles the mentor searching."""
     query = request.GET.get("q")
     mentors = Profile.objects.filter(is_expert=True)
     if query:
@@ -215,6 +246,7 @@ def search_mentors(request):
 
 @login_required
 def request_mentorship(request, mentor_id):
+    """A view that handles the mentorship request."""
     mentor_user = get_object_or_404(User, id=mentor_id)
     mentor_profile = get_object_or_404(Profile, user=mentor_user)
     mentee_profile = get_object_or_404(Profile, user=request.user)
@@ -238,6 +270,7 @@ def request_mentorship(request, mentor_id):
 
 @login_required
 def manage_mentorship_requests(request):
+    """A view that handles the mentroship request management."""
     mentor_profile = get_object_or_404(Profile, user=request.user)
     pending_requests = Mentorship.objects.filter(
         mentor=mentor_profile, status="pending"
@@ -250,12 +283,14 @@ def manage_mentorship_requests(request):
 
 
 def list_mentors(request):
+    """A view that handles the mentor list."""
     mentors = Profile.objects.filter(is_expert=True)
     return render(request, "masteryhub/list_mentors.html", {"mentors": mentors})
 
 
 @login_required
 def mentor_matching_view(request):
+    """A view that handles the mentor matching."""
     if request.user.is_authenticated:
         mentee = request.user
         matches = match_mentor_mentee(mentee)
@@ -266,6 +301,7 @@ def mentor_matching_view(request):
 
 @login_required
 def expert_dashboard(request):
+    """A view that handles the expert dashboard."""
     expert_profile = Profile.objects.get(user=request.user)
     participants = Profile.objects.filter(
         mentorship_areas__icontains=expert_profile.mentorship_areas
@@ -292,6 +328,7 @@ def expert_dashboard(request):
 
 @login_required
 def mentee_dashboard(request):
+    """A view that handles the mentee dashboard."""
     mentee_profile = Profile.objects.get(user=request.user)
     feedbacks = Feedback.objects.filter(mentee=mentee_profile)
     sessions = Session.objects.filter(participants=mentee_profile)
@@ -333,6 +370,7 @@ def mentee_dashboard(request):
 
 @login_required
 def my_mentorships(request):
+    """A view that handles my mentorship."""
     user_profile = request.user.profile
     mentorships_as_mentor = Mentorship.objects.filter(mentor=user_profile)
     mentorships_as_mentee = Mentorship.objects.filter(mentee=user_profile)
@@ -345,6 +383,7 @@ def my_mentorships(request):
 
 @login_required
 def accept_mentorship(request, mentorship_id):
+    """A view that handles the accept mentorship."""
     mentorship = get_object_or_404(
         Mentorship, id=mentorship_id, mentor=request.user.profile
     )
@@ -359,6 +398,7 @@ def accept_mentorship(request, mentorship_id):
 
 @login_required
 def reject_mentorship(request, mentorship_id):
+    """A view that handles the reject mentorship."""
     mentorship = get_object_or_404(
         Mentorship, id=mentorship_id, mentor=request.user.profile
     )
@@ -374,24 +414,19 @@ def session_list(request):
     """A view that renders the list of sessions with optional filtering."""
     query = request.GET.get("q")
     selected_category = request.GET.get("category")
-    
-    # Start with all scheduled sessions
+
     sessions = Session.objects.filter(status="scheduled")
-    
-    # Apply search query filter
+
     if query:
         sessions = sessions.filter(
             Q(title__icontains=query) | Q(description__icontains=query)
         )
-    
-    # Apply category filter
+
     if selected_category:
         sessions = sessions.filter(category__name=selected_category)
-    
-    # Fetch all categories for the filter dropdown
+
     categories = Category.objects.all()
-    
-    # Optional: Debugging information (use logging in production)
+
     for session in sessions:
         print(f"Session ID: {session.id}, Price: {session.price}")
 
@@ -401,7 +436,7 @@ def session_list(request):
         "selected_category": selected_category,
         "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
     }
-    
+
     return render(request, "masteryhub/session_list.html", context)
 
 
@@ -475,6 +510,7 @@ def forum_posts(request):
 
 @login_required
 def forum_list(request):
+    """A view that handles the forum list."""
     categories = Category.objects.all()
     posts = Forum.objects.filter(parent_post=None)
     return render(
@@ -486,6 +522,7 @@ def forum_list(request):
 
 @login_required
 def create_forum_post(request):
+    """A view that handles the create forum post."""
     if request.method == "POST":
         form = ForumPostForm(request.POST)
         if form.is_valid():
@@ -502,6 +539,7 @@ def create_forum_post(request):
 @login_required
 @login_required
 def view_forum_post(request, post_id):
+    """A view that handles the view forum post."""
     post = get_object_or_404(Forum, id=post_id)
     comments = post.comments.all()
     return render(
@@ -511,6 +549,7 @@ def view_forum_post(request, post_id):
 
 @login_required
 def reply_forum_post(request, post_id):
+    """A view that handles the reply forum post."""
     parent_post = get_object_or_404(Forum, id=post_id)
     if request.method == "POST":
         form = ForumPostForm(request.POST)
@@ -532,6 +571,7 @@ def reply_forum_post(request, post_id):
 
 @login_required
 def edit_forum_post(request, post_id):
+    """A view that handles the edit forum post."""
     post = get_object_or_404(Forum, id=post_id, author=request.user)
     if request.method == "POST":
         form = ForumPostForm(request.POST, instance=post)
@@ -546,6 +586,7 @@ def edit_forum_post(request, post_id):
 
 @login_required
 def delete_forum_post(request, post_id):
+    """A view that handles the delete forum post."""
     post = get_object_or_404(Forum, id=post_id, author=request.user)
     if request.method == "POST":
         post.delete()
@@ -556,6 +597,7 @@ def delete_forum_post(request, post_id):
 
 @login_required
 def book_session(request, session_id):
+    """A view that handles the session booking."""
     session = get_object_or_404(Session, id=session_id)
     user_profile = request.user.profile
 
@@ -599,13 +641,17 @@ def book_session(request, session_id):
 
 
 def pricing(request):
+    """A view that handles pricing."""
     return render(request, "masteryhub/pricing.html")
 
+
 def mentor_rules(request):
+    """A view that handles the mentor rules."""
     return render(request, "masteryhub/mentor_rules.html")
 
 
 def report_concern(request):
+    """A view that handles the report concern."""
     if request.method == "POST":
         form = ConcernReportForm(request.POST)
         if form.is_valid():
@@ -621,115 +667,227 @@ def report_concern(request):
 
 
 def mentor_help(request):
-    return render(request, "mentor_help.html")
+    return render(request, "masteryhub/mentor_help.html")
 
-class CreateCheckoutSessionView(View):
-    def post(self, request, *args, **kwargs):
-        try:
-            data = json.loads(request.body)
-            session_id = data.get('session_id')
-            session = get_object_or_404(Session, id=session_id)
-            
-            checkout_session = stripe.checkout.Session.create(
-                payment_method_types=['card'],
-                line_items=[{
-                    'price_data': {
-                        'currency': 'usd',
-                        'unit_amount': int(session.price * 100),
-                        'product_data': {
-                            'name': session.title,
-                        },
-                    },
-                    'quantity': 1,
-                }],
-                mode='payment',
-                success_url=request.build_absolute_uri(reverse('payment_success')) + f'?session_id={session.id}',
-                cancel_url=request.build_absolute_uri(reverse('payment_cancel')),
-                metadata={'session_id': str(session.id)},
-            )
-            return JsonResponse({'id': checkout_session.id})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-def payment_success(request):
-    session_id = request.GET.get('session_id')
-    if session_id:
-        session = get_object_or_404(Session, id=session_id)
-        user_profile = get_object_or_404(Profile, user=request.user)
-
-        if not session.is_full():
-            session.participants.add(user_profile)
-            session.save()
-            messages.success(request, f"You have successfully registered for the session: {session.title}")
-        else:
-            messages.error(request, "The session is already full.")
-    
-    return redirect('view_session', session_id=session_id)
-
-def payment_cancel(request):
-    messages.warning(request, "Your registration was cancelled.")
-    return redirect('session_list')
-
-@require_POST
-def add_to_bag(request):
-    try:
-        data = json.loads(request.body)
-        session_id = data.get('session_id')
-        title = data.get('title')
-        price = float(data.get('price'))
-
-        bag = request.session.get('bag', [])
-        bag.append({'session': {'id': session_id, 'title': title, 'price': price}})
-        request.session['bag'] = bag
-
-        total = sum(item['session']['price'] for item in bag)
-
-        return JsonResponse({'success': True, 'total': total})
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=400)
 
 @login_required
-def view_bag(request):
-    bag = request.session.get('bag', [])
-    total = sum(float(item['session']['price']) for item in bag)
-    
+def add_to_cart(request, session_id):
+    """A view that adds a session to the user's cart."""
+    if request.method == "POST":
+        session = get_object_or_404(Session, id=session_id)
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, session=session)
+        if not created:
+            cart_item.quantity += 1
+            cart_item.save()
+        total = sum(
+            item.session.price * item.quantity for item in cart.cartitem_set.all()
+        )
+        return JsonResponse({"success": True, "total": float(total)})
+    return JsonResponse({"success": False})
+
+
+@login_required
+def view_cart(request):
+    """A view that renders the user's cart."""
+    cart = get_object_or_404(Cart, user=request.user)
+    return render(request, "masteryhub/cart.html", {"cart": cart})
+
+
+@login_required
+def checkout(request):
+    """A view that handles the checkout process."""
+    cart = get_object_or_404(Cart, user=request.user)
+    grand_total = sum(
+        item.session.price * item.quantity for item in cart.cartitem_set.all()
+    )
+
+    if request.method == "POST":
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            full_name = form.cleaned_data["full_name"]
+            street_address1 = form.cleaned_data["address"]
+            street_address2 = form.cleaned_data.get("address2", "")
+            county = form.cleaned_data.get("county", "")
+            town_or_city = form.cleaned_data["city"]
+            postcode = form.cleaned_data.get("postcode", "")
+            country = form.cleaned_data["country"]
+            phone_number = request.POST.get("phone_number", "")
+
+            order = Order(
+                user=request.user,
+                order_number="ORD" + str(int(grand_total * 1000)),
+                full_name=full_name,
+                street_address1=street_address1,
+                street_address2=street_address2,
+                county=county,
+                town_or_city=town_or_city,
+                postcode=postcode,
+                country=country,
+                phone_number=phone_number,
+                order_total=grand_total,
+                delivery_cost=0,
+                grand_total=grand_total,
+            )
+            order.save()
+
+            payment = Payment.objects.create(
+                user=request.user.profile, amount=grand_total, session=None
+            )
+
+            cart.cartitem_set.all().delete()
+
+            send_mail(
+                "Purchase Confirmation",
+                "Thank you for your purchase!",
+                settings.DEFAULT_FROM_EMAIL,
+                [form.cleaned_data["email"]],
+                fail_silently=False,
+            )
+
+            return redirect("checkout_success", order_number=order.order_number)
+    else:
+        form = OrderForm()
+        intent = stripe.PaymentIntent.create(
+            amount=int(grand_total * 100),
+            currency="usd",
+            metadata={"integration_check": "accept_a_payment"},
+        )
+        client_secret = intent.client_secret
+
     context = {
-        'bag_items': bag,
-        'total': total,
-        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+        "order_form": form,
+        "client_secret": client_secret,
+        "cart": cart,
+        "grand_total": grand_total,
+        "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
     }
-    
-    return render(request, 'masteryhub/bag.html', context)
+    return render(request, "masteryhub/checkout.html", context)
+
+
+@login_required
+def create_checkout_session(request):
+    """A view that creates a Stripe Checkout session."""
+    cart = get_object_or_404(Cart, user=request.user)
+    line_items = []
+
+    for item in cart.cartitem_set.all():
+        line_items.append(
+            {
+                "price_data": {
+                    "currency": "usd",
+                    "product_data": {
+                        "name": item.session.title,
+                    },
+                    "unit_amount": int(item.session.price * 100),
+                },
+                "quantity": item.quantity,
+            }
+        )
+
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=line_items,
+            mode="payment",
+            success_url=request.build_absolute_uri("/masteryhub/checkout_success/"),
+            cancel_url=request.build_absolute_uri("/masteryhub/payment_cancel/"),
+        )
+    except stripe.error.InvalidRequestError as e:
+        return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"id": checkout_session.id})
+
+
+@login_required
+def payment_cancel(request):
+    """A view that handles the payment cancellation."""
+    return render(request, "masteryhub/payment_cancel.html")
+
+
+def complete_purchase(request):
+    """A view that handles the purhase complete."""
+    return render(request, "masteryhub/purchase_complete.html")
+
 
 @require_POST
-def remove_from_bag(request):
+def cache_checkout_data(request):
     try:
-        data = json.loads(request.body)
-        session_id = data.get('session_id')
+        client_secret = request.POST.get("client_secret")
+        if not client_secret:
+            raise ValueError("Missing client_secret")
 
-        bag = request.session.get('bag', [])
-        bag = [item for item in bag if item['session']['id'] != session_id]
-        request.session['bag'] = bag
-
-        total = sum(item['session']['price'] for item in bag)
-
-        return JsonResponse({'success': True, 'total': total})
+        pid = client_secret.split("_secret")[0]
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        stripe.PaymentIntent.modify(
+            pid,
+            metadata={
+                "cart": json.dumps(request.session.get("cart", {})),
+                "save_info": request.POST.get("save_info"),
+                "username": request.user.username,
+            },
+        )
+        return HttpResponse(status=200)
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=400)
+        logger.error(f"Error modifying PaymentIntent: {e}")
+        messages.error(
+            request,
+            "Sorry, your payment cannot be processed right now. Please try again later.",
+        )
+        return HttpResponse(content=str(e), status=400)
 
-def payment_success(request):
-    session_id = request.GET.get('session_id')
-    if session_id:
-        session = get_object_or_404(Session, id=session_id)
-        user_profile = get_object_or_404(Profile, user=request.user)
 
-        if not session.is_full():
-            session.participants.add(user_profile)
-            session.save()
-            messages.success(request, f"You have successfully registered for the session: {session.title}")
-        else:
-            messages.error(request, "The session is already full.")
-    else:
-        messages.error(request, "Invalid session ID.")
-    
-    return redirect('view_session', session_id=session_id if session_id else 'session_list')
+def checkout_view(request):
+    cart = get_cart(request)
+    total = int(cart.total * 100)
+
+    payment_intent = stripe.PaymentIntent.create(
+        amount=total,
+        currency="usd",
+    )
+
+    return render(
+        request,
+        "masteryhub/checkout.html",
+        {
+            "client_secret": payment_intent.client_secret,
+            "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
+            "cart": cart,
+            "grand_total": cart.total,
+        },
+    )
+
+
+@login_required
+def checkout_success(request, order_number):
+    """Handle successful checkouts."""
+    order = get_object_or_404(Order, order_number=order_number)
+    context = {
+        "order": order,
+        "from_profile": False,
+    }
+    return render(request, "masteryhub/checkout_success.html", context)
+
+
+@require_POST
+def increase_quantity(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id)
+    cart_item.quantity += 1
+    cart_item.save()
+    return redirect("view_cart")
+
+
+@require_POST
+def decrease_quantity(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id)
+    if cart_item.quantity > 1:
+        cart_item.quantity -= 1
+        cart_item.save()
+    return redirect("view_cart")
+
+
+@require_POST
+def remove_from_cart(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id)
+    cart_item.delete()
+    return redirect("view_cart")

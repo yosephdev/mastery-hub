@@ -1,6 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
-    setupMessageHandling();
-
+document.addEventListener('DOMContentLoaded', function () {  
     setupInfiniteScroll();
     setupDynamicSearch();
     setupLazyLoading();
@@ -8,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setupDarkMode();
     setupToggleVisibility();
     setupProfilePicturePreview();
-    setupSmoothScroll();
+    setupSmoothScroll();   
 });
 
 function setupInfiniteScroll() {

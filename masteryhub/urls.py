@@ -4,12 +4,6 @@ from .views import (
     CustomLoginView,
     CustomLogoutView,
     expert_dashboard,
-    CreateCheckoutSessionView,
-    payment_success,
-    payment_cancel,
-    add_to_bag,
-    view_bag,
-    remove_from_bag,
     mentee_dashboard,
     mentor_matching_view,
     view_profile,
@@ -41,6 +35,9 @@ from .views import (
     create_feedback,
     forum_posts,
     pricing,
+    increase_quantity,
+    decrease_quantity,
+    remove_from_cart,
 )
 from .admin_views import admin_dashboard
 
@@ -90,22 +87,42 @@ urlpatterns = [
     ),
     path("my-mentorships/", my_mentorships, name="my_mentorships"),
     # Sessions
-    path("sessions/", session_list, name="session_list"),
+    path("sessions/", views.session_list, name="session_list"),
     path("sessions/<int:session_id>/", view_session, name="view_session"),
     path("sessions/create/", create_session, name="create_session"),
     path("sessions/<int:session_id>/edit/", edit_session, name="edit_session"),
-    path("sessions/<int:session_id>/register/", session_list, name="session_list"),
+    # path("sessions/<int:session_id>/register/", session_list, name="session_list"),
     path("pricing/", pricing, name="pricing"),
     path("session/<int:session_id>/book/", book_session, name="book_session"),
-    path('create-checkout-session/', CreateCheckoutSessionView.as_view(), name='create_checkout_session'),
-    path('payment-success/', payment_success, name='payment_success'),
-    path('payment-cancel/', payment_cancel, name='payment_cancel'),
-    path('add-to-bag/', add_to_bag, name='add_to_bag'),
-    path('bag/', view_bag, name='view_bag'),
-    path('remove-from-bag/', remove_from_bag, name='remove_from_bag'),
     # Forums
     path("forums/", forum_list, name="forum_list"),
     path("forums/new/", create_forum_post, name="create_forum_post"),
     path("forums/<int:post_id>/", view_forum_post, name="view_forum_post"),
     path("forums/<int:post_id>/reply/", reply_forum_post, name="reply_forum_post"),
+    # Payment
+    path("add-to-cart/<int:session_id>/", views.add_to_cart, name="add_to_cart"),
+    path("cart/", views.view_cart, name="view_cart"),
+    path("checkout/", views.checkout, name="checkout"),
+    path(
+        "create-checkout-session/",
+        views.create_checkout_session,
+        name="create_checkout_session",
+    ),
+    # path("success/", views.payment_success, name="payment_success"),
+    path("cancel/", views.payment_cancel, name="payment_cancel"),
+    # path("complete-purchase/", views.complete_purchase, name="complete_purchase"),
+    path("sessions/", views.session_list, name="session_list"),
+    path(
+        "checkout/success/<order_number>/",
+        views.checkout_success,
+        name="checkout_success",
+    ),
+    path("cache_checkout_data/", views.cache_checkout_data, name="cache_checkout_data"),
+    path(
+        "increase_quantity/<int:item_id>/", increase_quantity, name="increase_quantity"
+    ),
+    path(
+        "decrease_quantity/<int:item_id>/", decrease_quantity, name="decrease_quantity"
+    ),
+    path("remove_from_cart/<int:item_id>/", remove_from_cart, name="remove_from_cart"),
 ]

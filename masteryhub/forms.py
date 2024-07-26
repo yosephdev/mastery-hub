@@ -145,3 +145,11 @@ class ConcernReportForm(forms.ModelForm):
             "description": forms.Textarea(attrs={"rows": 5, "class": "form-control"}),
             "category": forms.Select(attrs={"class": "form-control"}),
         }
+
+class OrderForm(forms.Form):
+    full_name = forms.CharField(max_length=50, required=True)
+    email = forms.EmailField(max_length=254, required=True)
+    address = forms.CharField(max_length=255, required=True)
+    city = forms.CharField(max_length=50, required=True)
+    postcode = forms.CharField(max_length=20, required=True)
+    country = forms.CharField(max_length=50, required=True)

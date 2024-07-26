@@ -155,6 +155,10 @@ h1 {
   font-size: 1rem;
 }
 
+.logo-font {
+  text-transform: uppercase;
+}
+
 /* Section: How It Works */
 .how-it-works {
   background-color: #f9f9f9;
