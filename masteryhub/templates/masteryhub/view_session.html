@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h2>{{ session.title }}</h2>
+                </div>
+                <div class="card-body">
+                    {% if session.image %}
+                    <img src="{{ session.image.url }}" class="img-fluid mb-3" alt="{{ session.title }}">
+                    {% endif %}
+                    <p><strong>Description:</strong> {{ session.description }}</p>
+                    <p><strong>Date:</strong> {{ session.date }}</p>
+                    <p><strong>Duration:</strong> {{ session.duration }}</p>
+                    <p><strong>Price:</strong> ${{ session.price }}</p>
+                    <p><strong>Host:</strong> {{ session.host.user.username }}</p>
+                    <p><strong>Status:</strong> {{ session.get_status_display }}</p>
+                    <p><strong>Max Participants:</strong> {{ session.max_participants }}</p>
+                    <p><strong>Available Spots:</strong> {{ session.available_spots }}</p>
+                    <p><strong>Participants:</strong></p>
+                    <ul>
+                        {% for participant in session.participants.all %}
+                        <li>{{ participant.user.username }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% if is_participant %}
+                    <p class="text-success">You are a participant in this session.</p>
+                    {% else %}
+                    <p class="text-warning">You are not a participant in this session.</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'session_list' %}" class="btn btn-secondary">Back to Sessions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
