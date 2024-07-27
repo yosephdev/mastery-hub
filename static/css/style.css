@@ -841,6 +841,10 @@ h1 {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+.container-fluid {  
+  background-color: #f8f9fa;
+}
+
 .container p {
   font-size: 1.2em;
   color: #666;
