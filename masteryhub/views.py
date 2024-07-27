@@ -683,7 +683,9 @@ def add_to_cart(request, session_id):
         total = sum(
             item.session.price * item.quantity for item in cart.cartitem_set.all()
         )
+        messages.success(request, f"Added {session.title} to your cart.")
         return JsonResponse({"success": True, "total": float(total)})
+    messages.error(request, "Failed to add session to cart.")
     return JsonResponse({"success": False})
 
 
@@ -737,15 +739,16 @@ def checkout(request):
 
             cart.cartitem_set.all().delete()
 
-            send_mail(
-                "Purchase Confirmation",
-                "Thank you for your purchase!",
-                settings.DEFAULT_FROM_EMAIL,
-                [form.cleaned_data["email"]],
-                fail_silently=False,
+            messages.success(
+                request,
+                "Your purchase was successful. A confirmation email has been sent to you.",
             )
-
             return redirect("checkout_success", order_number=order.order_number)
+        else:
+            messages.error(
+                request,
+                "There was an error with your order. Please check your details and try again.",
+            )
     else:
         form = OrderForm()
         intent = stripe.PaymentIntent.create(
@@ -890,4 +893,5 @@ def decrease_quantity(request, item_id):
 def remove_from_cart(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id)
     cart_item.delete()
+    messages.success(request, f"Removed {cart_item.session.title} from your cart.")
     return redirect("view_cart")
