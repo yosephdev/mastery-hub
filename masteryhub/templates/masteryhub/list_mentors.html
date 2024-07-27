@@ -2,27 +2,38 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2>Available Mentors</h2>
-    <div class="row">
-        {% for mentor in mentors %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                {% if mentor.profile_picture %}
-                <img src="{{ mentor.profile_picture.url }}" class="card-img-top" alt="{{ mentor.user.username }}">
-                {% else %}
-                <img src="{% static 'images/default_profile.png' %}" class="card-img-top"
-                    alt="{{ mentor.user.username }}">
-                {% endif %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <h2>Search Mentors</h2>
+            <div class="search mb-4">
+                <form method="GET" class="form-inline">
+                    <div class="input-group w-100">
+                        <input type="text" name="q" value="{{ query|default:'' }}" class="form-control"
+                            placeholder="Search mentors by skill or industry">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-black">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            {% for mentor in mentors %}
+            <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">{{ mentor.user.get_full_name }}</h5>
-                    <p class="card-text">{{ mentor.bio|truncatewords:20 }}</p>
-                    <a href="{% url 'view_mentor_profile' username=mentor.user.username %}" class="btn btn-primary">View
-                        Profile</a>
+                    <h3 class="card-title">{{ mentor.user.username }}</h3>
+                    <p class="card-text"><strong>Areas:</strong> {{ mentor.mentorship_areas }}</p>
+                    <p class="card-text"><strong>Rating:</strong> {{ mentor.rating|default:"Not Rated" }}</p>
+                    <p class="card-text">
+                        <strong>Availability:</strong> {{ mentor.availability|default:"Not Specified" }}
+                    </p>
+                    <a href="{% url 'view_profile' mentor.user.username %}" class="btn btn-secondary">View Profile</a>
                 </div>
             </div>
+            {% empty %}
+            <p class="alert alert-warning">No mentors found.</p>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
 </div>
 {% endblock %}

@@ -284,8 +284,15 @@ def manage_mentorship_requests(request):
 
 def list_mentors(request):
     """A view that handles the mentor list."""
-    mentors = Profile.objects.filter(is_expert=True)
-    return render(request, "masteryhub/list_mentors.html", {"mentors": mentors})
+    query = request.GET.get('q')
+    if query:
+        mentors = Profile.objects.filter(is_expert=True).filter(
+            Q(user__username__icontains=query) |
+            Q(mentorship_areas__icontains=query)
+        )
+    else:
+        mentors = Profile.objects.filter(is_expert=True)
+    return render(request, "masteryhub/list_mentors.html", {"mentors": mentors, "query": query})
 
 
 @login_required

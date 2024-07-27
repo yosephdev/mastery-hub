@@ -15,7 +15,7 @@
         <div class="col-md-9">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h1>Q&A and Discussion Forums</h1>
-                <a href="{% url 'create_forum_post' %}" class="btn btn-primary">New Post</a>
+                <a href="{% url 'create_forum_post' %}" class="btn btn-warning">New Post</a>
             </div>
             <div class="input-group mb-3">
                 <input type="text" class="form-control" placeholder="Search for questions, answers, forums">
@@ -32,7 +32,7 @@
                             <p class="card-text">{{ post.author.user.username }}</p>
                             <p class="card-text">Replies: {{ post.comments.count }}</p>
                             <p class="card-text">Last activity: {{ post.updated_at }}</p>
-                            <a href="{% url 'view_forum_post' post.id %}" class="btn btn-primary">View Post</a>
+                            <a href="{% url 'view_forum_post' post.id %}" class="btn btn-success">View Post</a>
                         </div>
                     </div>
                 </div>
