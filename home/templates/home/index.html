@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
-{% endblock %}
+{% load socialaccount %}
 
 {% block content %}
 <div class="container-fluid">
@@ -21,10 +18,15 @@
                 <div class="image-scroll-container">
                     <div class="image-scroll">
                         <figure class="p-2 text-center">
-                            <img src="{% static 'images/web-development.jpeg' %}" class="img-fluid"
-                                alt="Web Development">
-                            <figcaption>Web Development</figcaption>
+                            <img src="{% static 'images/career-development.jpeg' %}" class="img-fluid"
+                                alt="Career Development">
+                            <figcaption>Career Development</figcaption>
                         </figure>
+                        <figure class="p-2 text-center">
+                            <img src="{% static 'images/time-management.jpeg' %}" class="img-fluid"
+                                alt="Time Management">
+                            <figcaption>Time Management</figcaption>
+                        </figure>                       
                         <figure class="p-2 text-center">
                             <img src="{% static 'images/graphic-design.jpeg' %}" class="img-fluid" alt="Graphic Design">
                             <figcaption>Graphic Design</figcaption>
@@ -43,15 +45,12 @@
                             <figcaption>Leadership</figcaption>
                         </figure>
                         <figure class="p-2 text-center">
-                            <img src="{% static 'images/time-management.jpeg' %}" class="img-fluid"
-                                alt="Time Management">
-                            <figcaption>Time Management</figcaption>
+                            <img src="{% static 'images/web-development.jpeg' %}" class="img-fluid"
+                                alt="Web Development">
+                            <figcaption>Web Development</figcaption>
                         </figure>
-                        <figure class="p-2 text-center">
-                            <img src="{% static 'images/career-development.jpeg' %}" class="img-fluid"
-                                alt="Career Development">
-                            <figcaption>Career Development</figcaption>
-                        </figure>
+                     
+                       
                     </div>
                 </div>
             </div>
@@ -93,7 +92,7 @@
                         <img src="{% static 'images/technology.jpeg' %}" class="card-img-top" alt="Technology">
                         <div class="card-body">
                             <h5 class="card-title">Technology</h5>
-                            <button class="btn btn-warning">Join Now</button>
+                            <a href="{% url 'view_session' session_id=1 %}" class="btn btn-primary">Join Now</a>
                         </div>
                     </div>
                 </div>
@@ -102,7 +101,7 @@
                         <img src="{% static 'images/business.jpeg' %}" class="card-img-top" alt="Business">
                         <div class="card-body">
                             <h5 class="card-title">Business</h5>
-                            <button class="btn btn-warning">Join Now</button>
+                            <a href="{% url 'view_session' session_id=1 %}" class="btn btn-primary">Join Now</a>
                         </div>
                     </div>
                 </div>
@@ -111,7 +110,7 @@
                         <img src="{% static 'images/creative.jpeg' %}" class="card-img-top" alt="Creative">
                         <div class="card-body">
                             <h5 class="card-title">Creative</h5>
-                            <button class="btn btn-warning">Join Now</button>
+                            <a href="{% url 'view_session' session_id=1 %}" class="btn btn-primary">Join Now</a>
                         </div>
                     </div>
                 </div>
@@ -120,7 +119,7 @@
                         <img src="{% static 'images/soft-skills.jpeg' %}" class="card-img-top" alt="Soft Skills">
                         <div class="card-body">
                             <h5 class="card-title">Soft Skills</h5>
-                            <button class="btn btn-warning">Join Now</button>
+                            <a href="{% url 'view_session' session_id=1 %}" class="btn btn-primary">Join Now</a>
                         </div>
                     </div>
                 </div>
@@ -136,26 +135,26 @@
                 <div class="mentor-card">
                     <img src="{% static 'images/mentor1.jpeg' %}" alt="John Bennet">
                     <h5>John Bennet</h5>
-                    <p>Web Development</p>
-                    <button class="btn btn-warning">Join Now</button>
+                    <p>Digital Marketing</p>
+                    <a href="{% url 'view_mentor_profile' username='mentor_username' %}" class="btn btn-warning">View Mentor Profile</a>
                 </div>
                 <div class="mentor-card">
-                    <img src="{% static 'images/mentor3.jpeg' %}" alt="James Morgan">
-                    <h5>James Morgan</h5>
+                    <img src="{% static 'images/mentor3.jpeg' %}" alt="Sarah Ferugson">
+                    <h5>Sarah Ferugson</h5>
                     <p>Data Science</p>
-                    <button class="btn btn-warning">Join Now</button>
+                    <a href="{% url 'view_mentor_profile' username='Sarah' %}" class="btn btn-warning">View Mentor Profile</a>
                 </div>
                 <div class="mentor-card">
                     <img src="{% static 'images/mentor4.jpeg' %}" alt="Kent Smith">
                     <h5>Kent Smith</h5>
                     <p>Graphic Design</p>
-                    <button class="btn btn-warning">Join Now</button>
+                    <a href="{% url 'view_mentor_profile' username='mentor_username' %}" class="btn btn-warning">View Mentor Profile</a>
                 </div>
                 <div class="mentor-card">
-                    <img src="{% static 'images/mentor5.jpeg' %}" alt="Alex Johnson">
-                    <h5>Alex Johnson</h5>
-                    <p>Digital Marketing</p>
-                    <button class="btn btn-warning">Join Now</button>
+                    <img src="{% static 'images/mentor5.jpeg' %}" alt="Alex Jacob">
+                    <h5>Alex Jacob</h5>
+                    <p>Web Development</p>
+                    <a href="{% url 'view_mentor_profile' username='Alex' %}" class="btn btn-warning">View Mentor Profiles</a>
                 </div>
             </div>
         </div>
@@ -194,10 +193,9 @@
             <h2>Ready to Take Your Career to the Next Level?</h2>
             <p>Create an account to access expert-led sessions, workshops, and mentorship opportunities.</p>
             <a href="{% url 'account_signup' %}" class="btn btn-warning">Sign Up</a>
-            <a href="#" class="btn btn-secondary">
+            <a href="{% provider_login_url 'google' %}" class="btn btn-secondary google-signup-btn">
                 <i class="fab fa-google"></i> Sign Up with Google
             </a>
-
         </div>
     </div>
 </div>

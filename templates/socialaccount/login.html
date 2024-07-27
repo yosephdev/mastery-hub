@@ -1,31 +1,27 @@
 {% extends "socialaccount/base.html" %}
 {% load i18n %}
 {% load allauth %}
+{% load crispy_forms_tags %}
+
 {% block head_title %}
     {% trans "Sign In" %}
 {% endblock head_title %}
+
 {% block content %}
-    {% if process == "connect" %}
-        {% element h1 %}
-            {% blocktrans with provider.name as provider %}Connect {{ provider }}{% endblocktrans %}
-        {% endelement %}
-        {% element p %}
-            {% blocktrans with provider.name as provider %}You are about to connect a new third-party account from {{ provider }}.{% endblocktrans %}
-        {% endelement %}
-    {% else %}
-        {% element h1 %}
-            {% blocktrans with provider.name as provider %}Sign In Via {{ provider }}{% endblocktrans %}
-        {% endelement %}
-        {% element p %}
-            {% blocktrans with provider.name as provider %}You are about to sign in using a third-party account from {{ provider }}.{% endblocktrans %}
-        {% endelement %}
-    {% endif %}
-    {% element form method="post" no_visible_fields=True %}
-        {% slot actions %}
+<div class="container my-4">
+    <div class="google-signin-container text-center">
+        {% if process == "connect" %}
+            <h1>{% trans "Connect" %} {{ provider.name }}</h1>
+            <p>{% trans "You are about to connect a new third-party account from" %} {{ provider.name }}.</p>
+        {% else %}
+            <h1>{% trans "Sign In Via" %} {{ provider.name }}</h1>
+            <p>{% trans "You are about to sign in using a third-party account from" %} {{ provider.name }}.</p>
+        {% endif %}
+        <form method="POST" class="google-signin-form mt-4">
             {% csrf_token %}
-            {% element button type="submit" %}
-                {% trans "Continue" %}
-            {% endelement %}
-        {% endslot %}
-    {% endelement %}
+            <button type="submit" class="btn btn-primary">{% trans "Continue" %}</button>
+            <a class="btn btn-outline-dark" href="{% url 'home' %}">{% trans "Back to Home" %}</a>
+        </form>
+    </div>
+</div>
 {% endblock content %}
