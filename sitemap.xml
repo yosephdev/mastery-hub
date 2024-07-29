@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/login/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/signup/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/login/?next=/checkout/cart/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/sessions/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/masteryhub/become-mentor/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/masteryhub/search-mentors/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/about/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/login/?next=/masteryhub/sessions/1/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/contact/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/pricing/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/login/?next=/masteryhub/forums/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/masteryhub/report-concern/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/masteryhub/mentor-help/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/masteryhub/mentor-rules/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/?process=login</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/password/reset/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/?process=signup</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/?process=login&amp;next=%2Fcheckout%2Fcart%2F</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/sessions/?category=Web%20Development</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/sessions/?category=Digital%20Marketing</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/sessions/?category=Machine%20Learning</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/sessions/?category=Graphic%20Design</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/sessions/?category=Data%20Science</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/sessions/?category=Leadership</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/sessions/?category=Time%20Management</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/sessions/?category=Career%20Development</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/login/?next=/profiles/profile/Sarah/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/login/?next=/profiles/profile/Alex/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/?process=login&amp;next=%2Fmasteryhub%2Fsessions%2F1%2F</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/login/?next=/checkout/checkout/</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/?process=login&amp;next=%2Fmasteryhub%2Fforums%2F</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/?process=login&amp;next=%2Fprofiles%2Fprofile%2FSarah%2F</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/?process=login&amp;next=%2Fprofiles%2Fprofile%2FAlex%2F</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+<url>
+  <loc>https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/?process=login&amp;next=%2Fcheckout%2Fcheckout%2F</loc>
+  <lastmod>2024-07-29T17:24:36+00:00</lastmod>
+  <priority>0.51</priority>
+</url>
+
+
+</urlset>
