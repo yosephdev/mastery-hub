@@ -97,3 +97,13 @@ select option[value=""] {
 .container {
   margin-top: 50px;
 }
+
+.btn-outline-danger { 
+  color: red;
+  border: 1px solid black !important;
+}
+
+.btn-outline-danger:hover {
+  background-color: red;
+  color: white;
+}
