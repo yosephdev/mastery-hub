@@ -13,6 +13,9 @@ def index(request):
     """
     return render(request, "home/index.html")
 
+def home(request):
+    """A view that handles the home page."""
+    return render(request, "home/index.html")
 
 def about(request):
     return render(request, "home/about.html")

@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap4",
     "home",
+    "checkout",
+    "profiles",
+    "accounts"
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"

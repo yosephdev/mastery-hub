@@ -6,4 +6,4 @@ class MasteryhubConfig(AppConfig):
     name = "masteryhub"
 
     def ready(self):
-        import masteryhub.signals
+        import profiles.signals

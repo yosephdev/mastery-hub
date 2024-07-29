@@ -1,62 +1,36 @@
 from django.urls import path
 from . import views
-from .views import (
-    CustomLoginView,
-    CustomLogoutView,
+from .views import (   
     expert_dashboard,
     mentee_dashboard,
-    mentor_matching_view,
-    view_profile,
-    view_mentor_profile,
-    edit_profile,
+    mentor_matching_view,   
     forum_list,
     create_forum_post,
     view_forum_post,
     reply_forum_post,
     book_session,
-    edit_session,
-    home,
-    signup_view,
-    report_concern,
+    edit_session,      
     list_mentors,
     search_mentors,
     become_mentor,
     mentor_help,
+    report_concern,
     mentor_rules,
     request_mentorship,
     manage_mentorship_requests,
     accept_mentorship,
     reject_mentorship,
-    my_mentorships,
-    session_list,
+    my_mentorships,    
     view_session,
     create_session,
     delete_session,
     create_feedback,
     forum_posts,
-    pricing,
-    increase_quantity,
-    decrease_quantity,
-    remove_from_cart,
 )
-from .admin_views import admin_dashboard
 
-urlpatterns = [
-    path("", home, name="home"),
-    # Authentication
-    path("signup/", signup_view, name="account_signup"),
-    path("login/", CustomLoginView.as_view(), name="account_login"),
-    path("logout/", CustomLogoutView.as_view(), name="account_logout"),
-    path("report-concern/", report_concern, name="report_concern"),
-    # Admin Dashboard
-    path("admin/dashboard/", admin_dashboard, name="admin_dashboard"),
-    # Profile
-    path("profile/", view_profile, name="view_own_profile"),
-    path("profile/edit/", edit_profile, name="edit_profile"),
-    path("profile/<str:username>/", view_profile, name="view_profile"),
+urlpatterns = [   
     # Mentors
     path("mentors/", list_mentors, name="list_mentors"),
-    path("mentor/<str:username>/", view_mentor_profile, name="view_mentor_profile"),
     path("search-mentors/", search_mentors, name="search_mentors"),
     path("become-mentor/", become_mentor, name="become_mentor"),
     path("mentor-help/", mentor_help, name="mentor_help"),
@@ -86,43 +60,16 @@ urlpatterns = [
         name="reject_mentorship",
     ),
     path("my-mentorships/", my_mentorships, name="my_mentorships"),
-    # Sessions
-    path("sessions/", views.session_list, name="session_list"),
+    path("report-concern/", report_concern, name="report_concern"),
+    # Sessions 
     path("sessions/<int:session_id>/", view_session, name="view_session"),
     path("sessions/create/", create_session, name="create_session"),
-    path("sessions/<int:session_id>/edit/", edit_session, name="edit_session"),
-    # path("sessions/<int:session_id>/register/", session_list, name="session_list"),
-    path("pricing/", pricing, name="pricing"),
+    path("sessions/<int:session_id>/edit/", edit_session, name="edit_session"),       
     path("session/<int:session_id>/book/", book_session, name="book_session"),
     # Forums
     path("forums/", forum_list, name="forum_list"),
     path("forums/new/", create_forum_post, name="create_forum_post"),
     path("forums/<int:post_id>/", view_forum_post, name="view_forum_post"),
     path("forums/<int:post_id>/reply/", reply_forum_post, name="reply_forum_post"),
-    # Payment
-    path("add-to-cart/<int:session_id>/", views.add_to_cart, name="add_to_cart"),
-    path("cart/", views.view_cart, name="view_cart"),
-    path("checkout/", views.checkout, name="checkout"),
-    path(
-        "create-checkout-session/",
-        views.create_checkout_session,
-        name="create_checkout_session",
-    ),
-    # path("success/", views.payment_success, name="payment_success"),
-    path("cancel/", views.payment_cancel, name="payment_cancel"),
-    # path("complete-purchase/", views.complete_purchase, name="complete_purchase"),
-    path("sessions/", views.session_list, name="session_list"),
-    path(
-        "checkout/success/<order_number>/",
-        views.checkout_success,
-        name="checkout_success",
-    ),
-    path("cache_checkout_data/", views.cache_checkout_data, name="cache_checkout_data"),
-    path(
-        "increase_quantity/<int:item_id>/", increase_quantity, name="increase_quantity"
-    ),
-    path(
-        "decrease_quantity/<int:item_id>/", decrease_quantity, name="decrease_quantity"
-    ),
-    path("remove_from_cart/<int:item_id>/", remove_from_cart, name="remove_from_cart"),
+    
 ]

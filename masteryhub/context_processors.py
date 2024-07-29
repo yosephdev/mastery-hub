@@ -1,4 +1,4 @@
-from .models import Cart
+from checkout.models import Cart
 
 def cart_total(request):
     if request.user.is_authenticated:
