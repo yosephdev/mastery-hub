@@ -2,6 +2,14 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
+{% block meta %}
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Your cart contains the sessions you have selected. Review your cart and proceed to checkout to confirm your purchase.">
+    <meta name="keywords" content="skill sharing, cart, checkout, sessions, purchase, learning">
+{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
 {% endblock %}
