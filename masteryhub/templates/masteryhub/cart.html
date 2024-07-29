@@ -24,11 +24,11 @@
                             <div class="btn-group mb-3 mb-md-0" role="group" aria-label="Adjust quantity">
                                 <form action="{% url 'decrease_quantity' item.id %}" method="POST" style="display:inline;">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-black btn-dark">-</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-dark">-</button>
                                 </form>
                                 <form action="{% url 'increase_quantity' item.id %}" method="POST" style="display:inline;">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-black btn-dark">+</button>
+                                    <button type="submit" class="btn btn-sm btn-outline-dark">+</button>
                                 </form>
                                 <form action="{% url 'remove_from_cart' item.id %}" method="POST" style="display:inline;">
                                     {% csrf_token %}
