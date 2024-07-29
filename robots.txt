@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /accounts/
+Disallow: /cart/
+Sitemap:https://skill-sharing-446c0336ffb5.herokuapp.com/sitemap.xml
