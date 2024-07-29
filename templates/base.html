@@ -1,5 +1,4 @@
 {% load static %}
-
 <!doctype html>
 <html lang="en">
 
@@ -43,8 +42,7 @@
 </head>
 
 <body d-flex h-100 main-bg>
-    <header class="container-fluid fixed-top">
-        {% include 'includes/mobile-top-header.html' %}
+    <header class="container-fluid fixed-top">        
         <div id="topnav" class="row bg-white pt-lg-2 d-none d-lg-flex">
             <div class="col-12 col-lg-4 my-auto py-1 py-lg-0 text-center text-lg-left">
                 <a href="{% url 'home' %}" class="nav-link main-logo-link">
@@ -95,8 +93,7 @@
                             <a href="{% url 'account_signup' %}" class="dropdown-item">Sign Up</a>
                             {% endif %}
                         </div>
-                    </li>
-                    {% if user.is_authenticated %}
+                    </li>                 
                     <li class="list-inline-item">
                         <a class="{% if grand_total %}text-black font-weight-bold{% else %}text-black{% endif %} nav-link"
                             href="{% url 'view_cart' %}">
@@ -111,21 +108,23 @@
                                 </p>
                             </div>
                         </a>
-                    </li>
-                    {% endif %}
+                    </li>                   
                 </ul>
             </div>
         </div>
         <div class="row bg-white">
             <nav class="navbar navbar-expand-lg navbar-light w-100">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-nav"
-                    aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="main-nav">
-                    {% include 'includes/main-nav.html' %}
-                </div>
+                </button>       
+                {% include 'includes/mobile-top-header.html' %}         
+                {% include 'includes/main-nav.html' %}             
             </nav>
+        </div>
+        <div id="promo-banner" class="row text-center">
+            <div class="col bg-info text-white">
+                <h4 class="logo-font my-1">Welcome to MasteryHub!</h4>
+            </div>
         </div>
     </header>
 
@@ -165,14 +164,7 @@
     {% endblock %}
 
     {% block content %}
-    <div class="container-fluid">
-        <div class="text-center mt-5 pt-5 main-background" style="margin-top: 100px;">
-            <h1>Unlock Your Professional Potential with MasteryHub</h1>
-            <p>Connect, Learn, and Grow with Expert-Led Skill-Sharing Sessions</p>
-            <button class="btn btn-primary">Find a Skill</button>
-            <button class="btn btn-secondary">Share Your Expertise</button>
-        </div>
-    </div>
+   
     {% endblock %}
 
     <footer class="footer mt-5 py-4">

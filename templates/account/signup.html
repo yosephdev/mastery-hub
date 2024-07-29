@@ -6,7 +6,7 @@
 {% block head_title %}{% trans "Sign Up" %}{% endblock %}
 
 {% block content %}
-<div class="container d-flex align-items-center justify-content-center min-vh-100">
+<div class="container-fluid d-flex align-items-center justify-content-center min-vh-100">
   <div class="row justify-content-center w-100">
     <div class="col-md-6 col-lg-5">
       <div class="card shadow-sm">
@@ -28,7 +28,7 @@
             {% endif %}
             {% endfor %}
           </div>
-          <p class="text-center">or</p>
+          <p class="text-center">or MasteryHub account.</p>
           {% endif %}
 
           <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
@@ -46,10 +46,10 @@
             {% if redirect_field_value %}
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
             {% endif %}
-            <div class="d-flex justify-content-between mt-4">
-              <a class="btn btn-outline-dark" href="{% url 'account_login' %}">Back to Login</a>
-              <button type="submit" class="btn btn-primary">{% trans "Sign Up" %}</button>
-            </div>
+            <div class="d-flex justify-content-between align-items-center mt-4">
+              <a class="btn btn-outline-dark btn-lg" href="{% url 'account_login' %}">{% trans "Back to Login" %}</a>
+              <button type="submit" class="btn btn-primary btn-lg">{% trans "Sign Up" %}</button>
+            </div>            
           </form>
         </div>
       </div>

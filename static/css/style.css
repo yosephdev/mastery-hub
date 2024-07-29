@@ -775,7 +775,7 @@ h1 {
   position: fixed;
   top: 72px;
   right: 15px;
-  z-index: 9999; 
+  z-index: 9999;
 }
 
 .custom-toast {
@@ -788,36 +788,36 @@ h1 {
 
 .toast {
   border-radius: 0;
-  min-width: 300px; 
+  min-width: 300px;
 }
 
 .toast-header {
-  background-color: #f8f9fa; 
-  border-bottom: 1px solid #dee2e6; 
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .toast-body {
-  background-color: #ffffff; 
+  background-color: #ffffff;
 }
 
 .arrow-success {
-  border-bottom: 10px solid #28a745; 
+  border-bottom: 10px solid #28a745;
 }
 
 .arrow-danger {
-  border-bottom: 10px solid #dc3545; 
+  border-bottom: 10px solid #dc3545;
 }
 
 .arrow-warning {
-  border-bottom: 10px solid #ffc107; 
+  border-bottom: 10px solid #ffc107;
 }
 
 .arrow-info {
-  border-bottom: 10px solid #17a2b8; 
+  border-bottom: 10px solid #17a2b8;
 }
 
 .toast-capper.bg-success {
-  background-color: #28a745; 
+  background-color: #28a745;
 }
 
 .toast-capper.bg-danger {
@@ -825,11 +825,11 @@ h1 {
 }
 
 .toast-capper.bg-warning {
-  background-color: #ffc107; 
+  background-color: #ffc107;
 }
 
 .toast-capper.bg-info {
-  background-color: #17a2b8; 
+  background-color: #17a2b8;
 }
 
 /* Container style */
@@ -841,7 +841,7 @@ h1 {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.container-fluid {  
+.container-fluid {
   background-color: #f8f9fa;
 }
 
@@ -927,9 +927,30 @@ h1 {
 
 /* Media Queries */
 
+/* Styles for screens smaller than 768px */
 @media (max-width: 768px) {
+  .navbar-nav .nav-link {
+    padding: 0;
+  }
 
-  /* Adjust navigation for mobile screens */
+  .navbar-nav .nav-item {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  .navbar-nav .nav-item .nav-link {
+    display: block;
+  }
+
+  .navbar-nav .nav-item .nav-link .fa {
+    display: block;
+    margin: 0 auto;
+  }
+
+  .navbar-nav .nav-item .nav-link p {
+    margin: 0;
+  }
+
   .main-logo-link {
     text-align: center;
   }
@@ -942,7 +963,7 @@ h1 {
     flex-wrap: wrap;
   }
 
-  .icon-box>div {
+  .icon-box > div {
     flex: 0 0 calc(50% - 30px);
     max-width: calc(50% - 30px);
   }
@@ -961,8 +982,7 @@ h1 {
   }
 
   .left-column {
-    margin-right: 0;
-    margin-bottom: 40px;
+    margin: 0 0 40px 0;
   }
 
   .right-column {
@@ -970,66 +990,62 @@ h1 {
   }
 }
 
+/* Styles for screens smaller than 991px */
 @media (max-width: 991px) {
   .header-container {
     padding-top: 116px;
   }
+
+  .nav-link {
+    padding: 0.15rem;
+  }
+
+  .nav-link i.fa-lg {
+    font-size: 1rem;
+  }
+
+  .navbar-toggler {
+    padding: 0.6rem;
+    font-size: 1rem;
+  }
+
+  .navbar .list-inline-item {
+    margin-right: 10px;
+  }
+
+  .navbar .list-inline-item a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .navbar .list-inline-item a .fa-lg {
+    margin-bottom: 5px;
+  }
+
+  .fixed-top {
+    z-index: 1030;
+  }
+
+  .dropdown-menu {
+    margin-top: 0;
+  }
+
+  .input-group .form-control {
+    border-radius: 0;
+  }
 }
 
-/* Slightly larger container on xl screens */
+/* Styles for screens larger than 1200px */
 @media (min-width: 1200px) {
   .container {
     max-width: 80%;
   }
 }
 
-/* Allauth form formatting */
-.allauth-form-inner-content p {
-  margin-top: 1.5rem;
-  color: #333333;
-}
-
-.allauth-form-inner-content input {
-  border-color: #000;
-  border-radius: 0;
-}
-
-.allauth-form-inner-content input::placeholder {
-  color: #aab7c4;
-}
-
-.allauth-form-inner-content button,
-.allauth-form-inner-content input[type='submit'] {
-  display: inline-block;
-  font-weight: 400;
-  color: #fff;
-  text-align: center;
-  vertical-align: middle;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  background-color: #4285F4;
-  border: 1px solid #4285F4;
-  padding: .375rem .75rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  border-radius: 0;
-  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-.allauth-form-inner-content button:hover,
-.allauth-form-inner-content input[type='submit']:hover {
-  background-color: #3367D6;
-  border-color: #3367D6;
-}
-
-.allauth-form-inner-content a {
-  color: #17A853;
-}
-
+/* Styles for screens smaller than 480px */
 @media (max-width: 480px) {
-  .icon-box>div {
+  .icon-box > div {
     flex: 0 0 100%;
     max-width: 100%;
     margin-bottom: 15px;
