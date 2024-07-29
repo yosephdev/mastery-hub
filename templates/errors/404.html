@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center">
+            <h1 class="display-4 logo-font text-black">The page you are looking for isn't available</h1>
+            <p class="mt-4">We couldn't find the page you were looking for. This might be because:</p>
+            <ul class="list-unstyled">
+                <li>The page has been moved or deleted.</li>
+                <li>The URL is incorrect.</li>
+                <li>You do not have permission to view this page.</li>
+            </ul>
+            <div class="mt-5">
+                <a href="{% url 'session_list' %}" class="btn btn-lg btn-primary">Return to Sessions</a>
+                <a href="{% url 'home' %}" class="btn btn-lg btn-secondary">Return to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
