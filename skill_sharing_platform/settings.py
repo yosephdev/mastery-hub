@@ -144,15 +144,16 @@ LOGOUT_REDIRECT_URL = "home"
 
 # Social account settings
 SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "SCOPE": [
-            "profile",
-            "email",
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
         ],
-        "AUTH_PARAMS": {
-            "access_type": "online",
+        'AUTH_PARAMS': {
+            'access_type': 'online',
         },
-        "OAUTH_PKCE_ENABLED": True,
+        'OAUTH_PKCE_ENABLED': True,
+        'REDIRECT_URI': 'https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/callback/',
     }
 }
 
