@@ -16,28 +16,30 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from .forms import MentorApplicationForm, ConcernReportForm
 from django.contrib.admin.models import LogEntry, ADDITION
+from allauth.account.views import ConfirmEmailView
 from django.contrib.contenttypes.models import ContentType
-from .models import (
+from accounts.models import (
     Profile,
-    Feedback,
-    Session,
-    Category,
-    Mentorship,
+)
+from checkout.models import (
     Payment,
     Cart,
     CartItem,
     Order,
 )
-from .models import (
-    Profile,
+from masteryhub.models import (
     Feedback,
     Session,
     Category,
     Mentorship,
-    Payment,
-    Cart,
-    CartItem,
-    Order,
+)
+from .forms import (
+    CustomSignupForm,
+    CustomUserChangeForm,
+    ProfileForm,
+    SessionForm,
+    ForumPostForm,
+    MentorApplicationForm,
 )
 from .forms import OrderForm
 import stripe
@@ -48,18 +50,16 @@ import logging
 
 
 def signup_view(request):
-    """A view that handles the sign up."""
+    """Handle user signup."""
     if request.method == "POST":
         form = CustomSignupForm(request.POST)
         if form.is_valid():
-            user = form.save(request=request)
+            user = form.save()
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password1")
             user = authenticate(username=username, password=password)
             login(request, user)
-            messages.success(
-                request, f"Welcome, {user.username}! Registration successful!"
-            )
+            messages.success(request, f"Welcome, {user.username}! Registration successful!")
             return redirect("home")
         for field, error in form.errors.items():
             messages.error(request, f"{field}: {error}")
@@ -67,10 +67,8 @@ def signup_view(request):
         form = CustomSignupForm()
     return render(request, "account/signup.html", {"form": form})
 
-
 class CustomLoginView(LoginView):
-    """A view that handles the login."""
-
+    """Handle user login."""
     template_name = "account/login.html"
 
     def form_valid(self, form):
@@ -87,15 +85,11 @@ class CustomLoginView(LoginView):
             return redirect("view_profile", username=user.username)
 
     def form_invalid(self, form):
-        messages.error(
-            self.request, "Login failed. Please check your username and password."
-        )
+        messages.error(self.request, "Login failed. Please check your username and password.")
         return self.render_to_response(self.get_context_data(form=form))
 
-
 class CustomLogoutView(LogoutView):
-    """A view that handles the logout."""
-
+    """Handle user logout."""
     template_name = "account/logout.html"
     next_page = reverse_lazy("home")
 
@@ -110,3 +104,6 @@ class CustomLogoutView(LogoutView):
 
     def get_next_page(self):
         return str(self.next_page)
+
+class CustomConfirmEmailView(ConfirmEmailView):
+    template_name = "account/email_confirm.html"

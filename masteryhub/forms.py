@@ -1,64 +1,16 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from django.contrib.auth import get_user_model
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, ButtonHolder, Submit
 
-from .models import Profile, Session, Forum, ConcernReport
-
-User = get_user_model()
-
-class CustomSignupForm(UserCreationForm):
-    is_expert = forms.BooleanField(required=False, label="Are you a mentor?")
-
-    class Meta:
-        model = User
-        fields = ("username", "email", "password1", "password2")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = "post"
-        self.helper.add_input(Submit("submit", "Sign Up"))
-
-    def save(self, request):
-        user = super().save(request)
-        profile, created = Profile.objects.get_or_create(user=user)
-        profile.is_expert = self.cleaned_data.get("is_expert")
-        profile.save()
-        return user
-
-    def signup(self, request, user):
-        profile, created = Profile.objects.get_or_create(user=user)
-        profile.is_expert = self.cleaned_data.get("is_expert")
-        profile.save()
-        return user
-
-class CustomUserChangeForm(UserChangeForm):
-    class Meta:
-        model = User
-        fields = ("username", "email", "first_name", "last_name")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = "post"
-        self.helper.layout = Layout(
-            Field("username", css_class="form-control"),
-            Field("email", css_class="form-control"),
-            Field("first_name", css_class="form-control"),
-            Field("last_name", css_class="form-control"),
-            ButtonHolder(
-                Submit("submit", "Update Profile", css_class="btn btn-primary")
-            ),
-        )
+from accounts.models import Profile
+from masteryhub.models import Session, Forum, ConcernReport
 
 class SessionForm(forms.ModelForm):
     class Meta:
         model = Session
         fields = [
             "title",
-            "description",            
+            "description",
             "duration",
             "category",
             "max_participants",

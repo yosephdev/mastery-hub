@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, ButtonHolder, Submit
 
-from .models import Profile, Session, Forum, ConcernReport
+from accounts.models import Profile
+from masteryhub.models import Session, Forum, ConcernReport
 
 User = get_user_model()
 
@@ -21,11 +22,14 @@ class CustomSignupForm(UserCreationForm):
         self.helper.form_method = "post"
         self.helper.add_input(Submit("submit", "Sign Up"))
 
-    def save(self, request):
-        user = super().save(request)
-        profile, created = Profile.objects.get_or_create(user=user)
-        profile.is_expert = self.cleaned_data.get("is_expert")
-        profile.save()
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data["email"]
+        if commit:
+            user.save()
+            profile, created = Profile.objects.get_or_create(user=user)
+            profile.is_expert = self.cleaned_data.get("is_expert")
+            profile.save()
         return user
 
     def signup(self, request, user):
@@ -97,6 +101,53 @@ class ProfileForm(forms.ModelForm):
             "mentorship_areas": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
             "availability": forms.TextInput(attrs={"class": "form-control"}),
             "preferred_mentoring_method": forms.TextInput(attrs={"class": "form-control"}),
+        }
+
+class ForumPostForm(forms.ModelForm):
+    class Meta:
+        model = Forum
+        fields = ["title", "content", "category"]
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "content": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            "category": forms.Select(attrs={"class": "form-control"}),
+        }
+
+class MentorApplicationForm(forms.Form):
+    name = forms.CharField(
+        label="Your Name",
+        max_length=100,
+        widget=forms.TextInput(attrs={"placeholder": "Enter your full name", "class": "form-control"}),
+    )
+    email = forms.EmailField(
+        label="Your Email",
+        widget=forms.EmailInput(attrs={"placeholder": "Enter your email address", "class": "form-control"}),
+    )
+    areas_of_expertise = forms.CharField(
+        label="Areas of Expertise",
+        widget=forms.Textarea(attrs={"placeholder": "Describe your areas of expertise", "class": "form-control", "rows": 4}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(MentorApplicationForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "post"
+        self.helper.layout = Layout(
+            Field("name"),
+            Field("email"),
+            Field("areas_of_expertise"),
+            ButtonHolder(
+                Submit("submit", "Apply to be a Mentor", css_class="btn btn-primary")
+            ),
+        )
+
+class ConcernReportForm(forms.ModelForm):
+    class Meta:
+        model = ConcernReport
+        fields = ["category", "description"]
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 5, "class": "form-control"}),
+            "category": forms.Select(attrs={"class": "form-control"}),
         }
 
 class OrderForm(forms.Form):

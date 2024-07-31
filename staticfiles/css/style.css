@@ -990,6 +990,10 @@ h1 {
   }
 }
 
+.errorlist {
+  display: none;
+}
+
 /* Styles for screens smaller than 991px */
 @media (max-width: 991px) {
   .header-container {

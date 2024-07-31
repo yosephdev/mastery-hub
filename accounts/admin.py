@@ -1,10 +1,10 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.models import LogEntry
 from checkout.models import Payment
-from masteryhub.models import Session, Profile
+from accounts.models import Profile  
 
 # Register your models here.
 
@@ -15,13 +15,17 @@ def make_mentors(modeladmin, request, queryset):
             profile = Profile.objects.get(user=user)
             profile.is_expert = True
             profile.save()
+            messages.success(request, f"User {user.username} marked as mentor.")
         except Profile.DoesNotExist:
             messages.error(request, f"Profile for user {user.username} does not exist.")
-            continue
-    messages.success(request, "Selected users have been marked as mentors.")
 
-class CustomUserAdmin(UserAdmin):
+class ProfileInline(admin.StackedInline):
+    model = Profile
+    can_delete = False
+
+class CustomUserAdmin(BaseUserAdmin):
     actions = [make_mentors]
+    inlines = (ProfileInline,)
 
 admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)

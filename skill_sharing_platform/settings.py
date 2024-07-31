@@ -78,7 +78,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "masteryhub.context_processors.cart_total",
+                "checkout.context_processors.cart_total",
             ],
         },
     },
@@ -114,7 +114,7 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-ACCOUNT_SIGNUP_FORM_CLASS = "masteryhub.forms.CustomSignupForm"
+ACCOUNT_SIGNUP_FORM_CLASS = "accounts.forms.CustomSignupForm"
 
 CSRF_TRUSTED_ORIGINS = [
     "https://8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
@@ -134,7 +134,7 @@ ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
 ACCOUNT_USERNAME_MIN_LENGTH = 4
 
 ACCOUNT_FORMS = {
-    "signup": "masteryhub.forms.CustomSignupForm",
+    "signup": "accounts.forms.CustomSignupForm",
 }
 
 # Login/Logout URLs

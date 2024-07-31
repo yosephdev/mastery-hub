@@ -5,5 +5,4 @@ class MasteryhubConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "masteryhub"
 
-    def ready(self):
-        import profiles.signals
+  

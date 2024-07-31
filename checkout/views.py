@@ -7,7 +7,6 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Q, Count, Sum
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
@@ -22,7 +21,7 @@ from .models import (
     CartItem,
     Order,
 )
-from profiles.models import (
+from accounts.models import (
     Profile,   
 )
 from masteryhub.models import (

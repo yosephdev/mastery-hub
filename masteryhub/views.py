@@ -7,7 +7,6 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Q, Count, Sum
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
@@ -17,18 +16,18 @@ from django.contrib.auth.models import User
 from .forms import MentorApplicationForm, ConcernReportForm
 from django.contrib.admin.models import LogEntry, ADDITION
 from django.contrib.contenttypes.models import ContentType
+from accounts.models import Profile
 from .models import (
-    Profile,
     Feedback,
     Session,
     Category,
-    Mentorship,     
+    Mentorship,
 )
-from checkout.models import (   
-    Payment,   
+from checkout.models import (
+    Payment,
     Cart,
     CartItem,
-    Order, 
+    Order,
 )
 from .forms import OrderForm
 import stripe
@@ -39,7 +38,7 @@ logger = logging.getLogger(__name__)
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
-from .forms import (
+from accounts.forms import (
     CustomSignupForm,
     CustomUserChangeForm,
     ProfileForm,
@@ -47,7 +46,8 @@ from .forms import (
     ForumPostForm,
     MentorApplicationForm,
 )
-from .models import Profile, Mentorship, Session, Forum, Category, Feedback
+from .models import Mentorship, Session, Forum, Category, Feedback
+from accounts.models import Profile
 
 
 def become_mentor(request):
@@ -213,6 +213,7 @@ def expert_dashboard(request):
 def mentee_dashboard(request):
     """A view that handles the mentee dashboard."""
     profile = get_object_or_404(Profile, user=request.user)
+    print(f"Profile ID: {profile.id}, Profile User: {profile.user.username}")
     feedbacks = Feedback.objects.filter(mentee=profile)
     sessions = Session.objects.filter(participants=profile)
 
@@ -249,6 +250,7 @@ def mentee_dashboard(request):
         "grand_total": grand_total,
     }
     return render(request, "masteryhub/mentee_dashboard.html", context)
+
 
 @login_required
 def my_mentorships(request):
@@ -290,6 +292,7 @@ def reject_mentorship(request, mentorship_id):
         request, f"Mentorship with {mentorship.mentee.user.username} rejected"
     )
     return redirect("manage_mentorship_requests")
+
 
 @login_required
 def book_session(request, session_id):
