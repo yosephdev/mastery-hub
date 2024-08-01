@@ -61,7 +61,7 @@
 
 <script>
     function addToBag(sessionId, title, price) {
-        fetch(`/masteryhub/add-to-cart/${sessionId}/`, {
+        fetch(`/checkout/add-to-cart/${sessionId}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -84,7 +84,7 @@
 
                 totalElement.textContent = '$' + parseFloat(data.total).toFixed(2);
                
-                window.location.href = '/masteryhub/cart/';
+                window.location.href = '/checkout/cart/';
             } else {
                 showToast('Error', 'Error adding session to bag', 'danger');
             }
