@@ -91,7 +91,7 @@ def add_to_cart(request, session_id):
 def view_cart(request):
     """A view that renders the user's cart."""
     cart = get_object_or_404(Cart, user=request.user)
-    return render(request, "masteryhub/cart.html", {"cart": cart})
+    return render(request, "checkout/cart.html", {"cart": cart})
 
 @login_required
 def checkout(request):
@@ -162,7 +162,7 @@ def checkout(request):
         "grand_total": grand_total,
         "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
     }
-    return render(request, "masteryhub/checkout.html", context)
+    return render(request, "chekout/checkout.html", context)
 
 
 @login_required
@@ -202,12 +202,12 @@ def create_checkout_session(request):
 @login_required
 def payment_cancel(request):
     """A view that handles the payment cancellation."""
-    return render(request, "masteryhub/payment_cancel.html")
+    return render(request, "checkout/payment_cancel.html")
 
 
 def complete_purchase(request):
     """A view that handles the purhase complete."""
-    return render(request, "masteryhub/purchase_complete.html")
+    return render(request, "checkout/purchase_complete.html")
 
 
 @require_POST
