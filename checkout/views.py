@@ -190,8 +190,8 @@ def create_checkout_session(request):
             payment_method_types=["card"],
             line_items=line_items,
             mode="payment",
-            success_url=request.build_absolute_uri("/masteryhub/checkout_success/"),
-            cancel_url=request.build_absolute_uri("/masteryhub/payment_cancel/"),
+            success_url=request.build_absolute_uri("/checkout/checkout_success/"),
+            cancel_url=request.build_absolute_uri("/checkout/payment_cancel/"),
         )
     except stripe.error.InvalidRequestError as e:
         return JsonResponse({"error": str(e)}, status=400)
@@ -248,7 +248,7 @@ def checkout_view(request):
 
     return render(
         request,
-        "masteryhub/checkout.html",
+        "checkout/checkout.html",
         {
             "client_secret": payment_intent.client_secret,
             "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
@@ -266,7 +266,7 @@ def checkout_success(request, order_number):
         "order": order,
         "from_profile": False,
     }
-    return render(request, "masteryhub/checkout_success.html", context)
+    return render(request, "checkout/checkout_success.html", context)
 
 
 @require_POST
