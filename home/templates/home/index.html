@@ -17,8 +17,8 @@
     <div class="text-center mt-5 pt-5 main-background">
         <h1>Master New Skills with MasteryHub!</h1>
         <p>Connect, Learn, and Grow with Expert-Led Skill-Sharing Sessions</p>
-        <button class="btn btn-primary">Find a Skill</button>
-        <button class="btn btn-secondary">Share Your Expertise</button>
+        <a href="checkout/sessions/" class="btn btn-primary">Find a Skill</a>
+        <a href="masteryhub/become-mentor/" class="btn btn-secondary">Share Your Expertise</a>
     </div>
 
     <div class="container-fluid mt-5">
@@ -99,7 +99,7 @@
                         <img src="{% static 'images/technology.jpeg' %}" class="card-img-top" alt="Technology">
                         <div class="card-body">
                             <h5 class="card-title">Technology</h5>
-                            <a href="{% url 'view_session' session_id=1 %}" class="btn btn-primary">Join Now</a>
+                            <a href="{% url 'view_session' session_id=2 %}" class="btn btn-primary">Join Now</a>
                         </div>
                     </div>
                 </div>
@@ -108,7 +108,7 @@
                         <img src="{% static 'images/business.jpeg' %}" class="card-img-top" alt="Business">
                         <div class="card-body">
                             <h5 class="card-title">Business</h5>
-                            <a href="{% url 'view_session' session_id=1 %}" class="btn btn-primary">Join Now</a>
+                            <a href="{% url 'view_session' session_id=4 %}" class="btn btn-primary">Join Now</a>
                         </div>
                     </div>
                 </div>
@@ -126,7 +126,7 @@
                         <img src="{% static 'images/soft-skills.jpeg' %}" class="card-img-top" alt="Soft Skills">
                         <div class="card-body">
                             <h5 class="card-title">Soft Skills</h5>
-                            <a href="{% url 'view_session' session_id=1 %}" class="btn btn-primary">Join Now</a>
+                            <a href="{% url 'view_session' session_id=3 %}" class="btn btn-primary">Join Now</a>
                         </div>
                     </div>
                 </div>
@@ -140,27 +140,27 @@
             <h2>Learn from Creative Mentors</h2>
             <div class="d-flex justify-content-center flex-wrap">
                 <div class="mentor-card">
-                    <img src="{% static 'images/mentor1.jpeg' %}" alt="John Bennet">
-                    <h5>John Bennet</h5>
-                    <p>Digital Marketing</p>
-                    <a href="{% url 'view_mentor_profile' username='mentor_username' %}" class="btn btn-warning">View Mentor Profile</a>
+                    <img src="{% static 'images/anna-carolina.png' %}" alt="Anna Carolina">
+                    <h5>Anna Carolina</h5>
+                    <p>Health</p>
+                    <a href="{% url 'view_mentor_profile' username='Anna' %}" class="btn btn-warning">View Mentor Profile</a>
                 </div>
                 <div class="mentor-card">
-                    <img src="{% static 'images/mentor3.jpeg' %}" alt="Sarah Ferugson">
-                    <h5>Sarah Ferugson</h5>
-                    <p>Data Science</p>
-                    <a href="{% url 'view_mentor_profile' username='Sarah' %}" class="btn btn-warning">View Mentor Profile</a>
+                    <img src="{% static 'images/sara-taye.webp' %}" alt="Sara Taye">
+                    <h5>Sara Taye</h5>
+                    <p>Business</p>
+                    <a href="{% url 'view_mentor_profile' username='Sara' %}" class="btn btn-warning">View Mentor Profile</a>
                 </div>
                 <div class="mentor-card">
-                    <img src="{% static 'images/mentor4.jpeg' %}" alt="Kent Smith">
-                    <h5>Kent Smith</h5>
-                    <p>Graphic Design</p>
-                    <a href="{% url 'view_mentor_profile' username='mentor_username' %}" class="btn btn-warning">View Mentor Profile</a>
+                    <img src="{% static 'images/kidist-shibre.webp' %}" alt="Kidist Shibre">
+                    <h5>Kidist Shibre</h5>
+                    <p>Education</p>
+                    <a href="{% url 'view_mentor_profile' username='Kidist' %}" class="btn btn-warning">View Mentor Profile</a>
                 </div>
                 <div class="mentor-card">
-                    <img src="{% static 'images/mentor5.jpeg' %}" alt="Alex Jacob">
+                    <img src="{% static 'images/alex-jacob.png' %}" alt="Alex Jacob">
                     <h5>Alex Jacob</h5>
-                    <p>Web Development</p>
+                    <p>Technology</p>
                     <a href="{% url 'view_mentor_profile' username='Alex' %}" class="btn btn-warning">View Mentor Profiles</a>
                 </div>
             </div>
