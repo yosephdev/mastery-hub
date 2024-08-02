@@ -162,7 +162,7 @@ def checkout(request):
         "grand_total": grand_total,
         "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
     }
-    return render(request, "chekout/checkout.html", context)
+    return render(request, "checkout/checkout.html", context)
 
 
 @login_required
