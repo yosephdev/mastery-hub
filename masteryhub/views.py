@@ -213,9 +213,8 @@ def expert_dashboard(request):
 def mentee_dashboard(request):
     """A view that handles the mentee dashboard."""
     profile = get_object_or_404(Profile, user=request.user)
-    print(f"Profile ID: {profile.id}, Profile User: {profile.user.username}")
     feedbacks = Feedback.objects.filter(mentee=profile)
-    sessions = Session.objects.filter(participants=profile)
+    sessions = profile.sessions_participated.all()
 
     labels = []
     data = []
@@ -234,7 +233,7 @@ def mentee_dashboard(request):
     skills = profile.skills.split(",") if profile.skills else []
     goals = profile.goals.split(",") if profile.goals else []
 
-    payments = Payment.objects.filter(user=profile.user)
+    payments = Payment.objects.filter(user=profile)
     grand_total = payments.aggregate(Sum("amount"))["amount__sum"] or 0.00
 
     context = {
