@@ -15,17 +15,17 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.admin.models import LogEntry, ADDITION
 from django.contrib.contenttypes.models import ContentType
-from .models import (    
+from .models import (
     Payment,
     Cart,
     CartItem,
     Order,
 )
 from accounts.models import (
-    Profile,   
+    Profile,
 )
 from masteryhub.models import (
-    Session,   
+    Session,
     Category,
 )
 from checkout.forms import OrderForm
@@ -35,9 +35,11 @@ import logging
 
 # Create your views here.
 
+
 def pricing(request):
     """A view that handles pricing."""
     return render(request, "checkout/pricing.html")
+
 
 def session_list(request):
     """A view that renders the list of sessions with optional filtering."""
@@ -67,7 +69,8 @@ def session_list(request):
     }
 
     return render(request, "masteryhub/session_list.html", context)
-    
+
+
 @login_required
 def add_to_cart(request, session_id):
     """A view that adds a session to the user's cart."""
@@ -93,13 +96,20 @@ def view_cart(request):
     cart = get_object_or_404(Cart, user=request.user)
     return render(request, "checkout/cart.html", {"cart": cart})
 
+
 @login_required
 def checkout(request):
     """A view that handles the checkout process."""
     cart = get_object_or_404(Cart, user=request.user)
-    grand_total = sum(
-        item.session.price * item.quantity for item in cart.cartitem_set.all()
-    )
+    price = request.GET.get("price")
+    if price:
+        grand_total = float(price)
+    else:
+        grand_total = sum(
+            item.session.price * item.quantity for item in cart.cartitem_set.all()
+        )
+
+    MIN_CHARGE_AMOUNT = 50
 
     if request.method == "POST":
         form = OrderForm(request.POST)
@@ -148,12 +158,19 @@ def checkout(request):
             )
     else:
         form = OrderForm()
+
+    if grand_total * 100 >= MIN_CHARGE_AMOUNT:
         intent = stripe.PaymentIntent.create(
             amount=int(grand_total * 100),
             currency="usd",
             metadata={"integration_check": "accept_a_payment"},
         )
         client_secret = intent.client_secret
+    else:
+        setup_intent = stripe.SetupIntent.create(
+            usage="off_session", payment_method_types=["card"]
+        )
+        client_secret = setup_intent.client_secret
 
     context = {
         "order_form": form,
