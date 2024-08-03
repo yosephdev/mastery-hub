@@ -1,21 +1,149 @@
-<div class="collapse navbar-collapse" id="main-nav">
-    <ul class="navbar-nav w-auto mx-auto">
-        <li class="nav-item d-block d-md-none">
-            <a class="logo-font font-weight-bold nav-link text-black mr-5" href="{% url 'home' %}" id="home-link">
-                Home
+<div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <!-- Main logo and navigation links -->
+    <a href="{% url 'home' %}" class="nav-link main-logo-link">
+        <h3 class="logo-font text-black my-0"><strong>MasteryHub</strong></h3>
+    </a>
+    <!-- Dropdown navigation for different categories -->
+    <ul class="navbar-nav mx-auto">
+        <!-- Courses -->
+        <li class="nav-item dropdown">
+            <a class="logo-font font-weight-bold nav-link text-black" href="#" id="courses-link"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Courses
+            </a>
+            <!-- Dropdown menu for Course categories -->
+            <div class="dropdown-menu border-0" aria-labelledby="courses-link">
+                <div class="row">
+                    <div class="col">
+                        <h6 class="dropdown-header text-black font-weight-bold">Categories:</h6>
+                        <a href="{% url 'session_list' %}?category=Web Development"
+                            class="dropdown-item">Technology</a>
+                        <a href="{% url 'session_list' %}?category=Leadership" class="dropdown-item">Soft
+                            Skills</a>
+                        <a href="{% url 'session_list' %}?category=Business"
+                            class="dropdown-item">Business</a>
+                        <a href="{% url 'session_list' %}?category=all" class="dropdown-item">All
+                            Categories</a>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <!-- Mentors -->
+        <li class="nav-item dropdown">
+            <a class="logo-font font-weight-bold nav-link text-black" href="#" id="mentors-link"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Mentors
+            </a>
+            <!-- Dropdown menu for Mentors -->
+            <div class="dropdown-menu border-0" aria-labelledby="mentors-link">
+                <div class="row">
+                    <div class="col">
+                        <h6 class="dropdown-header text-black font-weight-bold">Find a Mentor:</h6>
+                        <a href="{% url 'search_mentors' %}" class="dropdown-item">Technology</a>
+                        <a href="{% url 'search_mentors' %}" class="dropdown-item">Soft Skills</a>
+                        <a href="{% url 'search_mentors' %}" class="dropdown-item">Business</a>
+                        <a href="{% url 'search_mentors' %}" class="dropdown-item">All Mentors</a>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <!-- Resources -->
+        <li class="nav-item dropdown">
+            <a class="logo-font font-weight-bold nav-link text-black" href="#" id="resources-link"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Resources
+            </a>
+            <!-- Dropdown menu for Resources -->
+            <div class="dropdown-menu border-0" aria-labelledby="resources-link">
+                <div class="row">
+                    <div class="col">
+                        <h6 class="dropdown-header text-black font-weight-bold">Learning Resources:</h6>
+                        <a href="https://www.udemy.com" target="_blank" class="dropdown-item">E-books</a>
+                        <a href="https://www.linkedin.com/learning/" target="_blank" class="dropdown-item">Videos</a>                                   
+                        <a href="https://www.coursera.org" target="_blank" class="dropdown-item" class="dropdown-item">Articles</a>                                    
+                    </div>
+                </div>
+            </div>
+        </li>
+        <!-- About-->
+        <li class="nav-item">
+            <a class="logo-font font-weight-bold nav-link text-black" href="{% url 'about' %}">
+                About
             </a>
         </li>
+        <!-- Contact -->
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'session_list' %}">Explore Skills</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'become_mentor' %}">Become a Mentor</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'search_mentors' %}">Find a Mentor</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'about' %}">About Us</a>
+            <a class="logo-font font-weight-bold nav-link text-black" href="{% url 'contact' %}">
+                Contact
+            </a>
         </li>
     </ul>
+    <!-- Search form -->
+    <form method="GET" action="{% url 'search_mentors' %}" class="header-search-form">
+        <div class="input-group w-100">
+            <input class="form-control border border-black rounded-0" type="text" name="q"
+                placeholder="Search">
+            <div class="input-group-append">
+                <button class="form-control btn btn-black border border-black rounded-0" type="submit">
+                    <span class="icon">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<!-- User account and notifications links -->
+<ul class="accout-block list-inline list-unstyled text-center text-lg-right my-0">
+    <!-- User account dropdown -->
+    <li class="list-inline-item dropdown">
+        <a class="text-black nav-link" href="#" id="user-options" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            <div class="text-center">
+                <div><i class="fas fa-user fa-lg"></i></div>
+                <p class="my-0">My Account</p>
+            </div>
+        </a>
+        <!-- Dropdown menu content for user account -->
+        <div class="dropdown-menu border-0" aria-labelledby="user-options">
+            {% if request.user.is_authenticated %}
+            {% if request.user.is_superuser %}
+            <a href="{% url 'admin_dashboard' %}" class="dropdown-item">Admin Dashboard</a>
+            {% endif %}
+            {% if not request.user.profile.is_expert %}
+            <a href="{% url 'mentee_dashboard' %}" class="dropdown-item">Mentee Dashboard</a>
+            {% endif %}
+            <a href="{% url 'mentor_matching' %}" class="dropdown-item">Mentor Matching</a>
+            <a href="{% url 'view_own_profile' %}" class="dropdown-item">My Profile</a>
+            <a href="{% url 'account_logout' %}" class="dropdown-item">Logout</a>
+            {% if request.user.profile.is_expert %}
+            <a href="{% url 'expert_dashboard' %}" class="dropdown-item">Expert Dashboard</a>
+            <a href="{% url 'manage_mentorship_requests' %}" class="dropdown-item">Manage Mentorship
+                Requests</a>
+            {% endif %}
+            {% else %}
+            <a href="{% url 'account_login' %}" class="dropdown-item">Login</a>
+            <a href="{% url 'account_signup' %}" class="dropdown-item">Sign Up</a>
+            {% endif %}
+        </div>
+    </li>
+    <!-- Notifications link (visible if the user is authenticated) -->
+    {% if request.user.is_authenticated %}
+    <li class="list-inline-item">
+        <a class="{% if grand_total %}text-black font-weight-bold{% else %}text-black{% endif %} nav-link"
+            href="{% url 'view_cart' %}">
+            <div class="text-center">
+                <div><i class="fas fa-shopping-bag fa-lg"></i></div>
+                <p class="my-0">
+                    {% if grand_total %}
+                    ${{ grand_total|floatformat:2 }}
+                    {% else %}
+                    $0.00
+                    {% endif %}
+                </p>
+            </div>
+        </a>
+    </li>
+    {% endif %}
+</ul>
 </div>
