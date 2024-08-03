@@ -13,11 +13,11 @@
         content="skill sharing, professional development, career growth, mentorship, online learning, upskilling, reskilling, share professional skills, learn new skills, develop expertise, business skills, industry knowledge, career mentor, professional mentoring, mentor-mentee matching, executive mentorship, online workshops, virtual training, video courses, expert webinars, skill assessment, professionals, upskilling, career changers, subject matter experts, thought leaders, premium content, coaching, certification, corporate training">
     {% endblock %}
 
-     <!-- Favicon -->
-     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon/apple-touch-icon.png' %}">
-     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon/favicon-32x32.png' %}">
-     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon/favicon-16x16.png' %}">
-     <link rel="manifest" href="{% static 'images/favicon/site.webmanifest' %}">   
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'images/favicon/site.webmanifest' %}">
 
     {% block extra_meta %}
     {% endblock %}
@@ -66,7 +66,7 @@
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
-            </button>            
+            </button>
             {% include 'includes/main-nav.html' %}
         </nav>
     </header>
@@ -192,6 +192,31 @@
             var toast = new bootstrap.Toast(toastElement);
             toast.show();
         });
+
+        $(document).ready(function () {
+            var textArray = [
+                "Achieve your goals with MasteryHub!&nbsp;&nbsp;<span class='text-primary'><i class='fas fa-award'></i></span>",
+                "Expert mentors at your service",
+                "Personalized learning paths just for you",
+                "Join our community of learners and achievers"
+            ];
+
+            var currentIndex = 0;
+            var delay = 3000;
+
+            function changeText() {
+                $("#carousel-text").fadeOut(500, function () {
+                    $(this).html(textArray[currentIndex]).fadeIn(500);
+                });
+
+                currentIndex = (currentIndex + 1) % textArray.length;
+
+                setTimeout(changeText, delay);
+            }
+
+            changeText();
+        });
+
 
 
         $(".dropdown").hover(
