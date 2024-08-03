@@ -1,80 +1,29 @@
 /* Global Styles and Resets */
-html,
-body {
-  height: 100%;
-  font-family: "GT Walsheim Pro", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  font-weight: 700;
-  color: #333333;
+
+* {
+  box-sizing: border-box;
   margin: 0;
-  padding-top: 60px;
+  padding: 0;
 }
 
 body {
-  padding-top: 60px;
-}
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
+  min-height: 100vh;
+  font-family: "GT Walsheim Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-weight: 700;
+  box-sizing: border-box;
+  background-size: cover;
+  color: #333333;
+  display: flex;
+  flex-direction: column;
 }
 
 h1 {
   font-size: 2em;
 }
 
-.navbar {
-  background-color: rgba(52, 168, 83, 0.9);
-}
-
-.navbar,
-.nav-link {
-  color: #FFFFFF !important;
-}
-
-.nav-link {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.nav-link .fa-shopping-bag {
-  margin-right: 5px;
-}
-
-.nav-link p.my-0 {
-  margin: 0;
-  font-weight: bold;
-}
-
 /* Header and Navigation */
 .main-logo-link {
   width: fit-content;
-}
-
-.main-background {
-  position: relative;
-  background: url("../images/background.jpeg") no-repeat center center fixed;
-  background-size: cover;
-  padding: 50px 0;
-  color: #FFFFFF;
-  max-width: 100%;
-  margin-top: 20px;
-}
-
-.main-background::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1;
-}
-
-.main-background>* {
-  position: relative;
-  z-index: 2;
 }
 
 .image-scroll-container {
@@ -99,6 +48,14 @@ h1 {
   width: 100%;
   height: 250px;
   object-fit: cover;
+}
+
+.carousel-item {
+  position: relative;
+}
+
+.carousel-item::before {
+  content: "";
 }
 
 /* Navigation Links and Buttons */
@@ -876,102 +833,10 @@ h1 {
   margin-right: 5px;
 }
 
-/* Google sign-in container */
-.google-signin-container {
-  text-align: center;
-  margin-top: 50px;
-  padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.google-signin-container h1 {
-  font-size: 2.5em;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-.google-signin-container p {
-  font-size: 1.2em;
-  color: #666;
-  margin-bottom: 30px;
-}
-
-.google-signin-container form {
-  display: inline-block;
-  text-align: left;
-  max-width: 400px;
-  width: 100%;
-}
-
-.google-signin-container .btn {
-  font-size: 1.1em;
-  padding: 10px 20px;
-  margin-top: 10px;
-  border-radius: 5px;
-}
-
-.google-signin-container .btn-primary {
-  background-color: #4285F4;
-  color: #fff;
-  border: none;
-}
-
-.google-signin-container .btn-primary:hover {
-  background-color: #357ae8;
-}
-
 /* Media Queries */
 
 /* Styles for screens smaller than 768px */
 @media (max-width: 768px) {
-  .navbar-nav .nav-link {
-    padding: 0;
-  }
-
-  .navbar-nav .nav-item {
-    flex: 1 1 auto;
-    text-align: center;
-  }
-
-  .navbar-nav .nav-item .nav-link {
-    display: block;
-  }
-
-  .navbar-nav .nav-item .nav-link .fa {
-    display: block;
-    margin: 0 auto;
-  }
-
-  .navbar-nav .nav-item .nav-link p {
-    margin: 0;
-  }
-
-  .main-logo-link {
-    text-align: center;
-  }
-
-  .main-background {
-    padding: 30px 0;
-  }
-
-  .icon-box {
-    flex-wrap: wrap;
-  }
-
-  .icon-box > div {
-    flex: 0 0 calc(50% - 30px);
-    max-width: calc(50% - 30px);
-  }
-
-  .image-scroll figure {
-    margin-right: 5px;
-  }
-
   form.login .btn {
     width: 100%;
     margin: 5px 0;
@@ -996,33 +861,6 @@ h1 {
     padding-top: 116px;
   }
 
-  .nav-link {
-    padding: 0.15rem;
-  }
-
-  .nav-link i.fa-lg {
-    font-size: 1rem;
-  }
-
-  .navbar-toggler {
-    padding: 0.6rem;
-    font-size: 1rem;
-  }
-
-  .navbar .list-inline-item {
-    margin-right: 10px;
-  }
-
-  .navbar .list-inline-item a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .navbar .list-inline-item a .fa-lg {
-    margin-bottom: 5px;
-  }
-
   .fixed-top {
     z-index: 1030;
   }
@@ -1040,14 +878,5 @@ h1 {
 @media (min-width: 1200px) {
   .container {
     max-width: 80%;
-  }
-}
-
-/* Styles for screens smaller than 480px */
-@media (max-width: 480px) {
-  .icon-box > div {
-    flex: 0 0 100%;
-    max-width: 100%;
-    margin-bottom: 15px;
   }
 }
