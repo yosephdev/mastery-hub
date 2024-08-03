@@ -861,16 +861,57 @@ h1 {
     padding-top: 116px;
   }
 
+  .nav-link {
+    padding: 0.15rem;
+  }
+
+  .nav-link i.fa-lg {
+    font-size: 1rem;
+  }
+
+  .navbar-toggler {
+    padding: .6rem .6rem;
+    font-size: 1rem;
+}
+
   .fixed-top {
     z-index: 1030;
   }
 
   .dropdown-menu {
     margin-top: 0;
+    display: none;
   }
+
+  .dropdown:hover .nav-link {
+    text-decoration: underline;
+    text-decoration-color: black;
+}
 
   .input-group .form-control {
     border-radius: 0;
+  }
+
+  .carousel-item {
+    position: relative;
+  }
+  
+  .carousel-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1;
+  }
+  
+  .carousel-item img {
+    height: 500px;
+    width: 100%;
+    object-fit: cover;
+    object-position: center top;
   }
 }
 
