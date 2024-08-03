@@ -7,10 +7,9 @@
         </div>
     </a>
     <div class="dropdown-menu border-0 w-100 p-3 rounded-0 my-0" aria-labelledby="mobile-search">
-        <form class="form" method="GET" action="{% url 'home' %}">
+        <form class="form" method="GET" action="{% url 'search_mentors' %}">
             <div class="input-group w-100">
-                <input class="form-control border border-black rounded-0" type="text" name="q"
-                    placeholder="Search our site">
+                <input class="form-control border border-black rounded-0" type="text" name="q" placeholder="Search">
                 <div class="input-group-append">
                     <button class="form-control btn btn-black border border-black rounded-0" type="submit">
                         <span class="icon">
@@ -43,8 +42,7 @@
         <a href="{% url 'account_logout' %}" class="dropdown-item">Logout</a>
         {% if request.user.profile.is_expert %}
         <a href="{% url 'expert_dashboard' %}" class="dropdown-item">Expert Dashboard</a>
-        <a href="{% url 'manage_mentorship_requests' %}" class="dropdown-item">Manage Mentorship
-            Requests</a>
+        <a href="{% url 'manage_mentorship_requests' %}" class="dropdown-item">Manage Mentorship Requests</a>
         {% endif %}
         {% else %}
         <a href="{% url 'account_login' %}" class="dropdown-item">Login</a>
