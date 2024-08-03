@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "home",
     "checkout",
     "profiles",
-    "accounts"
+    "accounts",
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
@@ -99,11 +99,11 @@ DATABASES = {
 
 DATABASES["default"]["ENGINE"] = "django.db.backends.postgresql"
 
-if 'test' in sys.argv:
+if "test" in sys.argv:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
         }
     }
 
@@ -144,16 +144,16 @@ LOGOUT_REDIRECT_URL = "home"
 
 # Social account settings
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
         ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
+        "AUTH_PARAMS": {
+            "access_type": "online",
         },
-        'OAUTH_PKCE_ENABLED': True,
-        'REDIRECT_URI': 'https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/callback/',
+        "OAUTH_PKCE_ENABLED": True,
+        "REDIRECT_URI": "https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/callback/",
     }
 }
 
@@ -192,13 +192,13 @@ SOCIALACCOUNT_FACEBOOK_SECRET = os.getenv("SOCIALACCOUNT_FACEBOOK_SECRET")
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # Email settings (for production)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  
-DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER")
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -247,7 +247,7 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = "DENY"
+    X_FRAME_OPTIONS = "SAMEORIGIN"
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
