@@ -791,6 +791,9 @@ h1 {
 
 /* Container style */
 .container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
   margin-top: 50px;
   padding: 20px;
   background-color: #f8f9fa;

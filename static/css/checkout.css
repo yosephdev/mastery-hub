@@ -94,10 +94,6 @@ select option[value=""] {
   margin-top: 20px;
 }
 
-.container {
-  margin-top: 50px;
-}
-
 .btn-outline-danger { 
   color: red;
   border: 1px solid black !important;
