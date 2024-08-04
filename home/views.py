@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect
 from django.core.mail import send_mail, BadHeaderError
 from django.conf import settings
 from django.http import HttpResponse
+from django.db.models import Q
+from masteryhub.models import Mentorship, Session
+from accounts.models import Profile
 from .forms import ContactForm
 
 # Create your views here.
@@ -57,3 +60,27 @@ def contact_view(request):
     return render(
         request, "home/contact.html", {"form": form, "message_sent": message_sent}
     )
+
+def search(request):
+    query = request.GET.get('q')
+    if query:
+        profiles = Profile.objects.filter(
+            Q(user__username__icontains=query) | 
+            Q(bio__icontains=query) |
+            Q(skills__icontains=query) |
+            Q(mentorship_areas__icontains=query)
+        )
+        sessions = Session.objects.filter(
+            Q(title__icontains=query) | 
+            Q(description__icontains=query)
+        )
+    else:
+        profiles = Profile.objects.none()
+        sessions = Session.objects.none()
+
+    context = {
+        'query': query,
+        'profiles': profiles,
+        'sessions': sessions,
+    }
+    return render(request, 'home/search_results.html', context)
