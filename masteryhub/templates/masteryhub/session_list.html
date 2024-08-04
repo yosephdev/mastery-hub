@@ -5,14 +5,14 @@
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 
-<div class="container-fluid mt-5">
+<div class="container mt-5">
     <div class="header-content text-center mb-5">
         <h1>Skill-Sharing Sessions</h1>
         <h2>Connect, Learn, and Grow with Expert-Led 1-on-1 Sessions</h2>
         <p>Explore various skill-sharing sessions and register for the ones that interest you.</p>
     </div>
 
-      <div class="row">
+    <div class="row">
         <div class="col-md-3">
             <div class="search-section mb-4">
                 <form method="GET" action="{% url 'session_list' %}" class="form-inline">
@@ -37,17 +37,16 @@
                         {% if session.image %}
                         <img class="card-img-top" src="{{ session.image.url }}" alt="{{ session.title }}">
                         {% else %}
-                        <img class="card-img-top" src="{% static 'images/no-image-available.png' %}"
-                            alt="No Image Available">
+                        <img class="card-img-top" src="{% static 'images/no-image-available.png' %}" alt="No Image Available">
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ session.title }}</h5>
                             <p class="card-text">{{ session.description|truncatewords:15 }}</p>
-                            <p class="card-text"><small class="text-muted">{{ session.classes_count }} class{{session.classes_count|pluralize }} ({{ session.total_duration }})</small></p>
-                            <p class="card-text"><small class="text-muted">Available spots: {{session.max_participants|sub:session.participants.count }}</small></p>
+                            <p class="card-text"><small class="text-muted">{{ session.classes_count }} class{{ session.classes_count|pluralize }} ({{ session.total_duration }})</small></p>
+                            <p class="card-text"><small class="text-muted">Available spots: {{ session.max_participants|sub:session.participants.count }}</small></p>
                             <p class="card-text"><strong>${{ session.price }}</strong></p>
-                            <button onclick="addToBag('{{ session.id }}', '{{ session.title }}', '{{ session.price }}')"
-                                class="btn btn-primary btn-block">Add to Bag</button>
+                            <a href="{% url 'view_session' session.id %}" class="btn btn-info btn-block">View Details</a>
+                            <button onclick="addToBag('{{ session.id }}', '{{ session.title }}', '{{ session.price }}')" class="btn btn-primary btn-block mt-2">Add to Bag</button>
                         </div>
                     </div>
                 </div>
