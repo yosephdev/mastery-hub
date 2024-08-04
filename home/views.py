@@ -16,9 +16,11 @@ def index(request):
     """
     return render(request, "home/index.html")
 
+
 def home(request):
     """A view that handles the home page."""
     return render(request, "home/index.html")
+
 
 def about(request):
     return render(request, "home/about.html")
@@ -61,28 +63,41 @@ def contact_view(request):
         request, "home/contact.html", {"form": form, "message_sent": message_sent}
     )
 
+
 def search(request):
-    query = request.GET.get('q', '').strip()
+    query = request.GET.get("q", "").strip()
     profiles = []
     sessions = []
     error_message = ""
 
     if query:
-        profiles = Profile.objects.filter(
-            models.Q(user__username__icontains=query) | 
-            models.Q(skills__icontains=query)
-        )
-        sessions = Session.objects.filter(
-            models.Q(title__icontains=query) | 
-            models.Q(description__icontains=query)
-        )
+        try:
+            profiles = Profile.objects.filter(
+                Q(user__username__icontains=query) | Q(skills__icontains=query)
+            )
+            sessions = Session.objects.filter(
+                Q(title__icontains=query) | Q(description__icontains=query)
+            )
+
+            if not profiles and not sessions:
+                error_message = "No results found for your search."
+        except Exception as e:
+            error_message = f"An error occurred during the search: {str(e)}"
     else:
         error_message = "Please enter a search term."
 
     context = {
-        'query': query,
-        'profiles': profiles,
-        'sessions': sessions,
-        'error_message': error_message,
+        "query": query,
+        "profiles": profiles,
+        "sessions": sessions,
+        "error_message": error_message,
     }
-    return render(request, 'home/search_results.html', context)
+    return render(request, "home/search_results.html", context)
+
+    context = {
+        "query": query,
+        "profiles": profiles,
+        "sessions": sessions,
+        "error_message": error_message,
+    }
+    return render(request, "home/search_results.html", context)
