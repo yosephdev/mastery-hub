@@ -7,8 +7,8 @@
     <ul class="navbar-nav mx-auto">
         <!-- Courses -->
         <li class="nav-item dropdown">
-            <a class="logo-font font-weight-bold nav-link text-black" href="#" id="courses-link"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="logo-font font-weight-bold nav-link text-black" href="#" id="courses-link" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
                 Courses
             </a>
             <!-- Dropdown menu for Course categories -->
@@ -16,12 +16,10 @@
                 <div class="row">
                     <div class="col">
                         <h6 class="dropdown-header text-black font-weight-bold">Categories:</h6>
-                        <a href="{% url 'session_list' %}?category=Web Development"
-                            class="dropdown-item">Technology</a>
+                        <a href="{% url 'session_list' %}?category=Web Development" class="dropdown-item">Technology</a>
                         <a href="{% url 'session_list' %}?category=Leadership" class="dropdown-item">Soft
                             Skills</a>
-                        <a href="{% url 'session_list' %}?category=Business"
-                            class="dropdown-item">Business</a>
+                        <a href="{% url 'session_list' %}?category=Business" class="dropdown-item">Business</a>
                         <a href="{% url 'session_list' %}?category=all" class="dropdown-item">All
                             Categories</a>
                     </div>
@@ -30,8 +28,8 @@
         </li>
         <!-- Mentors -->
         <li class="nav-item dropdown">
-            <a class="logo-font font-weight-bold nav-link text-black" href="#" id="mentors-link"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="logo-font font-weight-bold nav-link text-black" href="#" id="mentors-link" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
                 Mentors
             </a>
             <!-- Dropdown menu for Mentors -->
@@ -59,8 +57,9 @@
                     <div class="col">
                         <h6 class="dropdown-header text-black font-weight-bold">Learning Resources:</h6>
                         <a href="https://www.udemy.com" target="_blank" class="dropdown-item">E-books</a>
-                        <a href="https://www.linkedin.com/learning/" target="_blank" class="dropdown-item">Videos</a>                                   
-                        <a href="https://www.coursera.org" target="_blank" class="dropdown-item" class="dropdown-item">Articles</a>                                    
+                        <a href="https://www.linkedin.com/learning/" target="_blank" class="dropdown-item">Videos</a>
+                        <a href="https://www.coursera.org" target="_blank" class="dropdown-item"
+                            class="dropdown-item">Articles</a>
                     </div>
                 </div>
             </div>
@@ -79,10 +78,9 @@
         </li>
     </ul>
     <!-- Search form -->
-    <form method="GET" action="{% url 'search_mentors' %}" class="header-search-form">
+    <form method="GET" action="{% url 'search' %}" class="header-search-form">
         <div class="input-group w-100">
-            <input class="form-control border border-black rounded-0" type="text" name="q"
-                placeholder="Search">
+            <input class="form-control border border-black rounded-0" type="text" name="q" placeholder="Search">
             <div class="input-group-append">
                 <button class="form-control btn btn-dark border border-black rounded-0" type="submit">
                     <span class="icon">
@@ -97,8 +95,8 @@
 <ul class="accout-block list-inline list-unstyled text-center text-lg-right my-0">
     <!-- User account dropdown -->
     <li class="list-inline-item dropdown">
-        <a class="text-black nav-link" href="#" id="user-options" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
+        <a class="text-black nav-link" href="#" id="user-options" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
             <div class="text-center">
                 <div><i class="fas fa-user fa-lg"></i></div>
                 <p class="my-0">My Account</p>
