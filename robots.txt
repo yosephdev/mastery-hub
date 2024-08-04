@@ -1,4 +1,23 @@
 User-agent: *
 Disallow: /accounts/
 Disallow: /checkout/
-Sitemap:https://skill-sharing-446c0336ffb5.herokuapp.com/sitemap.xml
+Disallow: /admin/
+Disallow: /private/
+Allow: /public/
+
+# Crawl-delay for all robots
+Crawl-delay: 10
+
+# Allow specific bots full access
+User-agent: Googlebot
+Disallow:
+
+User-agent: Bingbot
+Disallow:
+
+# Block specific bots
+User-agent: BadBot
+Disallow: /
+
+# Sitemap location
+Sitemap: https://skill-sharing-446c0336ffb5.herokuapp.com/sitemap.xml
