@@ -11,6 +11,7 @@ from .views import (
     book_session,
     edit_session,      
     list_mentors,
+    session_list,
     search_mentors,
     become_mentor,
     mentor_help,
@@ -63,6 +64,7 @@ urlpatterns = [
     path("report-concern/", report_concern, name="report_concern"),
     # Sessions 
     path("sessions/<int:session_id>/", view_session, name="view_session"),
+    path("sessions/", views.session_list, name="session_list"), 
     path("sessions/create/", create_session, name="create_session"),
     path("sessions/<int:session_id>/edit/", edit_session, name="edit_session"),       
     path("session/<int:session_id>/book/", book_session, name="book_session"),

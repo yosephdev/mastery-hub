@@ -40,37 +40,6 @@ def pricing(request):
     """A view that handles pricing."""
     return render(request, "checkout/pricing.html")
 
-
-def session_list(request):
-    """A view that renders the list of sessions with optional filtering."""
-    query = request.GET.get("q")
-    selected_category = request.GET.get("category")
-
-    sessions = Session.objects.filter(status="scheduled")
-
-    if query:
-        sessions = sessions.filter(
-            Q(title__icontains=query) | Q(description__icontains=query)
-        )
-
-    if selected_category:
-        sessions = sessions.filter(category__name=selected_category)
-
-    categories = Category.objects.all()
-
-    for session in sessions:
-        print(f"Session ID: {session.id}, Price: {session.price}")
-
-    context = {
-        "sessions": sessions,
-        "categories": categories,
-        "selected_category": selected_category,
-        "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
-    }
-
-    return render(request, "masteryhub/session_list.html", context)
-
-
 @login_required
 def add_to_cart(request, session_id):
     """A view that adds a session to the user's cart."""
