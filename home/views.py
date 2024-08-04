@@ -62,25 +62,27 @@ def contact_view(request):
     )
 
 def search(request):
-    query = request.GET.get('q')
+    query = request.GET.get('q', '').strip()
+    profiles = []
+    sessions = []
+    error_message = ""
+
     if query:
         profiles = Profile.objects.filter(
-            Q(user__username__icontains=query) | 
-            Q(bio__icontains=query) |
-            Q(skills__icontains=query) |
-            Q(mentorship_areas__icontains=query)
+            models.Q(user__username__icontains=query) | 
+            models.Q(skills__icontains=query)
         )
         sessions = Session.objects.filter(
-            Q(title__icontains=query) | 
-            Q(description__icontains=query)
+            models.Q(title__icontains=query) | 
+            models.Q(description__icontains=query)
         )
     else:
-        profiles = Profile.objects.none()
-        sessions = Session.objects.none()
+        error_message = "Please enter a search term."
 
     context = {
         'query': query,
         'profiles': profiles,
         'sessions': sessions,
+        'error_message': error_message,
     }
     return render(request, 'home/search_results.html', context)
