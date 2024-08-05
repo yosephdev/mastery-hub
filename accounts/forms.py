@@ -1,4 +1,6 @@
 from django import forms
+from django_countries.fields import CountryField
+from django_countries.widgets import CountrySelectWidget
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
 from crispy_forms.helper import FormHelper
@@ -8,6 +10,7 @@ from accounts.models import Profile
 from masteryhub.models import Session, Forum, ConcernReport
 
 User = get_user_model()
+
 
 class CustomSignupForm(UserCreationForm):
     is_expert = forms.BooleanField(required=False, label="Are you a mentor?")
@@ -38,6 +41,7 @@ class CustomSignupForm(UserCreationForm):
         profile.save()
         return user
 
+
 class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
@@ -57,23 +61,29 @@ class CustomUserChangeForm(UserChangeForm):
             ),
         )
 
+
 class SessionForm(forms.ModelForm):
     class Meta:
         model = Session
         fields = [
             "title",
-            "description",            
+            "description",
             "duration",
             "category",
             "max_participants",
             "price",
         ]
         widgets = {
-            "date": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}),
-            "duration": forms.TimeInput(attrs={"type": "time", "class": "form-control"}),
+            "date": forms.DateTimeInput(
+                attrs={"type": "datetime-local", "class": "form-control"}
+            ),
+            "duration": forms.TimeInput(
+                attrs={"type": "time", "class": "form-control"}
+            ),
             "price": forms.NumberInput(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
         }
+
 
 class ProfileForm(forms.ModelForm):
     class Meta:
@@ -94,14 +104,26 @@ class ProfileForm(forms.ModelForm):
         ]
         widgets = {
             "bio": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
-            "skills": forms.TextInput(attrs={"placeholder": "Enter skills separated by commas", "class": "form-control"}),
+            "skills": forms.TextInput(
+                attrs={
+                    "placeholder": "Enter skills separated by commas",
+                    "class": "form-control",
+                }
+            ),
             "experience": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "achievements": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
-            "mentor_since": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
-            "mentorship_areas": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "mentor_since": forms.DateInput(
+                attrs={"type": "date", "class": "form-control"}
+            ),
+            "mentorship_areas": forms.Textarea(
+                attrs={"rows": 3, "class": "form-control"}
+            ),
             "availability": forms.TextInput(attrs={"class": "form-control"}),
-            "preferred_mentoring_method": forms.TextInput(attrs={"class": "form-control"}),
+            "preferred_mentoring_method": forms.TextInput(
+                attrs={"class": "form-control"}
+            ),
         }
+
 
 class ForumPostForm(forms.ModelForm):
     class Meta:
@@ -113,19 +135,30 @@ class ForumPostForm(forms.ModelForm):
             "category": forms.Select(attrs={"class": "form-control"}),
         }
 
+
 class MentorApplicationForm(forms.Form):
     name = forms.CharField(
         label="Your Name",
         max_length=100,
-        widget=forms.TextInput(attrs={"placeholder": "Enter your full name", "class": "form-control"}),
+        widget=forms.TextInput(
+            attrs={"placeholder": "Enter your full name", "class": "form-control"}
+        ),
     )
     email = forms.EmailField(
         label="Your Email",
-        widget=forms.EmailInput(attrs={"placeholder": "Enter your email address", "class": "form-control"}),
+        widget=forms.EmailInput(
+            attrs={"placeholder": "Enter your email address", "class": "form-control"}
+        ),
     )
     areas_of_expertise = forms.CharField(
         label="Areas of Expertise",
-        widget=forms.Textarea(attrs={"placeholder": "Describe your areas of expertise", "class": "form-control", "rows": 4}),
+        widget=forms.Textarea(
+            attrs={
+                "placeholder": "Describe your areas of expertise",
+                "class": "form-control",
+                "rows": 4,
+            }
+        ),
     )
 
     def __init__(self, *args, **kwargs):
@@ -141,6 +174,7 @@ class MentorApplicationForm(forms.Form):
             ),
         )
 
+
 class ConcernReportForm(forms.ModelForm):
     class Meta:
         model = ConcernReport
@@ -150,10 +184,37 @@ class ConcernReportForm(forms.ModelForm):
             "category": forms.Select(attrs={"class": "form-control"}),
         }
 
+
 class OrderForm(forms.Form):
     full_name = forms.CharField(max_length=50, required=True)
     email = forms.EmailField(max_length=254, required=True)
     address = forms.CharField(max_length=255, required=True)
     city = forms.CharField(max_length=50, required=True)
     postcode = forms.CharField(max_length=20, required=True)
-    country = forms.CharField(max_length=50, required=True)
+    country = CountryField(blank_label="Country").formfield(
+        widget=CountrySelectWidget(
+            attrs={"class": "border-black rounded-0 profile-form-input"}
+        )
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        placeholders = {
+            "full_name": "Full Name",
+            "email": "Email Address",
+            "address": "Street Address",
+            "city": "Town or City",
+            "postcode": "Postal Code",
+        }
+
+        # Setting autofocus for the 'full_name' field
+        self.fields["full_name"].widget.attrs["autofocus"] = True
+        # Adding placeholders and styles to form fields
+        for field in self.fields:
+            if field != "country":
+                placeholder = placeholders.get(field, field)
+                if self.fields[field].required:
+                    placeholder += " *"
+                self.fields[field].widget.attrs["placeholder"] = placeholder
+            self.fields[field].widget.attrs["class"] = "stripe-style-input"
+            self.fields[field].label = False
