@@ -129,6 +129,7 @@ h1 {
 
 .logo-font {
   text-transform: uppercase;
+  font-weight: 600;
 }
 
 /* Section: How It Works */
