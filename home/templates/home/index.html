@@ -15,7 +15,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
-        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 
 <!-- Carousel Section -->
 <div id="skillCarousel" class="carousel slide" data-ride="carousel">
@@ -29,13 +29,16 @@
         <div class="carousel-item active">
             <img src="{% static 'images/hero-bg-2.jpg' %}" class="d-block w-100" alt="hero-bg">
             <div class="carousel-caption d-none d-md-block">
-                <h2 class="display-4 font-weight-bold">Connect, Learn, and Grow with Expert-Led Skill-Sharing Sessions</h2>
+                <h2 class="display-4 font-weight-bold">Connect, Learn, and Grow with Expert-Led Skill-Sharing Sessions
+                </h2>
                 <p class="lead">Find a Skill | Share Your Expertise</p>
                 <ul class="list-unstyled">
                     <li><i class="fas fa-check-circle text-success"></i> Step 1: Create your profile</li>
-                    <li><i class="fas fa-check-circle text-success"></i> Step 2: Explore skills or offer your expertise</li>
+                    <li><i class="fas fa-check-circle text-success"></i> Step 2: Explore skills or offer your expertise
+                    </li>
                     <li><i class="fas fa-check-circle text-success"></i> Step 3: Connect with mentors or mentees</li>
-                    <li><i class="fas fa-check-circle text-success"></i> Step 4: Participate in sessions and track your progress</li>
+                    <li><i class="fas fa-check-circle text-success"></i> Step 4: Participate in sessions and track your
+                        progress</li>
                 </ul>
             </div>
         </div>
@@ -66,11 +69,13 @@
             <div class="carousel-caption d-none d-md-block">
                 <h3 class="display-4 font-weight-bold mb-4">Testimonials</h3>
                 <blockquote class="blockquote text-center">
-                    <p class="mb-0">"MasteryHub has transformed my career! The mentors are incredibly knowledgeable and supportive."</p>
+                    <p class="mb-0">"MasteryHub has transformed my career! The mentors are incredibly knowledgeable and
+                        supportive."</p>
                     <footer class="blockquote-footer text-white">Emily R.</footer>
                 </blockquote>
                 <blockquote class="blockquote text-center">
-                    <p class="mb-0">"I've learned so much in such a short time. The platform is easy to use and the sessions are very engaging."</p>
+                    <p class="mb-0">"I've learned so much in such a short time. The platform is easy to use and the
+                        sessions are very engaging."</p>
                     <footer class="blockquote-footer text-white">Michael T.</footer>
                 </blockquote>
             </div>
@@ -100,11 +105,13 @@
             <div class="image-scroll-container">
                 <div class="image-scroll">
                     <figure class="p-2 text-center">
-                        <img src="{% static 'images/digital-marketing.jpeg' %}" class="img-fluid" alt="Digital Marketing">
+                        <img src="{% static 'images/digital-marketing.jpeg' %}" class="img-fluid"
+                            alt="Digital Marketing">
                         <figcaption>Digital Marketing</figcaption>
                     </figure>
                     <figure class="p-2 text-center">
-                        <img src="{% static 'images/career-development.jpeg' %}" class="img-fluid" alt="Career Development">
+                        <img src="{% static 'images/career-development.jpeg' %}" class="img-fluid"
+                            alt="Career Development">
                         <figcaption>Career Development</figcaption>
                     </figure>
                     <figure class="p-2 text-center">
@@ -160,47 +167,40 @@
 
 <!-- Featured Skills Section -->
 <div class="container-fluid featured-skills">
-    <div class="text-center">
-        <h2>Featured Skills and Categories</h2>
-        <div class="row">
-            <div class="col-md-3">
-                <div class="card mb-4">
-                    <img src="{% static 'images/technology.jpeg' %}" class="card-img-top" alt="Technology">
-                    <div class="card-body">
-                        <h5 class="card-title">Technology</h5>
-                        <a href="{% url 'view_session' session_id=2 %}" class="btn btn-primary">Join Now</a>
-                    </div>
+    <h2 class="display-4 font-weight-bold text-center">Featured Skills</h2>
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="{% static 'images/web-development.jpeg' %}" class="card-img-top" alt="Web Development">
+                <div class="card-body">
+                    <h5 class="card-title">Web Development</h5>
+                    <p class="card-text">Build modern, responsive websites using the latest technologies.</p>
+                    <a href="{% url 'view_session' session_id=2 %}" class="btn btn-primary">Explore</a>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card mb-4">
-                    <img src="{% static 'images/business.jpeg' %}" class="card-img-top" alt="Business">
-                    <div class="card-body">
-                        <h5 class="card-title">Business</h5>
-                        <a href="{% url 'view_session' session_id=5 %}" class="btn btn-primary">Join Now</a>
-                    </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="{% static 'images/digital-marketing.jpeg' %}" class="card-img-top" alt="Digital Marketing">
+                <div class="card-body">
+                    <h5 class="card-title">Digital Marketing</h5>
+                    <p class="card-text">Learn how to create and execute effective digital marketing strategies.</p>
+                    <a href="{% url 'view_session' session_id=1 %}" class="btn btn-primary">Explore</a>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card mb-4">
-                    <img src="{% static 'images/creative.jpeg' %}" class="card-img-top" alt="Creative">
-                    <div class="card-body">
-                        <h5 class="card-title">Creative</h5>
-                        <a href="{% url 'view_session' session_id=1 %}" class="btn btn-primary">Join Now</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card mb-4">
-                    <img src="{% static 'images/soft-skills.jpeg' %}" class="card-img-top" alt="Soft Skills">
-                    <div class="card-body">
-                        <h5 class="card-title">Soft Skills</h5>
-                        <a href="{% url 'view_session' session_id=4 %}" class="btn btn-primary">Join Now</a>
-                    </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="{% static 'images/data-science.jpeg' %}" class="card-img-top" alt="Data Science">
+                <div class="card-body">
+                    <h5 class="card-title">Data Science</h5>
+                    <p class="card-text">Analyze data to gain valuable insights and make data-driven decisions.</p>
+                    <a href="{% url 'view_session' session_id=3 %}" class="btn btn-primary">Explore</a>
                 </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <!-- Creative Mentors Section -->
