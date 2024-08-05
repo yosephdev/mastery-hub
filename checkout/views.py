@@ -84,10 +84,10 @@ def checkout(request):
         form = OrderForm(request.POST)
         if form.is_valid():
             full_name = form.cleaned_data["full_name"]
-            street_address1 = form.cleaned_data["address"]
-            street_address2 = form.cleaned_data.get("address2", "")
+            street_address1 = form.cleaned_data["street_address1"]
+            street_address2 = form.cleaned_data.get("street_address2", "")
             county = form.cleaned_data.get("county", "")
-            town_or_city = form.cleaned_data["city"]
+            town_or_city = form.cleaned_data["town_or_city"]
             postcode = form.cleaned_data.get("postcode", "")
             country = form.cleaned_data["country"]
             phone_number = request.POST.get("phone_number", "")
