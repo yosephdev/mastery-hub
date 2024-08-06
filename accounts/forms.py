@@ -186,25 +186,35 @@ class ConcernReportForm(forms.ModelForm):
 
 
 class OrderForm(forms.Form):
-    full_name = forms.CharField(max_length=50, required=True)
-    email = forms.EmailField(max_length=254, required=True)
-    address = forms.CharField(max_length=255, required=True)
-    city = forms.CharField(max_length=50, required=True)
-    postcode = forms.CharField(max_length=20, required=True)
+    full_name = forms.CharField(max_length=50, required=True, label="Full Name")
+    email = forms.EmailField(max_length=254, required=True, label="Email")
+    street_address1 = forms.CharField(
+        max_length=80, required=True, label="Street Address 1"
+    )
+    street_address2 = forms.CharField(
+        max_length=80, required=False, label="Street Address 2"
+    )
+    county = forms.CharField(max_length=80, required=False, label="County")
+    town_or_city = forms.CharField(max_length=80, required=True, label="Town/City")
+    postcode = forms.CharField(max_length=20, required=True, label="Postcode")
     country = CountryField(blank_label="Country").formfield(
         widget=CountrySelectWidget(
             attrs={"class": "border-black rounded-0 profile-form-input"}
         )
     )
+    phone_number = forms.CharField(max_length=20, required=True, label="Phone Number")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         placeholders = {
             "full_name": "Full Name",
             "email": "Email Address",
-            "address": "Street Address",
-            "city": "Town or City",
+            "street_address1": "Street Address 1",
+            "street_address2": "Street Address 2",
+            "county": "County",
+            "town_or_city": "Town/City",
             "postcode": "Postal Code",
+            "phone_number": "Phone Number",
         }
 
         # Setting autofocus for the 'full_name' field
