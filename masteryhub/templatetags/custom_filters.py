@@ -8,3 +8,7 @@ def subtract(value, arg):
         return value - arg
     except (ValueError, TypeError):
         return value
+
+@register.filter
+def custom_field_errors(field):
+    return field.errors
