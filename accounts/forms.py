@@ -25,6 +25,8 @@ class CustomSignupForm(UserCreationForm):
         self.helper.form_method = "post"
         self.helper.form_class = 'signup'
         self.helper.form_id = 'signup_form'
+        self.helper.add_input(Submit("submit", "Sign Up"))
+       
         self.helper.layout = Layout(
             Field('username', aria_describedby="id_username_helptext"),
             'email',
