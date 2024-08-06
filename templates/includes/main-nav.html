@@ -16,13 +16,11 @@
                 <div class="row">
                     <div class="col">
                         <h6 class="dropdown-header text-black font-weight-bold">Categories:</h6>
-                        <a href="/masteryhub/sessions/?category=Web Development" class="dropdown-item">Technology</a>
-                        <a href="{% url 'session_list' %}?category=Leadership" class="dropdown-item">Soft
-                            Skills</a>
-                        <a href="{% url 'session_list' %}?category=Business" class="dropdown-item">Business</a>
-                        <a href="{% url 'session_list' %}?category=all" class="dropdown-item">All
-                            Categories</a>
-                    </div>
+                        <a href="{% url 'session_list' %}?category={{ 'Web Development'|urlencode }}" class="dropdown-item">Technology</a>
+                        <a href="{% url 'session_list' %}?category={{ 'Leadership'|urlencode }}" class="dropdown-item">Soft Skills</a>
+                        <a href="{% url 'session_list' %}?category={{ 'Business'|urlencode }}" class="dropdown-item">Business</a>
+                        <a href="{% url 'session_list' %}?category={{ 'all'|urlencode }}" class="dropdown-item">All Categories</a>
+                    </div>                    
                 </div>
             </div>
         </li>
