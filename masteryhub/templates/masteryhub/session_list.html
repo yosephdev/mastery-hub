@@ -2,7 +2,6 @@
 {% load static %}
 {% load custom_filters %}
 
-
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 
@@ -25,7 +24,7 @@
             <div class="categories-section mb-4">
                 <a href="{% url 'session_list' %}" class="btn btn-outline-secondary btn-block {% if not selected_category %}active{% endif %}">All categories</a>
                 {% for category in categories %}
-                <a href="{% url 'session_list' %}?category={{ category.name }}" class="btn btn-outline-secondary btn-block {% if selected_category == category.name %}active{% endif %}">{{category.name }}</a>
+                <a href="{% url 'session_list' %}?category={{ category.name|urlencode }}" class="btn btn-outline-secondary btn-block {% if selected_category == category.name %}active{% endif %}">{{ category.name }}</a>
                 {% endfor %}
             </div>
         </div>
