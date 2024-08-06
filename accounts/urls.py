@@ -1,4 +1,5 @@
 from django.urls import path
+from allauth.account.views import SignupView
 from . import views
 from . import admin_views
 from .views import (
@@ -10,16 +11,11 @@ from .views import (
 
 urlpatterns = [
     # Authentication
-    path("signup/", signup_view, name="account_signup"),
+    path("accounts/signup/", SignupView.as_view(), name="account_signup"),
     path("login/", CustomLoginView.as_view(), name="account_login"),
     path("logout/", CustomLogoutView.as_view(), name="account_logout"),
     path(
-        "confirm-email/",
-        CustomConfirmEmailView.as_view(),
-        name="account_email_verification_sent",
-    ),
-    path(
-        "confirm-email/<key>/",
+        "confirm-email/<str:key>/",
         CustomConfirmEmailView.as_view(),
         name="account_confirm_email",
     ),
