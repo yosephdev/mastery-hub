@@ -23,7 +23,18 @@ class CustomSignupForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
-        self.helper.add_input(Submit("submit", "Sign Up"))
+        self.helper.form_class = 'signup'
+        self.helper.form_id = 'signup_form'
+        self.helper.layout = Layout(
+            Field('username', css_class='textinput form-control'),
+            Field('email', css_class='emailinput form-control'),
+            Field('password1', css_class='passwordinput form-control', autocomplete='new-password'),
+            Field('password2', css_class='passwordinput form-control', autocomplete='new-password'),
+            Field('is_expert', css_class='checkboxinput form-check-input'),
+            ButtonHolder(
+                Submit('submit', 'Sign Up', css_class='btn btn-primary btn-lg')
+            )
+        )
 
     def save(self, commit=True):
         user = super().save(commit=False)
