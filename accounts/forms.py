@@ -5,6 +5,8 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, ButtonHolder, Submit, Div
+from django.utils.translation import gettext_lazy as _
+from allauth.account.forms import SignupForm as AllAuthSignupForm
 
 from accounts.models import Profile
 from masteryhub.models import Session, Forum, ConcernReport
@@ -12,7 +14,7 @@ from masteryhub.models import Session, Forum, ConcernReport
 User = get_user_model()
 
 
-class SignUpForm(forms.Form):
+class CustomSignupForm(AllAuthSignupForm):
     username = forms.CharField(max_length=150, help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.")
     email = forms.EmailField()
     password1 = forms.CharField(widget=forms.PasswordInput, help_text=(
@@ -26,7 +28,7 @@ class SignUpForm(forms.Form):
     terms = forms.BooleanField(required=True)
 
     def __init__(self, *args, **kwargs):
-        super(SignUpForm, self).__init__(*args, **kwargs)
+        super(CustomSignupForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
@@ -46,11 +48,12 @@ class SignUpForm(forms.Form):
                 'submit',
                 css_class='d-flex justify-content-between align-items-center mt-4'
             )
-        )       
+        )
         for field_name, field in self.fields.items():
             field.help_text = field.help_text.replace('<br>', ' ')
 
-    def signup(self, request, user):
+    def save(self, request):
+        user = super().save(request)
         profile, created = Profile.objects.get_or_create(user=user)
         profile.is_expert = self.cleaned_data.get("is_expert")
         profile.save()
