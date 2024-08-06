@@ -45,19 +45,32 @@ class CustomSignupForm(AllAuthSignupForm):
                 css_class='form-group'
             ),
             Div(
-                'submit',
+                Submit('submit', 'Sign Up', css_class='btn btn-primary'),
                 css_class='d-flex justify-content-between align-items-center mt-4'
             )
         )
         for field_name, field in self.fields.items():
             field.help_text = field.help_text.replace('<br>', ' ')
 
-    def save(self, request):
-        user = super().save(request)
+    def save(self, request):       
+        user = super().save(request)       
         profile, created = Profile.objects.get_or_create(user=user)
         profile.is_expert = self.cleaned_data.get("is_expert")
         profile.save()
         return user
+    def save(self, request):
+        try:
+            print(f"Saving user with email: {self.cleaned_data.get('email')}")
+            user = super().save(request)
+            profile, created = Profile.objects.get_or_create(user=user)
+            profile.is_expert = self.cleaned_data.get("is_expert")
+            profile.save()
+            return user
+        except ValueError as e:
+            print(f"ValueError in save method: {e}")
+            raise
+
+
 
 
 class CustomUserChangeForm(UserChangeForm):
