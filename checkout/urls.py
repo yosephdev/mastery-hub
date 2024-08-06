@@ -4,15 +4,15 @@ from .views import (
     pricing,
     increase_quantity,
     decrease_quantity,
-    remove_from_cart,    
+    remove_from_cart,
 )
-from masteryhub.views import (    
+from masteryhub.views import (
     session_list,
 )
 
 urlpatterns = [
     path("pricing/", pricing, name="pricing"),
-    path('', views.checkout, name='checkout'),
+    path("", views.checkout, name="checkout"),
     path("add-to-cart/<int:session_id>/", views.add_to_cart, name="add_to_cart"),
     path("cart/", views.view_cart, name="view_cart"),
     path("checkout/", views.checkout, name="checkout"),
@@ -21,8 +21,8 @@ urlpatterns = [
         views.create_checkout_session,
         name="create_checkout_session",
     ),
-   path('success/', views.checkout_success, name='checkout_success'),
-    path("cancel/", views.payment_cancel, name="payment_cancel"),           
+    path("success/", views.checkout_success, name="checkout_success"),
+    path("cancel/", views.payment_cancel, name="payment_cancel"),
     path(
         "checkout/success/<order_number>/",
         views.checkout_success,

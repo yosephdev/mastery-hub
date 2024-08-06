@@ -59,7 +59,9 @@ def signup_view(request):
             password = form.cleaned_data.get("password1")
             user = authenticate(username=username, password=password)
             login(request, user)
-            messages.success(request, f"Welcome, {user.username}! Registration successful!")
+            messages.success(
+                request, f"Welcome, {user.username}! Registration successful!"
+            )
             return redirect("home")
         for field, error in form.errors.items():
             messages.error(request, f"{field}: {error}")
@@ -67,8 +69,10 @@ def signup_view(request):
         form = CustomSignupForm()
     return render(request, "account/signup.html", {"form": form})
 
+
 class CustomLoginView(LoginView):
     """Handle user login."""
+
     template_name = "account/login.html"
 
     def form_valid(self, form):
@@ -85,11 +89,15 @@ class CustomLoginView(LoginView):
             return redirect("view_profile", username=user.username)
 
     def form_invalid(self, form):
-        messages.error(self.request, "Login failed. Please check your username and password.")
+        messages.error(
+            self.request, "Login failed. Please check your username and password."
+        )
         return self.render_to_response(self.get_context_data(form=form))
+
 
 class CustomLogoutView(LogoutView):
     """Handle user logout."""
+
     template_name = "account/logout.html"
     next_page = reverse_lazy("home")
 
@@ -104,6 +112,7 @@ class CustomLogoutView(LogoutView):
 
     def get_next_page(self):
         return str(self.next_page)
+
 
 class CustomConfirmEmailView(ConfirmEmailView):
     template_name = "account/email_confirm.html"

@@ -1,1 +1,1 @@
-default_app_config = 'masteryhub.apps.YourAppNameConfig'
+default_app_config = "masteryhub.apps.YourAppNameConfig"

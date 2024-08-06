@@ -5,14 +5,19 @@ from datetime import timedelta, datetime
 
 # Create your models here.
 
+
 class Session(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
     duration = models.DurationField(default=timedelta(hours=1))
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    host = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="sessions_hosted")
-    participants = models.ManyToManyField(Profile, related_name="sessions_participated", blank=True)
+    host = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name="sessions_hosted"
+    )
+    participants = models.ManyToManyField(
+        Profile, related_name="sessions_participated", blank=True
+    )
     category = models.ForeignKey("Category", on_delete=models.SET_NULL, null=True)
     status = models.CharField(
         max_length=20,
@@ -92,6 +97,7 @@ class Review(models.Model):
     def __str__(self):
         return f"{self.reviewer.user.username}'s review for {self.session.title}"
 
+
 class Forum(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
@@ -108,8 +114,12 @@ class Forum(models.Model):
 
 
 class Feedback(models.Model):
-    mentee = models.ForeignKey(Profile, related_name="feedbacks", on_delete=models.CASCADE)
-    mentor = models.ForeignKey(Profile, related_name="given_feedbacks", on_delete=models.CASCADE)
+    mentee = models.ForeignKey(
+        Profile, related_name="feedbacks", on_delete=models.CASCADE
+    )
+    mentor = models.ForeignKey(
+        Profile, related_name="given_feedbacks", on_delete=models.CASCADE
+    )
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

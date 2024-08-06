@@ -8,7 +8,8 @@ from checkout.models import Payment
 
 # Register your models here.
 
-@admin.action(description='Mark selected users as mentors')
+
+@admin.action(description="Mark selected users as mentors")
 def make_mentors(modeladmin, request, queryset):
     for user in queryset:
         try:
@@ -19,6 +20,7 @@ def make_mentors(modeladmin, request, queryset):
             messages.error(request, f"Profile for user {user.username} does not exist.")
             continue
     messages.success(request, "Selected users have been marked as mentors.")
+
 
 admin.site.register(Session)
 admin.site.register(Category)

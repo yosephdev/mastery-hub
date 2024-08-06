@@ -26,12 +26,12 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("accounts/", include("allauth.urls")),
     path("masteryhub/", include("masteryhub.urls")),
-    path('checkout/', include('checkout.urls')),
-    path('profiles/', include('profiles.urls')),
+    path("checkout/", include("checkout.urls")),
+    path("profiles/", include("profiles.urls")),
     path("", include("home.urls")),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-handler404 = 'skill_sharing_platform.views.handler404'
+handler404 = "skill_sharing_platform.views.handler404"

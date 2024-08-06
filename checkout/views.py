@@ -40,6 +40,7 @@ def pricing(request):
     """A view that handles pricing."""
     return render(request, "checkout/pricing.html")
 
+
 @login_required
 def add_to_cart(request, session_id):
     """A view that adds a session to the user's cart."""

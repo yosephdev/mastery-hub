@@ -185,7 +185,8 @@ def session_list(request):
     }
 
     return render(request, "masteryhub/session_list.html", context)
-    
+
+
 def list_mentors(request):
     """A view that handles the mentor list."""
     query = request.GET.get("q")

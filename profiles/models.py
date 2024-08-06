@@ -3,4 +3,3 @@ from django.db import models
 from datetime import timedelta, datetime
 
 # Create your models here.
-

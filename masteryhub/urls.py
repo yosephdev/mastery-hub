@@ -1,15 +1,15 @@
 from django.urls import path
 from . import views
-from .views import (   
+from .views import (
     expert_dashboard,
     mentee_dashboard,
-    mentor_matching_view,   
+    mentor_matching_view,
     forum_list,
     create_forum_post,
     view_forum_post,
     reply_forum_post,
     book_session,
-    edit_session,      
+    edit_session,
     list_mentors,
     session_list,
     search_mentors,
@@ -21,7 +21,7 @@ from .views import (
     manage_mentorship_requests,
     accept_mentorship,
     reject_mentorship,
-    my_mentorships,    
+    my_mentorships,
     view_session,
     create_session,
     delete_session,
@@ -29,7 +29,7 @@ from .views import (
     forum_posts,
 )
 
-urlpatterns = [   
+urlpatterns = [
     # Mentors
     path("mentors/", list_mentors, name="list_mentors"),
     path("search-mentors/", search_mentors, name="search_mentors"),
@@ -62,16 +62,15 @@ urlpatterns = [
     ),
     path("my-mentorships/", my_mentorships, name="my_mentorships"),
     path("report-concern/", report_concern, name="report_concern"),
-    # Sessions 
+    # Sessions
     path("sessions/<int:session_id>/", view_session, name="view_session"),
-    path("sessions/", views.session_list, name="session_list"), 
+    path("sessions/", views.session_list, name="session_list"),
     path("sessions/create/", create_session, name="create_session"),
-    path("sessions/<int:session_id>/edit/", edit_session, name="edit_session"),       
+    path("sessions/<int:session_id>/edit/", edit_session, name="edit_session"),
     path("session/<int:session_id>/book/", book_session, name="book_session"),
     # Forums
     path("forums/", forum_list, name="forum_list"),
     path("forums/new/", create_forum_post, name="create_forum_post"),
     path("forums/<int:post_id>/", view_forum_post, name="view_forum_post"),
     path("forums/<int:post_id>/reply/", reply_forum_post, name="reply_forum_post"),
-    
 ]
