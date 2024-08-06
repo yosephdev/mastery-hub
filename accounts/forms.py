@@ -4,7 +4,7 @@ from django_countries.widgets import CountrySelectWidget
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, ButtonHolder, Submit
+from crispy_forms.layout import Layout, Field, ButtonHolder, Submit, Div
 
 from accounts.models import Profile
 from masteryhub.models import Session, Forum, ConcernReport
@@ -12,39 +12,43 @@ from masteryhub.models import Session, Forum, ConcernReport
 User = get_user_model()
 
 
-class CustomSignupForm(UserCreationForm):
-    is_expert = forms.BooleanField(required=False, label="Are you a mentor?")
-
-    class Meta:
-        model = User
-        fields = ("username", "email", "password1", "password2")
+class SignUpForm(forms.Form):
+    username = forms.CharField(max_length=150, help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.")
+    email = forms.EmailField()
+    password1 = forms.CharField(widget=forms.PasswordInput, help_text=(
+        "Your password can’t be too similar to your other personal information.<br>"
+        "Your password must contain at least 8 characters.<br>"
+        "Your password can’t be a commonly used password.<br>"
+        "Your password can’t be entirely numeric."
+    ))
+    password2 = forms.CharField(widget=forms.PasswordInput, help_text="Enter the same password as before, for verification.")
+    is_expert = forms.BooleanField(required=False)
+    terms = forms.BooleanField(required=True)
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(SignUpForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_method = "post"
-        self.helper.form_class = 'signup'
-        self.helper.form_id = 'signup_form'
-        self.helper.add_input(Submit("submit", "Sign Up"))
-       
+        self.helper.form_method = 'post'
         self.helper.layout = Layout(
-            Field('username', aria_describedby="id_username_helptext"),
-            'email',
-            Field('password1', aria_describedby="id_password1_helptext"),
-            Field('password2', aria_describedby="id_password2_helptext"),
-            'is_expert',
-            Submit('submit', 'Sign Up')
-        )
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.email = self.cleaned_data["email"]
-        if commit:
-            user.save()
-            profile, created = Profile.objects.get_or_create(user=user)
-            profile.is_expert = self.cleaned_data.get("is_expert")
-            profile.save()
-        return user
+            Div(
+                Field('username'),
+                Field('email'),
+                Field('password1'),
+                Field('password2'),
+                Field('is_expert'),
+                Div(
+                    Field('terms'),
+                    css_class='form-check'
+                ),
+                css_class='form-group'
+            ),
+            Div(
+                'submit',
+                css_class='d-flex justify-content-between align-items-center mt-4'
+            )
+        )       
+        for field_name, field in self.fields.items():
+            field.help_text = field.help_text.replace('<br>', ' ')
 
     def signup(self, request, user):
         profile, created = Profile.objects.get_or_create(user=user)
