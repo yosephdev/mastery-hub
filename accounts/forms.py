@@ -26,14 +26,12 @@ class CustomSignupForm(UserCreationForm):
         self.helper.form_class = 'signup'
         self.helper.form_id = 'signup_form'
         self.helper.layout = Layout(
-            Field('username', css_class='textinput form-control'),
-            Field('email', css_class='emailinput form-control'),
-            Field('password1', css_class='passwordinput form-control', autocomplete='new-password'),
-            Field('password2', css_class='passwordinput form-control', autocomplete='new-password'),
-            Field('is_expert', css_class='checkboxinput form-check-input'),
-            ButtonHolder(
-                Submit('submit', 'Sign Up', css_class='btn btn-primary btn-lg')
-            )
+            Field('username', aria_describedby="id_username_helptext"),
+            'email',
+            Field('password1', aria_describedby="id_password1_helptext"),
+            Field('password2', aria_describedby="id_password2_helptext"),
+            'is_expert',
+            Submit('submit', 'Sign Up')
         )
 
     def save(self, commit=True):
