@@ -33,24 +33,26 @@
 
           <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
             {% csrf_token %}
-            {{ form|crispy }}
+            {{ form|crispy }}            
             <div class="form-group">
               <div class="form-check">
                 <input type="checkbox" name="terms" class="form-check-input" id="id_terms" required>
                 <label for="id_terms" class="form-check-label">
-                  I have read and agree to MasteryHub's <a href="https://www.termsfeed.com/live/0f539249-0d33-4a4c-b95d-a62c56808701" class="text-success">Privacy Policy</a> and <a
-                    href="https://www.termsfeed.com/live/1c785e96-6ff6-4948-99ff-c333f8923466" class="text-success">Terms of Service</a>
+                  I have read and agree to MasteryHub's 
+                  <a href="https://www.termsfeed.com/live/0f539249-0d33-4a4c-b95d-a62c56808701" class="text-success">Privacy Policy</a> 
+                  and 
+                  <a href="https://www.termsfeed.com/live/1c785e96-6ff6-4948-99ff-c333f8923466" class="text-success">Terms of Service</a>
                 </label>
               </div>
-            </div>
+            </div>            
             {% if redirect_field_value %}
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-            {% endif %}
+            {% endif %}            
             <div class="d-flex justify-content-between align-items-center mt-4">
               <a class="btn btn-outline-dark btn-lg" href="{% url 'account_login' %}">{% trans "Back to Login" %}</a>
               <button type="submit" class="btn btn-primary btn-lg">{% trans "Sign Up" %}</button>
             </div>            
-          </form>
+          </form>          
         </div>
       </div>
     </div>
