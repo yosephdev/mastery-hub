@@ -15,62 +15,48 @@ User = get_user_model()
 
 
 class CustomSignupForm(AllAuthSignupForm):
-    username = forms.CharField(max_length=150, help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.")
+    username = forms.CharField(
+        max_length=150,
+        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+    )
     email = forms.EmailField()
-    password1 = forms.CharField(widget=forms.PasswordInput, help_text=(
-        "Your password can’t be too similar to your other personal information.<br>"
-        "Your password must contain at least 8 characters.<br>"
-        "Your password can’t be a commonly used password.<br>"
-        "Your password can’t be entirely numeric."
-    ))
-    password2 = forms.CharField(widget=forms.PasswordInput, help_text="Enter the same password as before, for verification.")
+    password1 = forms.CharField(
+        widget=forms.PasswordInput,
+        help_text=(
+            "Your password can’t be too similar to your other personal information. "
+            "Your password must contain at least 8 characters. "
+            "Your password can’t be a commonly used password. "
+            "Your password can’t be entirely numeric."
+        ),
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput,
+        help_text="Enter the same password as before, for verification.",
+    )
     is_expert = forms.BooleanField(required=False)
     terms = forms.BooleanField(required=True)
 
     def __init__(self, *args, **kwargs):
-        super(CustomSignupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.helper = FormHelper()
-        self.helper.form_method = 'post'
+        self.helper.form_method = "post"
         self.helper.layout = Layout(
             Div(
-                Field('username'),
-                Field('email'),
-                Field('password1'),
-                Field('password2'),
-                Field('is_expert'),
-                Div(
-                    Field('terms'),
-                    css_class='form-check'
-                ),
-                css_class='form-group'
+                Field("username"),
+                Field("email"),
+                Field("password1"),
+                Field("password2"),
+                Field("is_expert"),
+                Div(Field("terms", id="id_terms_checkbox"), css_class="form-check"),
+                css_class="form-group",
             ),
             Div(
-                Submit('submit', 'Sign Up', css_class='btn btn-primary'),
-                css_class='d-flex justify-content-between align-items-center mt-4'
-            )
+                Submit("submit", "Sign Up", css_class="btn btn-primary"),
+                css_class="d-flex justify-content-between align-items-center mt-4",
+            ),
         )
         for field_name, field in self.fields.items():
-            field.help_text = field.help_text.replace('<br>', ' ')
-
-    def save(self, request):       
-        user = super().save(request)       
-        profile, created = Profile.objects.get_or_create(user=user)
-        profile.is_expert = self.cleaned_data.get("is_expert")
-        profile.save()
-        return user
-    def save(self, request):
-        try:
-            print(f"Saving user with email: {self.cleaned_data.get('email')}")
-            user = super().save(request)
-            profile, created = Profile.objects.get_or_create(user=user)
-            profile.is_expert = self.cleaned_data.get("is_expert")
-            profile.save()
-            return user
-        except ValueError as e:
-            print(f"ValueError in save method: {e}")
-            raise
-
-
+            field.help_text = field.help_text.replace("<br>", " ")
 
 
 class CustomUserChangeForm(UserChangeForm):
