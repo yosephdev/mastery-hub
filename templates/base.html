@@ -187,7 +187,7 @@
     </footer>
 
     {% block postloadjs %}
-    <script type="text/javascript">
+    <script>
         document.querySelectorAll('.toast').forEach(function (toastElement) {
             var toast = new bootstrap.Toast(toastElement);
             toast.show();
