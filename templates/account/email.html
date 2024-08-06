@@ -42,7 +42,10 @@
             <div class="buttonHolder">
                 <button class="secondaryAction" type="submit" name="action_primary">{% trans 'Make Primary' %}</button>
                 <button class="secondaryAction" type="submit" name="action_send">{% trans 'Re-send Verification' %}</button>
-                <button class="primaryAction" type="submit" name="action_remove" onclick="return confirm('{% trans 'Do you really want to remove the selected e-mail address?' %}');">{% trans 'Remove' %}</button>
+                <button class="primaryAction" type="submit" name="action_remove" id="remove-email-btn">
+                    {% trans "Remove" %}
+                </button>
+
             </div>
 
         </fieldset>
@@ -66,9 +69,9 @@
 <script>
 (function() {
     var message = "{% trans 'Do you really want to remove the selected e-mail address?' %}";
-    var actions = document.getElementsByName('action_remove');
-    if (actions.length) {
-        actions[0].addEventListener("click", function(e) {
+    var actionButton = document.getElementById('remove-email-btn');
+    if (actionButton) {
+        actionButton.addEventListener("click", function(e) {
             if (!confirm(message)) {
                 e.preventDefault();
             }
@@ -77,3 +80,4 @@
 })();
 </script>
 {% endblock extra_body %}
+
