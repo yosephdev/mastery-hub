@@ -116,8 +116,6 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-ACCOUNT_SIGNUP_FORM_CLASS = "accounts.forms.CustomSignupForm"
-
 CSRF_TRUSTED_ORIGINS = [
     "https://8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net",
     "https://skill-sharing-446c0336ffb5.herokuapp.com/",
