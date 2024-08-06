@@ -2,8 +2,7 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.views import View
 from django.conf import settings
 from django.core.mail import send_mail
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -12,12 +11,15 @@ from django.db.models import Q, Count, Sum
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404
 from django.utils import timezone
 from django.contrib.auth.models import User
 from .forms import MentorApplicationForm, ConcernReportForm
 from django.contrib.admin.models import LogEntry, ADDITION
 from allauth.account.views import ConfirmEmailView
+from allauth.account.models import EmailConfirmationHMAC
 from django.contrib.contenttypes.models import ContentType
+
 from accounts.models import (
     Profile,
 )
@@ -58,16 +60,35 @@ def signup_view(request):
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password1")
             user = authenticate(username=username, password=password)
-            login(request, user)
-            messages.success(
-                request, f"Welcome, {user.username}! Registration successful!"
-            )
-            return redirect("home")
-        for field, error in form.errors.items():
-            messages.error(request, f"{field}: {error}")
+
+            if user is not None:
+                auth_login(request, user)
+                messages.success(
+                    request, f"Welcome, {user.username}! Registration successful!"
+                )
+                return redirect("home")
+            else:
+                messages.error(request, "Authentication failed.")
+        else:
+            for field, error in form.errors.items():
+                messages.error(request, f"{field}: {error}")
     else:
         form = CustomSignupForm()
+
     return render(request, "account/signup.html", {"form": form})
+
+
+class CustomConfirmEmailView(ConfirmEmailView):
+    template_name = "account/email_confirm.html"
+
+    def get_object(self, queryset=None):
+        key = self.kwargs.get("key")
+        if not key:
+            raise Http404("No key provided")
+        email_confirmation = EmailConfirmationHMAC.from_key(key)
+        if email_confirmation is None:
+            raise Http404("Invalid key")
+        return email_confirmation
 
 
 class CustomLoginView(LoginView):
