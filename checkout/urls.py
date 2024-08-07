@@ -37,5 +37,5 @@ urlpatterns = [
         "decrease_quantity/<int:item_id>/", decrease_quantity, name="decrease_quantity"
     ),
     path("remove_from_cart/<int:item_id>/", remove_from_cart, name="remove_from_cart"),
-    path('webhook/stripe/', stripe_webhook, name='stripe_webhook'),
+    path('wh/', stripe_webhook, name='stripe_webhook'),
 ]
