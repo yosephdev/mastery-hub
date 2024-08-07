@@ -228,30 +228,7 @@ The Home page of this online resource is an attractive and informative landing p
 ### Skill-Sharing Sessions Section
 ![Skill-Sharing Sessions Section Image](docs/readme_images/image-3.png)
 
-The Skill-Sharing Sessions page allows users to explore and register for various sessions. 
-
-### Features:
-- **Session Listings**: Displays sessions with images, titles, descriptions, and other details.
-- **Search & Filter**: Search sessions or filter by category.
-- **Session Actions**:
-  - **View Details**: Link to view detailed information about each session.
-  - **Add to Bag**: Button to add sessions to the shopping bag.
-- **User Interaction**:
-  - **Unauthorized Users**: Prompted to log in or register.
-
-### Dropdown Options:
-- View options in the dropdown menu.
-  ![Dropdown Option 1](docs/readme_images/image-17.png)
-  ![Dropdown Option 2](docs/readme_images/image-18.png)
-
-### Editing Options:
-- Modify options in the admin panel or directly on the site with admin rights.
-  ![Editing Option 1](docs/readme_images/image-19.png)
-  ![Editing Option 2](docs/readme_images/image-20.png)
-
-### Unauthorized Users:
-- Prompts to log in or register if not authorized.
-
+The Skill-Sharing Sessions page allows users to explore and register for various sessions. Prompts to log in or register if not authorized.
 
 <br>
 
@@ -302,6 +279,7 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 
 ### Restricted Pages
 ![Logged in and out Nav Image](docs/readme_images/image-11.png)
+![Logged in and out Nav Image](docs/readme_images/image-17.png)
 
 - Certain pages are accessible only to users who have logged in. Links to these pages are displayed in the Navbar exclusively when a user is logged in.
 
@@ -331,25 +309,6 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 ### Session Details Page
 ![Session Detail Image](docs/readme_images/image-16.png)
 The Session Details page provides a view of a session, including its image, name, price, category, rating, and other relevant information. Users can interact with this page in the following ways:
-
-- **Session Info**: Image, title, description, date, duration, price, host, status, max participants, and available spots.
-- **Participants**: List of current participants.
-- **User Status**:
-  - **Current Participants**: Success message.
-  - **Non-Participants**: Warning message.
-- **Reviews**: Users can add, update, or delete reviews.
-- **Navigation**: Button to return to the session list.
-
-- **Dropdown Options**: View various options in the dropdown window.
-
-![Dropdown Options](docs/readme_images/image-17.png)
-![Dropdown Options](docs/readme_images/image-18.png)
-
-- **Editing Options**: Modify options either in the admin panel or directly on the site if you have admin rights.
-  ![Editing Options](docs/readme_images/image-19.png)
-  ![Editing Options](docs/readme_images/image-20.png)
-
-- **User Authorization**: Unauthorized users are prompted to log in or register.
 
 <br>
 
@@ -893,7 +852,7 @@ As a backup, in case users prematurely close the purchase-order page during paym
 
 - From your Stripe dashboard, click **Developers**, and select **Webhooks**.
 - From there, click **Add Endpoint**.
-	- `https://sportswear-ebbdbb6bb6ec.herokuapp.com/checkout/wh/`
+	- `https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/wh/`
 - Click **receive all events**.
 - Click **Add Endpoint** to complete the process.
 - You'll have a new key here:
