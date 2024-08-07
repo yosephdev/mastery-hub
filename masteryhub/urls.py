@@ -72,5 +72,6 @@ urlpatterns = [
     path("forums/", forum_list, name="forum_list"),
     path("forums/new/", create_forum_post, name="create_forum_post"),
     path("forums/<int:post_id>/", view_forum_post, name="view_forum_post"),
-    path("forums/<int:post_id>/reply/", reply_forum_post, name="reply_forum_post"),
+    path(
+        "forums/<int:post_id>/reply/", reply_forum_post, name="reply_forum_post"),
 ]
