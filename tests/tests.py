@@ -1,8 +1,18 @@
+import os
+import django
+from django.test.utils import setup_test_environment
+
+os.environ["DJANGO_SETTINGS_MODULE"] = "skill_sharing_platform.settings"
+
+django.setup()
+setup_test_environment()
+
 import json
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
-from masteryhub.models import Session, Profile, Category
+from masteryhub.models import Session, Category
+from accounts.models import Profile
 from datetime import datetime, timedelta
 
 
@@ -30,9 +40,9 @@ class BagViewTests(TestCase):
             category=self.category,
         )
 
-    def test_add_to_bag(self):
+    def test_add_to_cart(self):
         response = self.client.post(
-            reverse("add_to_bag"),
+            reverse("add_to_cart", args=[self.session.id]),
             data=json.dumps(
                 {
                     "session_id": self.session.id,
@@ -43,12 +53,16 @@ class BagViewTests(TestCase):
             content_type="application/json",
         )
 
+        # Follow redirect if status code is 301 or 302
+        while response.status_code in (301, 302):
+            response = self.client.get(response.url)
+
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json().get("success"))
-        self.assertEqual(len(self.client.session.get("bag", [])), 1)
+        self.assertEqual(len(self.client.session.get("cart", [])), 1)
 
-    def test_remove_from_bag(self):
-        self.client.session["bag"] = [
+    def test_remove_from_cart(self):
+        self.client.session["cart"] = [
             {
                 "session": {
                     "id": self.session.id,
@@ -60,11 +74,14 @@ class BagViewTests(TestCase):
         self.client.session.save()
 
         response = self.client.post(
-            reverse("remove_from_bag"),
-            data=json.dumps({"session_id": self.session.id}),
+            reverse("remove_from_cart", args=[self.session.id]),
             content_type="application/json",
         )
 
+        # Follow redirect if status code is 301 or 302
+        while response.status_code in (301, 302):
+            response = self.client.get(response.url)
+
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json().get("success"))
-        self.assertEqual(len(self.client.session.get("bag", [])), 0)
+        self.assertEqual(len(self.client.session.get("cart", [])), 0)
