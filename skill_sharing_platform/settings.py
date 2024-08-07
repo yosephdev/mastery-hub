@@ -108,7 +108,11 @@ if "test" in sys.argv:
             "NAME": ":memory:",
         }
     }
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 
+FORMS_URLFIELD_ASSUME_HTTPS = True
 
 # Authentication
 AUTHENTICATION_BACKENDS = [

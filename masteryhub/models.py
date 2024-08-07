@@ -18,7 +18,8 @@ class Session(models.Model):
     participants = models.ManyToManyField(
         Profile, related_name="sessions_participated", blank=True
     )
-    category = models.ForeignKey("Category", on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(
+        "Category", on_delete=models.SET_NULL, null=True)
     status = models.CharField(
         max_length=20,
         choices=[
@@ -30,7 +31,8 @@ class Session(models.Model):
         default="scheduled",
     )
     max_participants = models.PositiveIntegerField(default=10)
-    image = models.ImageField(upload_to="session_images/", null=True, blank=True)
+    image = models.ImageField(
+        upload_to="session_images/", null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -82,7 +84,10 @@ class Mentorship(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.mentor.user.username} mentoring {self.mentee.user.username} - {self.status}"
+        return (
+            f"{self.mentor.user.username} mentoring "
+            f"{self.mentee.user.username} - {self.status}"
+        )
 
 
 class Review(models.Model):
@@ -95,18 +100,23 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.reviewer.user.username}'s review for {self.session.title}"
+        return (
+             f"{self.reviewer.user.username}'s review for "
+             f"{self.session.title}"
+         )
 
 
 class Forum(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     author = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     parent_post = models.ForeignKey(
-        "self", on_delete=models.CASCADE, null=True, blank=True, related_name="comments"
+        "self", on_delete=models.CASCADE, null=True,
+        blank=True, related_name="comments"
     )
 
     def __str__(self):

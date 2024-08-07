@@ -34,10 +34,6 @@ import stripe
 import json
 import logging
 
-logger = logging.getLogger(__name__)
-
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
 from accounts.forms import (
     CustomSignupForm,
     CustomUserChangeForm,
@@ -48,6 +44,11 @@ from accounts.forms import (
 )
 from .models import Mentorship, Session, Forum, Category, Feedback
 from accounts.models import Profile
+
+
+logger = logging.getLogger(__name__)
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 def become_mentor(request):
@@ -70,7 +71,8 @@ def become_mentor(request):
                     change_message=areas_of_expertise,
                 )
             messages.success(
-                request, "Your mentor application has been submitted successfully."
+                request,
+                "Your mentor application has been submitted successfully."
             )
             return redirect("home")
     else:
@@ -115,7 +117,8 @@ def search_mentors(request):
     if query:
         mentors = mentors.filter(mentorship_areas__icontains=query)
     return render(
-        request, "masteryhub/search_mentors.html", {"mentors": mentors, "query": query}
+        request,
+        "masteryhub/search_mentors.html", {"mentors": mentors, "query": query}
     )
 
 
@@ -133,7 +136,8 @@ def request_mentorship(request, mentor_id):
         message = (
             f"Mentorship request sent to {mentor_user.username}"
             if created
-            else f"You already have a pending request with {mentor_user.username}"
+            else f"You already have a pending request with {
+                mentor_user.username}"
         )
         messages.success(request, message)
         return redirect("view_mentor_profile", username=mentor_user.username)
@@ -192,12 +196,14 @@ def list_mentors(request):
     query = request.GET.get("q")
     if query:
         mentors = Profile.objects.filter(is_expert=True).filter(
-            Q(user__username__icontains=query) | Q(mentorship_areas__icontains=query)
+            Q(user__username__icontains=query)
+            | Q(mentorship_areas__icontains=query)
         )
     else:
         mentors = Profile.objects.filter(is_expert=True)
     return render(
-        request, "masteryhub/list_mentors.html", {"mentors": mentors, "query": query}
+        request, "masteryhub/list_mentors.html",
+        {"mentors": mentors, "query": query}
     )
 
 
@@ -207,7 +213,8 @@ def mentor_matching_view(request):
     if request.user.is_authenticated:
         mentee = request.user
         matches = match_mentor_mentee(mentee)
-        return render(request, "masteryhub/matching_results.html", {"matches": matches})
+        return render(
+            request, "masteryhub/matching_results.html", {"matches": matches})
     else:
         return redirect("login")
 
@@ -342,7 +349,7 @@ def book_session(request, session_id):
                     {
                         "price_data": {
                             "currency": "usd",
-                            "unit_amount": int(session.price * 100),
+                            "unit_amount": price_in_cents,
                             "product_data": {
                                 "name": session.title,
                                 "description": session.description,
@@ -352,17 +359,20 @@ def book_session(request, session_id):
                     }
                 ],
                 mode="payment",
-                success_url=request.build_absolute_uri(reverse("payment_success"))
-                + f"?session_id={{CHECKOUT_SESSION_ID}}&django_session_id={session.id}",
-                cancel_url=request.build_absolute_uri(reverse("payment_cancel")),
+                success_url=(
+                    request.build_absolute_uri(reverse("payment_success"))
+                    + f"?session_id={{CHECKOUT_SESSION_ID}}"
+                    + f"&django_session_id={session.id}"
+                ),
+                cancel_url=request.build_absolute_uri(
+                    reverse("payment_cancel")),
                 client_reference_id=str(session.id),
                 customer_email=request.user.email,
             )
             return redirect(checkout_session.url, code=303)
         except Exception as e:
             messages.error(
-                request, "Unable to process booking. Please try again later."
-            )
+                request, "Unable to process booking. Please try again later.")
             return redirect("session_list")
 
     return redirect("session_list")
@@ -415,7 +425,8 @@ def delete_session(request, session_id):
         session.delete()
         messages.success(request, "Session deleted successfully.")
         return redirect("session_list")
-    return render(request, "masteryhub/delete_session.html", {"session": session})
+    return render(
+     request, "masteryhub/delete_session.html", {"session": session})
 
 
 @login_required
@@ -428,7 +439,8 @@ def create_feedback(request, session_id):
         )
         messages.success(request, "Thank you for your feedback!")
         return redirect("view_session", session_id=session_id)
-    return render(request, "masteryhub/create_feedback.html", {"session": session})
+    return render(
+        request, "masteryhub/create_feedback.html", {"session": session})
 
 
 def forum_posts(request):
@@ -471,7 +483,8 @@ def view_forum_post(request, post_id):
     post = get_object_or_404(Forum, id=post_id)
     comments = post.comments.all()
     return render(
-        request, "masteryhub/view_forum_post.html", {"post": post, "comments": comments}
+        request,
+        "masteryhub/view_forum_post.html", {"post": post, "comments": comments}
     )
 
 
@@ -539,7 +552,8 @@ def report_concern(request):
         if form.is_valid():
             form.save()
             messages.success(
-                request, "Your concern has been reported. We will review it shortly."
+                request,
+                "Your concern has been reported. We will review it shortly."
             )
             return redirect("home")
     else:

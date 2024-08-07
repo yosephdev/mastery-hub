@@ -6,7 +6,8 @@ from datetime import timedelta
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
     skills = models.CharField(max_length=255, blank=True)
     goals = models.TextField(blank=True)
@@ -20,10 +21,12 @@ class Profile(models.Model):
     is_expert = models.BooleanField(default=False)
     mentor_since = models.DateField(null=True, blank=True)
     mentorship_areas = models.TextField(
-        blank=True, help_text="Areas you're willing to mentor in, separated by commas"
+        blank=True,
+        help_text="Areas you're willing to mentor in, separated by commas"
     )
     availability = models.CharField(
-        max_length=255, blank=True, help_text="Your general availability for mentoring"
+        max_length=255,
+        blank=True, help_text="Your general availability for mentoring"
     )
     preferred_mentoring_method = models.CharField(
         max_length=100,

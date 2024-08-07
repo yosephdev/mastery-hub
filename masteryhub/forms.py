@@ -25,7 +25,8 @@ class SessionForm(forms.ModelForm):
                 attrs={"type": "time", "class": "form-control"}
             ),
             "price": forms.NumberInput(attrs={"class": "form-control"}),
-            "description": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+            "description": forms.Textarea(
+                attrs={"class": "form-control", "rows": 4}),
         }
 
 
@@ -54,8 +55,10 @@ class ProfileForm(forms.ModelForm):
                     "class": "form-control",
                 }
             ),
-            "experience": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
-            "achievements": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
+            "experience": forms.Textarea(
+                attrs={"rows": 4, "class": "form-control"}),
+            "achievements": forms.Textarea(
+                attrs={"rows": 4, "class": "form-control"}),
             "mentor_since": forms.DateInput(
                 attrs={"type": "date", "class": "form-control"}
             ),
@@ -75,7 +78,8 @@ class ForumPostForm(forms.ModelForm):
         fields = ["title", "content", "category"]
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
-            "content": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            "content": forms.Textarea(
+                attrs={"class": "form-control", "rows": 5}),
             "category": forms.Select(attrs={"class": "form-control"}),
         }
 
@@ -85,13 +89,16 @@ class MentorApplicationForm(forms.Form):
         label="Your Name",
         max_length=100,
         widget=forms.TextInput(
-            attrs={"placeholder": "Enter your full name", "class": "form-control"}
+            attrs={
+                "placeholder": "Enter your full name", "class": "form-control"}
         ),
     )
     email = forms.EmailField(
         label="Your Email",
         widget=forms.EmailInput(
-            attrs={"placeholder": "Enter your email address", "class": "form-control"}
+            attrs={
+                "placeholder":
+                    "Enter your email address", "class": "form-control"}
         ),
     )
     areas_of_expertise = forms.CharField(
@@ -114,7 +121,9 @@ class MentorApplicationForm(forms.Form):
             Field("email"),
             Field("areas_of_expertise"),
             ButtonHolder(
-                Submit("submit", "Apply to be a Mentor", css_class="btn btn-primary")
+                Submit(
+                    "submit", "Apply to be a Mentor",
+                    css_class="btn btn-primary")
             ),
         )
 
@@ -124,7 +133,8 @@ class ConcernReportForm(forms.ModelForm):
         model = ConcernReport
         fields = ["category", "description"]
         widgets = {
-            "description": forms.Textarea(attrs={"rows": 5, "class": "form-control"}),
+            "description": forms.Textarea(
+                attrs={"rows": 5, "class": "form-control"}),
             "category": forms.Select(attrs={"class": "form-control"}),
         }
 

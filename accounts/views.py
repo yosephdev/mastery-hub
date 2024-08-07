@@ -64,7 +64,8 @@ def signup_view(request):
             if user is not None:
                 auth_login(request, user)
                 messages.success(
-                    request, f"Welcome, {user.username}! Registration successful!"
+                    request,
+                    f"Welcome, {user.username}! Registration successful!"
                 )
                 return redirect("home")
             else:
@@ -111,7 +112,8 @@ class CustomLoginView(LoginView):
 
     def form_invalid(self, form):
         messages.error(
-            self.request, "Login failed. Please check your username and password."
+            self.request,
+            "Login failed. Please check your username and password."
         )
         return self.render_to_response(self.get_context_data(form=form))
 
@@ -125,7 +127,8 @@ class CustomLogoutView(LogoutView):
     def dispatch(self, request, *args, **kwargs):
         if request.method == "POST":
             if not self.request.session.get("message_sent", False):
-                messages.success(request, "You have been logged out successfully.")
+                messages.success(
+                    request, "You have been logged out successfully.")
                 self.request.session["message_sent"] = True
             logout(request)
             return HttpResponseRedirect(self.get_next_page())
