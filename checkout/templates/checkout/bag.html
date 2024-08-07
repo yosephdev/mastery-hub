@@ -45,47 +45,5 @@
     function toggleSpinner(show) {
         document.getElementById('loading-spinner').style.display = show ? 'block' : 'none';
     }
-
-    function removeFromBag(sessionId) {
-        toggleSpinner(true);
-        fetch('{% url "remove_from_bag" %}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ session_id: sessionId })
-        })
-            .then(response => response.json())
-            .then(data => {
-                toggleSpinner(false);
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Error removing session from bag');
-                }
-            });
-    }
-
-    function addToBag(sessionId, title, price) {
-        toggleSpinner(true);
-        fetch('{% url "add_to_bag" %}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ session_id: sessionId, title: title, price: price })
-        })
-            .then(response => response.json())
-            .then(data => {
-                toggleSpinner(false);
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Error adding session to bag');
-                }
-            });
-    }
 </script>
 {% endblock %}

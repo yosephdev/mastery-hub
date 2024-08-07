@@ -186,53 +186,51 @@
         </div>
     </footer>
 
-    {% block postloadjs %}
-    <script>
-        document.querySelectorAll('.toast').forEach(function (toastElement) {
-            var toast = new bootstrap.Toast(toastElement);
-            toast.show();
-        });
+{% block postloadjs %}
+<script>  
+  document.querySelectorAll('.toast').forEach(function (toastElement) {
+    var toast = new bootstrap.Toast(toastElement);
+    toast.show();
+  });
 
-        $(document).ready(function () {
-            var textArray = [
-                "Achieve your goals with MasteryHub!&nbsp;&nbsp;<span class='text-primary'><i class='fas fa-award'></i></span>",
-                "Expert mentors at your service",
-                "Personalized learning paths just for you",
-                "Join our community of learners and achievers"
-            ];
+  $(document).ready(function () {
+    var textArray = [
+      "Achieve your goals with MasteryHub!&nbsp;&nbsp;<span class='text-primary'><i class='fas fa-award'></i></span>",
+      "Expert mentors at your service",
+      "Personalized learning paths just for you",
+      "Join our community of learners and achievers"
+    ];
 
-            var currentIndex = 0;
-            var delay = 3000;
+    var currentIndex = 0;
+    var delay = 3000;
+   
+    function changeText() {
+      $("#carousel-text").fadeOut(500, function () {
+        $(this).html(textArray[currentIndex]).fadeIn(500);
+      });
 
-            function changeText() {
-                $("#carousel-text").fadeOut(500, function () {
-                    $(this).html(textArray[currentIndex]).fadeIn(500);
-                });
+      currentIndex = (currentIndex + 1) % textArray.length;
+      setTimeout(changeText, delay);
+    }
 
-                currentIndex = (currentIndex + 1) % textArray.length;
-
-                setTimeout(changeText, delay);
-            }
-
-            changeText();
-        });
-
-
-
-        $(".dropdown").hover(
-            function () {
-                $(this).find('.dropdown-menu').show();
-                $(this).find('.nav-link').css('text-decoration', 'underline');
-                $(this).find('.nav-link').css('text-decoration-color', 'black');
-            },
-            function () {
-                $(this).find('.dropdown-menu').hide();
-                $(this).find('.nav-link').css('text-decoration', 'none');
-            }
-        );
-
-    </script>
-    {% endblock %}
+    changeText();
+  });
+  
+  $(".dropdown").hover(
+    function () {
+      $(this).find('.dropdown-menu').show();
+      $(this).find('.nav-link').css({
+        'text-decoration': 'underline',
+        'text-decoration-color': 'black'
+      });
+    },
+    function () {
+      $(this).find('.dropdown-menu').hide();
+      $(this).find('.nav-link').css('text-decoration', 'none');
+    }
+  );
+</script>
+{% endblock %}
 
 </body>
 
