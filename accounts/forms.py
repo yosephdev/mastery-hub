@@ -16,10 +16,11 @@ User = get_user_model()
 
 class CustomSignupForm(AllAuthSignupForm):
     username = forms.CharField(
-        max_length=150,
-        help_text="
-        Required. 150 characters or fewer.
-        Letters, digits and @/./+/-/_ only.",
+    max_length=150,
+    help_text=(
+        "Required. 150 characters or fewer. "
+        "Letters, digits, and @/./+/-/_ only."
+    ),
     )
     email = forms.EmailField()
     password1 = forms.CharField(
