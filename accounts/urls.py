@@ -20,5 +20,7 @@ urlpatterns = [
         name="account_confirm_email",
     ),
     # Admin Dashboard
-    path("admin/dashboard/", admin_views.admin_dashboard, name="admin_dashboard"),
+    path(
+        "admin/dashboard/",
+        admin_views.admin_dashboard, name="admin_dashboard"),
 ]

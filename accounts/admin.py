@@ -16,9 +16,11 @@ def make_mentors(modeladmin, request, queryset):
             profile = Profile.objects.get(user=user)
             profile.is_expert = True
             profile.save()
-            messages.success(request, f"User {user.username} marked as mentor.")
+            messages.success(
+                request, f"User {user.username} marked as mentor.")
         except Profile.DoesNotExist:
-            messages.error(request, f"Profile for user {user.username} does not exist.")
+            messages.error(
+                request, f"Profile for user {user.username} does not exist.")
 
 
 class ProfileInline(admin.StackedInline):
@@ -36,7 +38,8 @@ admin.site.register(User, CustomUserAdmin)
 
 
 class LogEntryAdmin(admin.ModelAdmin):
-    list_display = ("user", "action_time", "content_type", "object_repr", "action_flag")
+    list_display = (
+        "user", "action_time", "content_type", "object_repr", "action_flag")
     list_filter = ("action_time", "content_type", "user")
     search_fields = ("object_repr", "change_message")
 

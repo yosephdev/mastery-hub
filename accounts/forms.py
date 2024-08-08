@@ -17,13 +17,15 @@ User = get_user_model()
 class CustomSignupForm(AllAuthSignupForm):
     username = forms.CharField(
         max_length=150,
-        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+        help_text="
+        Required. 150 characters or fewer.
+        Letters, digits and @/./+/-/_ only.",
     )
     email = forms.EmailField()
     password1 = forms.CharField(
         widget=forms.PasswordInput,
         help_text=(
-            "Your password can’t be too similar to your other personal information. "
+            "Your password can’t be too similar to your personal information. "
             "Your password must contain at least 8 characters. "
             "Your password can’t be a commonly used password. "
             "Your password can’t be entirely numeric."
@@ -47,12 +49,17 @@ class CustomSignupForm(AllAuthSignupForm):
                 Field("password1"),
                 Field("password2"),
                 Field("is_expert"),
-                Div(Field("terms", id="id_terms_checkbox"), css_class="form-check"),
+                Div(
+                    Field("terms", id="id_terms_checkbox"),
+                    css_class="form-check"),
                 css_class="form-group",
             ),
             Div(
                 Submit("submit", "Sign Up", css_class="btn btn-primary"),
-                css_class="d-flex justify-content-between align-items-center mt-4",
+                css_class=(
+                    "d-flex justify-content-between "
+                    "align-items-center mt-4"
+                ),
             ),
         )
         for field_name, field in self.fields.items():
@@ -98,7 +105,8 @@ class SessionForm(forms.ModelForm):
                 attrs={"type": "time", "class": "form-control"}
             ),
             "price": forms.NumberInput(attrs={"class": "form-control"}),
-            "description": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+            "description": forms.Textarea(
+                attrs={"class": "form-control", "rows": 4}),
         }
 
 
@@ -127,8 +135,10 @@ class ProfileForm(forms.ModelForm):
                     "class": "form-control",
                 }
             ),
-            "experience": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
-            "achievements": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
+            "experience": forms.Textarea(
+                attrs={"rows": 4, "class": "form-control"}),
+            "achievements":
+                forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "mentor_since": forms.DateInput(
                 attrs={"type": "date", "class": "form-control"}
             ),
@@ -148,7 +158,8 @@ class ForumPostForm(forms.ModelForm):
         fields = ["title", "content", "category"]
         widgets = {
             "title": forms.TextInput(attrs={"class": "form-control"}),
-            "content": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            "content":
+                forms.Textarea(attrs={"class": "form-control", "rows": 5}),
             "category": forms.Select(attrs={"class": "form-control"}),
         }
 
@@ -158,13 +169,16 @@ class MentorApplicationForm(forms.Form):
         label="Your Name",
         max_length=100,
         widget=forms.TextInput(
-            attrs={"placeholder": "Enter your full name", "class": "form-control"}
+            attrs={
+                "placeholder": "Enter your full name", "class": "form-control"}
         ),
     )
     email = forms.EmailField(
         label="Your Email",
         widget=forms.EmailInput(
-            attrs={"placeholder": "Enter your email address", "class": "form-control"}
+            attrs={
+                "placeholder": "Enter your email address",
+                "class": "form-control"}
         ),
     )
     areas_of_expertise = forms.CharField(
@@ -187,7 +201,9 @@ class MentorApplicationForm(forms.Form):
             Field("email"),
             Field("areas_of_expertise"),
             ButtonHolder(
-                Submit("submit", "Apply to be a Mentor", css_class="btn btn-primary")
+                Submit(
+                    "submit", "Apply to be a Mentor",
+                    css_class="btn btn-primary")
             ),
         )
 
@@ -197,13 +213,15 @@ class ConcernReportForm(forms.ModelForm):
         model = ConcernReport
         fields = ["category", "description"]
         widgets = {
-            "description": forms.Textarea(attrs={"rows": 5, "class": "form-control"}),
+            "description": forms.Textarea(attrs={
+                "rows": 5, "class": "form-control"}),
             "category": forms.Select(attrs={"class": "form-control"}),
         }
 
 
 class OrderForm(forms.Form):
-    full_name = forms.CharField(max_length=50, required=True, label="Full Name")
+    full_name = forms.CharField(
+        max_length=50, required=True, label="Full Name")
     email = forms.EmailField(max_length=254, required=True, label="Email")
     street_address1 = forms.CharField(
         max_length=80, required=True, label="Street Address 1"
@@ -212,14 +230,16 @@ class OrderForm(forms.Form):
         max_length=80, required=False, label="Street Address 2"
     )
     county = forms.CharField(max_length=80, required=False, label="County")
-    town_or_city = forms.CharField(max_length=80, required=True, label="Town/City")
+    town_or_city = forms.CharField(
+        max_length=80, required=True, label="Town/City")
     postcode = forms.CharField(max_length=20, required=True, label="Postcode")
     country = CountryField(blank_label="Country").formfield(
         widget=CountrySelectWidget(
             attrs={"class": "border-black rounded-0 profile-form-input"}
         )
     )
-    phone_number = forms.CharField(max_length=20, required=True, label="Phone Number")
+    phone_number = forms.CharField(
+        max_length=20, required=True, label="Phone Number")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
