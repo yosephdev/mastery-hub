@@ -60,7 +60,8 @@ def contact_view(request):
     message_sent = request.session.pop("message_sent", False)
 
     return render(
-        request, "home/contact.html", {"form": form, "message_sent": message_sent}
+        request,
+        "home/contact.html", {"form": form, "message_sent": message_sent}
     )
 
 
