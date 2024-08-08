@@ -47,7 +47,8 @@ class Order(models.Model):
     country = CountryField(blank_label="Country *", null=False, blank=False)
     phone_number = models.CharField(max_length=20)
     order_total = models.DecimalField(max_digits=10, decimal_places=2)
-    delivery_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    delivery_cost = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0)
     grand_total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):

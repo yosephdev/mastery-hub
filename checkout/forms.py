@@ -34,7 +34,8 @@ class SessionForm(forms.ModelForm):
                 attrs={"type": "time", "class": "form-control"}
             ),
             "price": forms.NumberInput(attrs={"class": "form-control"}),
-            "description": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+            "description": forms.Textarea(
+                attrs={"class": "form-control", "rows": 4}),
         }
 
 

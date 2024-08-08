@@ -47,12 +47,14 @@ def add_to_cart(request, session_id):
     if request.method == "POST":
         session = get_object_or_404(Session, id=session_id)
         cart, created = Cart.objects.get_or_create(user=request.user)
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, session=session)
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart, session=session)
         if not created:
             cart_item.quantity += 1
             cart_item.save()
         total = sum(
-            item.session.price * item.quantity for item in cart.cartitem_set.all()
+            item.session.price *
+            item.quantity for item in cart.cartitem_set.all()
         )
         messages.success(request, f"Added {session.title} to your cart.")
         return JsonResponse({"success": True, "total": float(total)})
@@ -76,7 +78,8 @@ def checkout(request):
         grand_total = float(price)
     else:
         grand_total = sum(
-            item.session.price * item.quantity for item in cart.cartitem_set.all()
+            item.session.price *
+            item.quantity for item in cart.cartitem_set.all()
         )
 
     MIN_CHARGE_AMOUNT = 50
@@ -118,13 +121,16 @@ def checkout(request):
 
             messages.success(
                 request,
-                "Your purchase was successful. A confirmation email has been sent to you.",
+                "Your purchase was successful. "
+                "A confirmation email has been sent to you."
             )
-            return redirect("checkout_success", order_number=order.order_number)
+            return redirect(
+                "checkout_success", order_number=order.order_number)
         else:
             messages.error(
                 request,
-                "There was an error with your order. Please check your details and try again.",
+                "There was an error with your order. "
+                "Please check your details and try again.",
             )
     else:
         form = OrderForm()
@@ -177,7 +183,8 @@ def create_checkout_session(request):
             payment_method_types=["card"],
             line_items=line_items,
             mode="payment",
-            success_url=request.build_absolute_uri("/checkout/checkout_success/"),
+            success_url=request.build_absolute_uri(
+                "/checkout/checkout_success/"),
             cancel_url=request.build_absolute_uri("/checkout/payment_cancel/"),
         )
     except stripe.error.InvalidRequestError as e:
@@ -219,7 +226,8 @@ def cache_checkout_data(request):
         logger.error(f"Error modifying PaymentIntent: {e}")
         messages.error(
             request,
-            "Sorry, your payment cannot be processed right now. Please try again later.",
+            "Sorry, your payment cannot be processed right now. "
+            "Please try again later.",
         )
         return HttpResponse(content=str(e), status=400)
 
@@ -277,5 +285,6 @@ def decrease_quantity(request, item_id):
 def remove_from_cart(request, item_id):
     cart_item = get_object_or_404(CartItem, id=item_id)
     cart_item.delete()
-    messages.success(request, f"Removed {cart_item.session.title} from your cart.")
+    messages.success(
+        request, f"Removed {cart_item.session.title} from your cart.")
     return redirect("view_cart")
