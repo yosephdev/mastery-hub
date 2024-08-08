@@ -20,8 +20,14 @@ DEBUG = False
 
 ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
-    "localhost,127.0.0.1,8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net,.herokuapp.com",
+    (
+        "localhost,"
+        "127.0.0.1,"
+        "8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net,"
+        ".herokuapp.com"
+    ),
 ).split(",")
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -157,7 +163,11 @@ SOCIALACCOUNT_PROVIDERS = {
             "access_type": "online",
         },
         "OAUTH_PKCE_ENABLED": True,
-        "REDIRECT_URI": "https://skill-sharing-446c0336ffb5.herokuapp.com/accounts/google/login/callback/",
+        "REDIRECT_URI": (
+            "https://skill-sharing-446c0336ffb5.herokuapp.com/"
+            "accounts/google/login/callback/"
+        ),
+
     }
 }
 
@@ -189,7 +199,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SOCIALACCOUNT_FACEBOOK_CLIENT_ID = os.getenv("SOCIALACCOUNT_FACEBOOK_CLIENT_ID")
+SOCIALACCOUNT_FACEBOOK_CLIENT_ID = os.getenv(
+    "SOCIALACCOUNT_FACEBOOK_CLIENT_ID")
 SOCIALACCOUNT_FACEBOOK_SECRET = os.getenv("SOCIALACCOUNT_FACEBOOK_SECRET")
 
 # Email settings (for development)
@@ -207,18 +218,31 @@ DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER")
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "UserAttributeSimilarityValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "MinimumLengthValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "CommonPasswordValidator"
+        ),
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "NumericPasswordValidator"
+        ),
     },
 ]
+
 
 # Internationalization
 LANGUAGE_CODE = "en-us"
