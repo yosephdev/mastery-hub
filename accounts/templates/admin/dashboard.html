@@ -14,9 +14,9 @@
         <div class="profile-card card text-center">
             <div class="card-body">
                 {% if user.profile.profile_picture %}
-                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-picture">
+                <img src="{{ user.profile.profile_picture.url }}" loading="lazy" alt="Profile Picture" class="profile-picture">
                 {% else %}
-                <img src="{% static 'images/default_profile.jpg' %}" alt="Default Profile Picture"
+                <img src="{% static 'images/default_profile.jpg' %}" loading="lazy" alt="Default Profile Picture"
                     class="profile-picture">
                 {% endif %}
                 <h3 class="card-title">{{ user.username }}</h3>

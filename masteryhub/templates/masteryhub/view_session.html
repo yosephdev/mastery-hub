@@ -11,7 +11,8 @@
                 </div>
                 <div class="card-body">
                     {% if session.image %}
-                    <img src="{{ session.image.url }}" class="img-fluid mb-3" alt="{{ session.title }}">
+                    <img src="{{ session.image.url }}" class="img-fluid mb-3" 
+                         loading="lazy" alt="{{ session.title }}">
                     {% endif %}
                     <p><strong>Description:</strong> {{ session.description }}</p>
                     <p><strong>Date:</strong> {{ session.date }}</p>

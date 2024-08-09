@@ -15,9 +15,11 @@
                 <div class="col-md-4">
                     <div class="card mb-4">
                         {% if profile.profile_picture %}
-                        <img class="card-img-top" src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}">
+                        <img class="card-img-top" src="{{ profile.profile_picture.url }}" 
+                             loading="lazy" alt="{{ profile.user.username }}">
                         {% else %}
-                        <img class="card-img-top" src="{% static 'images/default_profile.jpg' %}" alt="No Image Available">
+                        <img class="card-img-top" src="{% static 'images/default_profile.jpg' %}" 
+                             loading="lazy" alt="No Image Available">
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ profile.user.username }}</h5>
@@ -39,9 +41,11 @@
                 <div class="col-md-4">
                     <div class="card mb-4">
                         {% if session.image %}
-                        <img class="card-img-top" src="{{ session.image.url }}" alt="{{ session.title }}">
+                        <img class="card-img-top" src="{{ session.image.url }}" 
+                             loading="lazy" alt="{{ session.title }}">
                         {% else %}
-                        <img class="card-img-top" src="{% static 'images/default_profile.jpg' %}" alt="No Image Available">
+                        <img class="card-img-top" src="{% static 'images/default_profile.jpg' %}" 
+                             loading="lazy" alt="No Image Available">
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ session.title }}</h5>

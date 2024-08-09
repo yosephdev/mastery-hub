@@ -6,11 +6,11 @@
     <div class="row">
         <div class="col-md-4">
             {% if profile.profile_picture %}
-            <img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}"
-                class="img-fluid rounded-circle mb-3">
+            <img src="{{ profile.profile_picture.url }}" loading="lazy"
+               alt="{{ profile.user.username }}" class="img-fluid rounded-circle mb-3">
             {% else %}
-            <img src="{% static 'images/default_profile.jpg' %}" alt="{{ profile.user.username }}"
-                class="img-fluid rounded-circle mb-3">
+            <img src="{% static 'images/default_profile.jpg' %}" loading="lazy" 
+               alt="{{ profile.user.username }}" class="img-fluid rounded-circle mb-3">
             {% endif %}
         </div>
         <div class="col-md-8">

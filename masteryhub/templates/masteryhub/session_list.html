@@ -35,9 +35,11 @@
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
                         {% if session.image %}
-                        <img class="card-img-top" src="{{ session.image.url }}" alt="{{ session.title }}">
+                        <img class="card-img-top" src="{{ session.image.url }}" 
+                           loading="lazy" alt="{{ session.title }}">
                         {% else %}
-                        <img class="card-img-top" src="{% static 'images/no-image-available.png' %}" alt="No Image Available">
+                        <img class="card-img-top" src="{% static 'images/no-image-available.png' %}" 
+                             loading="lazy" alt="No Image Available">
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ session.title }}</h5>

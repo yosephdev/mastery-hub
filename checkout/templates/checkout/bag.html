@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 <div id="loading-spinner" style="display:none;">
-    <img src="{% static 'images/spinner.gif' %}" alt="Loading...">
+    <img src="{% static 'images/spinner.gif' %}" loading="lazy" alt="Loading...">
 </div>
 
 {% block content %}
