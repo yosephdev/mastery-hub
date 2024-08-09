@@ -18,7 +18,7 @@
                         <img class="card-img-top" src="{{ profile.profile_picture.url }}" 
                              loading="lazy" alt="{{ profile.user.username }}">
                         {% else %}
-                        <img class="card-img-top" src="{% static 'images/default_profile.jpg' %}" 
+                        <img class="card-img-top" src="{% static 'images/default_profile.webp' %}" 
                              loading="lazy" alt="No Image Available">
                         {% endif %}
                         <div class="card-body">
@@ -44,7 +44,7 @@
                         <img class="card-img-top" src="{{ session.image.url }}" 
                              loading="lazy" alt="{{ session.title }}">
                         {% else %}
-                        <img class="card-img-top" src="{% static 'images/default_profile.jpg' %}" 
+                        <img class="card-img-top" src="{% static 'images/no-image-available.webp' %}" 
                              loading="lazy" alt="No Image Available">
                         {% endif %}
                         <div class="card-body">
