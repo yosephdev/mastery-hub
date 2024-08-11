@@ -104,6 +104,32 @@ I've tested my deployed project on multiple devices to check for responsiveness 
 
 I've tested my deployed project using the Lighthouse Audit tool to check for any major issues.
 
+| Page           | Size    | Screenshot                                      | Notes               |
+| -------------- | ------- | ----------------------------------------------- | ------------------- |
+| Home           | Desktop | ![screenshot](docs/readme_images/home_desktop.png) | No major warnings   |
+| Home           | Mobile  | ![screenshot](docs/readme_images/home_mobile.png)  | Some minor warnings |
+| Sessions       | Desktop | ![screenshot](docs/readme_images/sessions_desktop.png) | Some minor warnings |
+| Sessions       | Mobile  | ![screenshot](docs/readme_images/sessions_mobile.png)  | Some minor warnings |
+| Session detail | Desktop | ![screenshot](docs/readme_images/session_detail_desktop.png) | Some minor warnings |
+| Session detail | Mobile  | ![screenshot](docs/readme_images/session_detail_mobile.png)  | Some minor warnings |
+| Contact        | Desktop | ![screenshot](docs/readme_images/contact_desktop.png) | No major warnings   |
+| Contact        | Mobile  | ![screenshot](docs/readme_images/contact_mobile.png)  | Some minor warnings |
+| Sign Up        | Desktop | ![screenshot](docs/readme_images/signup_desktop.png) | Some minor warnings |
+| Sign Up        | Mobile  | ![screenshot](docs/readme_images/signup_mobile.png)  | Some minor warnings |
+| Sign In        | Desktop | ![screenshot](docs/readme_images/signin_desktop.png) | Some minor warnings |
+| Sign In        | Mobile  | ![screenshot](docs/readme_images/signin_mobile.png)  | Some minor warnings |
+| Search         | Desktop | ![screenshot](docs/readme_images/search_desktop.png) | Some minor warnings |
+| Search         | Mobile  | ![screenshot](docs/readme_images/search_mobile.png)  | Some minor warnings |
+| Log Out        | Desktop | ![screenshot](docs/readme_images/logout_desktop.png) | No major warnings   |
+| Log Out        | Mobile  | ![screenshot](docs/readme_images/logout_mobile.png)  | Some minor warnings |
+| Cart         | Desktop | ![screenshot](docs/readme_images/basket_desktop.png) | Some minor warnings |
+| Cart        | Mobile  | ![screenshot](docs/readme_images/basket_mobile.png)  | Some minor warnings |
+| Checkout       | Desktop | ![screenshot](docs/readme_images/checkout_desktop.png) | Some minor warnings |
+| Checkout       | Mobile  | ![screenshot](docs/readme_images/checkout_mobile.png)  | Some minor warnings |
+| Profile        | Desktop | ![screenshot](docs/readme_images/profile_desktop.png) | Some minor warnings |
+| Profile        | Mobile  | ![screenshot](docs/readme_images/profile_mobile.png)  | Some minor warnings |
+
+**Note:** Due to time constraints, the screenshots could not be displayed here. 
 
 ## Manual Testing
 
