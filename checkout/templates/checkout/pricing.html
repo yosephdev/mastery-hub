@@ -5,54 +5,25 @@
 <div class="container mt-5">
     <h1 class="text-center mb-5">Our Pricing Plans</h1>
     <div class="row">
+        {% for plan in pricing_plans %}
         <div class="col-md-4">
             <div class="card mb-4">
                 <div class="card-header">
-                    <h3 class="text-center">Basic</h3>
+                    <h3 class="text-center">{{ plan.name }}</h3>
                 </div>
                 <div class="card-body">
-                    <h2 class="card-title pricing-card-title text-center">$9.99<small class="text-muted">/ mo</small></h2>
+                    <h2 class="card-title pricing-card-title text-center">${{ plan.price }}<small class="text-muted">/ mo</small></h2>
                     <ul class="list-unstyled mt-3 mb-4">
-                        <li>Access to 5 sessions per month</li>
-                        <li>Basic mentorship features</li>
-                        <li>Email support</li>
+                        {% for feature in plan.features %}
+                        <li>{{ feature }}</li>
+                        {% endfor %}
                     </ul>
-                    <a href="{% url 'checkout' %}?plan=basic&price=9.99" class="btn btn-lg btn-block btn-outline-primary">Sign up for Basic</a>
+                    <a href="{% url 'checkout' %}?plan={{ plan.name|lower }}&price={{ plan.price }}" class="btn btn-lg btn-block {{ plan.button_class }}">Sign up for {{ plan.name }}</a>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3 class="text-center">Pro</h3>
-                </div>
-                <div class="card-body">
-                    <h2 class="card-title pricing-card-title text-center">$19.99<small class="text-muted">/ mo</small></h2>
-                    <ul class="list-unstyled mt-3 mb-4">
-                        <li>Access to 15 sessions per month</li>
-                        <li>Advanced mentorship features</li>
-                        <li>Priority email support</li>
-                    </ul>
-                    <a href="{% url 'checkout' %}?plan=pro&price=19.99" class="btn btn-lg btn-block btn-success">Sign up for Pro</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h3 class="text-center">Enterprise</h3>
-                </div>
-                <div class="card-body">
-                    <h2 class="card-title pricing-card-title text-center">$49.99<small class="text-muted">/ mo</small></h2>
-                    <ul class="list-unstyled mt-3 mb-4">
-                        <li>Unlimited access to sessions</li>
-                        <li>Premium mentorship features</li>
-                        <li>24/7 phone and email support</li>
-                    </ul>
-                    <a href="{% url 'checkout' %}?plan=enterprise&price=49.99" class="btn btn-lg btn-block btn-black">Sign up for Enterprise</a>
-                </div>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
+
