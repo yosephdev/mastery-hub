@@ -14,7 +14,7 @@ from django.http import JsonResponse
 
 from profiles.models import Profile
 from masteryhub.models import Session
-from .models import Order, CartItem
+from .models import Order, CartItem, Cart
 
 User = get_user_model()
 
@@ -229,16 +229,18 @@ def add_to_cart(request, session_id):
 
 
 def view_cart(request):
-    """A view that displays the items in the cart."""
-    cart_items = CartItem.objects.filter(user=request.user) 
+    """View to display the user's cart."""
+    cart = get_object_or_404(Cart, user=request.user)  
+    cart_items = cart.items.all()  
+    total_items = cart_items.count()  
     total_price = sum(item.session.price * item.quantity for item in cart_items)  
 
     context = {
         'cart_items': cart_items,
+        'total_items': total_items,
         'total_price': total_price,
     }
-
-    return render(request, 'checkout/cart.html', context)  
+    return render(request, 'checkout/cart.html', context)
 
 
 @csrf_exempt
