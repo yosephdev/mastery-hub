@@ -1,31 +1,31 @@
 import os
 import django
-
-os.environ["DJANGO_SETTINGS_MODULE"] = "skill_sharing_platform.settings"
-
-django.setup()
-
 import json
+from datetime import datetime, timedelta
+
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
-from masteryhub.models import Session, Category
+from masteryhub.models import Session, Category, Skill, Booking
 from accounts.models import Profile
-from datetime import datetime, timedelta
-
-from django.test import TestCase
-from masteryhub.models import Skill, Booking
-from accounts.models import Profile
-from django.contrib.auth.models import User
-from datetime import datetime
 from django.core.exceptions import ValidationError
+
+os.environ["DJANGO_SETTINGS_MODULE"] = "skill_sharing_platform.settings"
+django.setup()
+
 
 class SkillModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="testuser", password="testpass")
 
     def test_skill_creation(self):
-        skill = Skill.objects.create(title="Web Development", description="Learn Django", category="Tech", price=50, user=self.user)
+        skill = Skill.objects.create(
+            title="Web Development",
+            description="Learn Django",
+            category="Tech",
+            price=50,
+            user=self.user
+        )
         self.assertEqual(str(skill), "Web Development")
         self.assertEqual(skill.title, "Web Development")
         self.assertEqual(skill.description, "Learn Django")
@@ -33,20 +33,38 @@ class SkillModelTest(TestCase):
         self.assertEqual(skill.price, 50)
 
     def test_skill_retrieval(self):
-        skill = Skill.objects.create(title="Web Development", description="Learn Django", category="Tech", price=50, user=self.user)
+        skill = Skill.objects.create(
+            title="Web Development",
+            description="Learn Django",
+            category="Tech",
+            price=50,
+            user=self.user
+        )
         retrieved_skill = Skill.objects.get(id=skill.id)
         self.assertEqual(retrieved_skill.title, skill.title)
         self.assertEqual(retrieved_skill.description, skill.description)
 
     def test_skill_update(self):
-        skill = Skill.objects.create(title="Web Development", description="Learn Django", category="Tech", price=50, user=self.user)
+        skill = Skill.objects.create(
+            title="Web Development",
+            description="Learn Django",
+            category="Tech",
+            price=50,
+            user=self.user
+        )
         skill.title = "Advanced Web Development"
         skill.save()
         updated_skill = Skill.objects.get(id=skill.id)
         self.assertEqual(updated_skill.title, "Advanced Web Development")
 
     def test_skill_deletion(self):
-        skill = Skill.objects.create(title="Web Development", description="Learn Django", category="Tech", price=50, user=self.user)
+        skill = Skill.objects.create(
+            title="Web Development",
+            description="Learn Django",
+            category="Tech",
+            price=50,
+            user=self.user
+        )
         skill_id = skill.id
         skill.delete()
         with self.assertRaises(Skill.DoesNotExist):
@@ -55,13 +73,22 @@ class SkillModelTest(TestCase):
     def test_invalid_skill_creation(self):
         with self.assertRaises(ValidationError):
             skill = Skill(title="", description="Learn Django", category="Tech", price=50)
-            skill.full_clean()  
+            skill.full_clean()
+
 
 class BookingModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="testuser", password="testpass")
-        self.profile, created = Profile.objects.get_or_create(user=self.user, defaults={"bio": "Test bio"})
-        self.skill = Skill.objects.create(title="Web Development", description="Learn Django", category="Tech", price=50, user=self.user)
+        self.profile, created = Profile.objects.get_or_create(
+            user=self.user, defaults={"bio": "Test bio"}
+        )
+        self.skill = Skill.objects.create(
+            title="Web Development",
+            description="Learn Django",
+            category="Tech",
+            price=50,
+            user=self.user
+        )
 
     def test_booking_creation(self):
         booking = Booking.objects.create(
@@ -113,7 +140,8 @@ class BookingModelTest(TestCase):
     def test_invalid_booking_creation(self):
         with self.assertRaises(ValidationError):
             booking = Booking(user=None, skill=None, booking_date=datetime.now(), status="confirmed")
-            booking.full_clean()  
+            booking.full_clean()
+
 
 class BagViewTests(TestCase):
     def setUp(self):
@@ -151,23 +179,15 @@ class BagViewTests(TestCase):
             ),
             content_type="application/json",
         )
-        
-        print("Response status code:", response.status_code)
-        print("Response content:", response.content)
 
         self.client.session.modified = True
         self.client.session.save()
-
-        print("Cart contents after adding:", self.client.session.get("cart", []))
 
         while response.status_code in (301, 302):
             response = self.client.get(response.url)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json().get("success"))
-        
-        print("Cart length after adding:", len(self.client.session.get("cart", [])))
-        
         self.assertEqual(len(self.client.session.get("cart", [])), 1)
 
     def test_remove_from_cart(self):
@@ -182,17 +202,14 @@ class BagViewTests(TestCase):
         ]
         self.client.session.save()
 
-        print("Cart contents before removal:", self.client.session.get("cart", []))
-
         response = self.client.post(
             reverse("remove_from_cart", args=[self.session.id]),
             content_type="application/json",
         )
-        
+
         while response.status_code in (301, 302):
             response = self.client.get(response.url)
 
-        print("Remove from cart response:", response.json())
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json().get("success"))
         self.assertEqual(len(self.client.session.get("cart", [])), 0)
