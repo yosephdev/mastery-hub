@@ -23,14 +23,17 @@ def home(request):
 
 
 def about(request):
+    """A view that handles the about page."""
     return render(request, "home/about.html")
 
 
 def contact(request):
+    """A view that handles the contact page."""
     return render(request, "home/contact.html")
 
 
 def contact_view(request):
+    """A view that handles the contact form submission."""
     if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -52,7 +55,6 @@ def contact_view(request):
                 return HttpResponse(f"Error sending email: {e}")
 
             request.session["message_sent"] = True
-
             return redirect("contact")
     else:
         form = ContactForm()
@@ -61,11 +63,13 @@ def contact_view(request):
 
     return render(
         request,
-        "home/contact.html", {"form": form, "message_sent": message_sent}
+        "home/contact.html",
+        {"form": form, "message_sent": message_sent},
     )
 
 
 def search(request):
+    """A view that handles search functionality."""
     query = request.GET.get("q", "").strip()
     profiles = []
     sessions = []
@@ -86,14 +90,6 @@ def search(request):
             error_message = f"An error occurred during the search: {str(e)}"
     else:
         error_message = "Please enter a search term."
-
-    context = {
-        "query": query,
-        "profiles": profiles,
-        "sessions": sessions,
-        "error_message": error_message,
-    }
-    return render(request, "home/search_results.html", context)
 
     context = {
         "query": query,
