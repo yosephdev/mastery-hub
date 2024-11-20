@@ -20,25 +20,10 @@ from allauth.account.views import ConfirmEmailView
 from allauth.account.models import EmailConfirmationHMAC
 from django.contrib.contenttypes.models import ContentType
 
-from profiles.models import (
-    Profile,
-)
-from checkout.models import (
-    Payment,
-    Cart,
-    CartItem,
-    Order,
-)
-from masteryhub.models import (
-    Feedback,
-    Session,
-    Category,
-    Mentorship,
-)
-from .forms import (
-    CustomSignupForm,
-    CustomUserChangeForm,
-)
+from profiles.models import Profile
+from checkout.models import Payment, Cart, CartItem, Order
+from masteryhub.models import Feedback, Session, Category, Mentorship
+from .forms import CustomSignupForm, CustomUserChangeForm
 from checkout.forms import OrderForm
 import stripe
 import json
@@ -126,8 +111,7 @@ class CustomLogoutView(LogoutView):
     def dispatch(self, request, *args, **kwargs):
         if request.method == "POST":
             if not self.request.session.get("message_sent", False):
-                messages.success(
-                    request, "You have been logged out successfully.")
+                messages.success(request, "You have been logged out successfully.")
                 self.request.session["message_sent"] = True
             logout(request)
             return HttpResponseRedirect(self.get_next_page())
@@ -135,7 +119,3 @@ class CustomLogoutView(LogoutView):
 
     def get_next_page(self):
         return str(self.next_page)
-
-
-class CustomConfirmEmailView(ConfirmEmailView):
-    template_name = "account/email_confirm.html"
