@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.admin.models import LogEntry
 from checkout.models import Payment
-from accounts.models import Profile
+from profiles.models import Profile
 
 # Register your models here.
 

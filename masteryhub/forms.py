@@ -2,8 +2,8 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, ButtonHolder, Submit
 
-from accounts.models import Profile
-from masteryhub.models import Session, Forum, ConcernReport
+from profiles.models import Profile
+from masteryhub.models import Session, Forum, ConcernReport, Booking, Review
 
 
 class SessionForm(forms.ModelForm):
@@ -70,7 +70,6 @@ class ProfileForm(forms.ModelForm):
                 attrs={"class": "form-control"}
             ),
         }
-
 
 class ForumPostForm(forms.ModelForm):
     class Meta:
@@ -146,3 +145,22 @@ class OrderForm(forms.Form):
     city = forms.CharField(max_length=50, required=True)
     postcode = forms.CharField(max_length=20, required=True)
     country = forms.CharField(max_length=50, required=True)
+
+
+class BookingForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['session', 'scheduled_time']
+        widgets = {
+            'scheduled_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment']
+        widgets = {
+            'rating': forms.Select(attrs={'class': 'form-control'}),
+            'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Write your review here...'}),
+        }

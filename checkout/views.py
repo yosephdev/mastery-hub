@@ -21,7 +21,7 @@ from .models import (
     CartItem,
     Order,
 )
-from accounts.models import (
+from profiles.models import (
     Profile,
 )
 from masteryhub.models import (

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from accounts.models import Profile
+from profiles.models import Profile
 from datetime import timedelta, datetime
 
 # Create your models here.
@@ -148,3 +148,28 @@ class ConcernReport(models.Model):
 
     def __str__(self):
         return f"{self.get_category_display()} - {self.created_at}"
+
+
+class Skill(models.Model):
+    title = models.CharField(max_length=255)  
+    description = models.TextField()          
+    category = models.CharField(max_length=100)  
+    price = models.DecimalField(max_digits=10, decimal_places=2)  
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='skills')  
+    created_at = models.DateTimeField(auto_now_add=True)  
+    updated_at = models.DateTimeField(auto_now=True)       
+
+    def __str__(self):
+        return self.title  
+
+
+class Booking(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE, default=1)
+    booking_date = models.DateTimeField()
+    status = models.CharField(max_length=20)
+    scheduled_time = models.DateTimeField(null=True, blank=True)
+    session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f"Booking by {self.user.username} for {self.skill.title}"

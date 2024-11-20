@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 from .forms import MentorApplicationForm, ConcernReportForm
 from django.contrib.admin.models import LogEntry, ADDITION
 from django.contrib.contenttypes.models import ContentType
-from accounts.models import Profile
+from profiles.models import Profile
 from .models import (
     Feedback,
     Session,
@@ -29,21 +29,24 @@ from checkout.models import (
     CartItem,
     Order,
 )
-from .forms import OrderForm
+from .forms import BookingForm, ReviewForm
 import stripe
 import json
 import logging
 
 from accounts.forms import (
     CustomSignupForm,
-    CustomUserChangeForm,
-    ProfileForm,
-    SessionForm,
+    CustomUserChangeForm,    
+    SessionForm,   
+    MentorApplicationForm,
+)
+from .forms import (
+    ProfileForm,    
     ForumPostForm,
     MentorApplicationForm,
 )
 from .models import Mentorship, Session, Forum, Category, Feedback
-from accounts.models import Profile
+from profiles.models import Profile
 
 
 logger = logging.getLogger(__name__)
@@ -116,6 +119,9 @@ def search_mentors(request):
     mentors = Profile.objects.filter(is_expert=True)
     if query:
         mentors = mentors.filter(mentorship_areas__icontains=query)
+
+    print(f"Query: {query}, Mentors Count: {mentors.count()}")  
+
     return render(
         request,
         "masteryhub/search_mentors.html", {"mentors": mentors, "query": query}
@@ -129,16 +135,19 @@ def request_mentorship(request, mentor_id):
     mentor_profile = get_object_or_404(Profile, user=mentor_user)
     mentee_profile = get_object_or_404(Profile, user=request.user)
 
+    if not mentor_profile.is_available:
+        messages.error(request, f"{mentor_user.username} is not currently accepting mentorship requests.")
+        return redirect("view_mentor_profile", username=mentor_user.username)
+
     if request.method == "POST":
         mentorship, created = Mentorship.objects.get_or_create(
             mentor=mentor_profile, mentee=mentee_profile, status="pending"
-        )
-        message = (
-            f"Mentorship request sent to {mentor_user.username}"
-            if created
-            else f"You already have a pending request with {
-                mentor_user.username}"
-        )
+        )    
+        if created:
+            message = f"Mentorship request sent to {mentor_user.username}"
+        else:
+            message = f"You already have a pending request with {mentor_user.username}"
+
         messages.success(request, message)
         return redirect("view_mentor_profile", username=mentor_user.username)
 
@@ -467,7 +476,7 @@ def create_forum_post(request):
         form = ForumPostForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
-            post.author = request.user
+            post.author = request.user.profile
             post.save()
             messages.success(request, "Forum post created successfully.")
             return redirect("forum_posts")
@@ -560,3 +569,38 @@ def report_concern(request):
         form = ConcernReportForm()
 
     return render(request, "masteryhub/report_concern.html", {"form": form})
+
+def book_session(request, session_id):
+    session = Session.objects.get(id=session_id)
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.user = request.user  
+            booking.save()
+            return redirect('booking_success')  
+    else:
+        form = BookingForm()
+
+    return render(request, 'masteryhub/book_session.html', {'form': form, 'session': session})
+
+def browse_skills_view(request):   
+    return render(request, 'masteryhub/browse_skills.html')  
+
+def review_list(request):
+    reviews = Review.objects.all()
+    return render(request, 'reviews/review_list.html', {'reviews': reviews})
+
+def create_review(request, session_id):
+    session = Session.objects.get(id=session_id)
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.session = session
+            review.reviewer = request.user.profile  
+            review.save()
+            return redirect('review_list') 
+    else:
+        form = ReviewForm()
+    return render(request, 'reviews/create_review.html', {'form': form, 'session': session})

@@ -1,14 +1,15 @@
 from django import forms
 from django_countries.fields import CountryField
 from django_countries.widgets import CountrySelectWidget
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth import get_user_model
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, ButtonHolder, Submit, Div
 from django.utils.translation import gettext_lazy as _
 from allauth.account.forms import SignupForm as AllAuthSignupForm
+from django.utils import timezone
 
-from accounts.models import Profile
+from profiles.models import Profile
 from masteryhub.models import Session, Forum, ConcernReport
 
 User = get_user_model()
@@ -111,58 +112,13 @@ class SessionForm(forms.ModelForm):
         }
 
 
-class ProfileForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        fields = [
-            "bio",
-            "skills",
-            "experience",
-            "achievements",
-            "profile_picture",
-            "linkedin_profile",
-            "github_profile",
-            "is_expert",
-            "mentor_since",
-            "mentorship_areas",
-            "availability",
-            "preferred_mentoring_method",
-        ]
-        widgets = {
-            "bio": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
-            "skills": forms.TextInput(
-                attrs={
-                    "placeholder": "Enter skills separated by commas",
-                    "class": "form-control",
-                }
-            ),
-            "experience": forms.Textarea(
-                attrs={"rows": 4, "class": "form-control"}),
-            "achievements":
-                forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
-            "mentor_since": forms.DateInput(
-                attrs={"type": "date", "class": "form-control"}
-            ),
-            "mentorship_areas": forms.Textarea(
-                attrs={"rows": 3, "class": "form-control"}
-            ),
-            "availability": forms.TextInput(attrs={"class": "form-control"}),
-            "preferred_mentoring_method": forms.TextInput(
-                attrs={"class": "form-control"}
-            ),
-        }
 
 
-class ForumPostForm(forms.ModelForm):
-    class Meta:
-        model = Forum
-        fields = ["title", "content", "category"]
-        widgets = {
-            "title": forms.TextInput(attrs={"class": "form-control"}),
-            "content":
-                forms.Textarea(attrs={"class": "form-control", "rows": 5}),
-            "category": forms.Select(attrs={"class": "form-control"}),
-        }
+    def clean_mentor_since(self):
+        mentor_since = self.cleaned_data.get('mentor_since')
+        if mentor_since > timezone.now().date():
+            raise forms.ValidationError("The date cannot be in the future.")
+        return mentor_since
 
 
 class MentorApplicationForm(forms.Form):

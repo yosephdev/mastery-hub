@@ -20,7 +20,7 @@ from allauth.account.views import ConfirmEmailView
 from allauth.account.models import EmailConfirmationHMAC
 from django.contrib.contenttypes.models import ContentType
 
-from accounts.models import (
+from profiles.models import (
     Profile,
 )
 from checkout.models import (
@@ -38,12 +38,8 @@ from masteryhub.models import (
 from .forms import (
     CustomSignupForm,
     CustomUserChangeForm,
-    ProfileForm,
-    SessionForm,
-    ForumPostForm,
-    MentorApplicationForm,
 )
-from .forms import OrderForm
+from checkout.forms import OrderForm
 import stripe
 import json
 import logging
@@ -56,20 +52,23 @@ def signup_view(request):
     if request.method == "POST":
         form = CustomSignupForm(request.POST)
         if form.is_valid():
-            user = form.save(request)
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password1")
-            user = authenticate(username=username, password=password)
+            try:
+                user = form.save(request)
+                username = form.cleaned_data.get("username")
+                password = form.cleaned_data.get("password1")
+                user = authenticate(username=username, password=password)
 
-            if user is not None:
-                auth_login(request, user)
-                messages.success(
-                    request,
-                    f"Welcome, {user.username}! Registration successful!"
-                )
-                return redirect("home")
-            else:
-                messages.error(request, "Authentication failed.")
+                if user is not None:
+                    auth_login(request, user)
+                    messages.success(
+                        request,
+                        f"Welcome, {user.username}! Registration successful!"
+                    )
+                    return redirect("home")
+                else:
+                    messages.error(request, "Authentication failed.")
+            except Exception as e:
+                messages.error(request, f"An error occurred: {str(e)}")
         else:
             for field, error in form.errors.items():
                 messages.error(request, f"{field}: {error}")

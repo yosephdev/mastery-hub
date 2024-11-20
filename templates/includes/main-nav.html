@@ -11,7 +11,6 @@
                 aria-haspopup="true" aria-expanded="false">
                 Courses
             </a>
-            <!-- Dropdown menu for Course categories -->
             <div class="dropdown-menu border-0" aria-labelledby="courses-link">
                 <div class="row">
                     <div class="col">
@@ -30,7 +29,6 @@
                 aria-haspopup="true" aria-expanded="false">
                 Mentors
             </a>
-            <!-- Dropdown menu for Mentors -->
             <div class="dropdown-menu border-0" aria-labelledby="mentors-link">
                 <div class="row">
                     <div class="col">
@@ -49,7 +47,6 @@
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Resources
             </a>
-            <!-- Dropdown menu for Resources -->
             <div class="dropdown-menu border-0" aria-labelledby="resources-link">
                 <div class="row">
                     <div class="col">
@@ -88,8 +85,9 @@
         </div>
     </form>
 </div>
+
 <!-- User account and notifications links -->
-<ul class="accout-block list-inline list-unstyled text-center text-lg-right my-0">
+<ul class="account-block list-inline list-unstyled text-center text-lg-right my-0">
     <!-- User account dropdown -->
     <li class="list-inline-item dropdown">
         <a class="text-black nav-link" href="#" id="user-options" data-toggle="dropdown" aria-haspopup="true"
@@ -99,7 +97,6 @@
                 <p class="my-0">My Account</p>
             </div>
         </a>
-        <!-- Dropdown menu content for user account -->
         <div class="dropdown-menu border-0" aria-labelledby="user-options">
             {% if request.user.is_authenticated %}
             {% if request.user.is_superuser %}
@@ -113,8 +110,7 @@
             <a href="{% url 'account_logout' %}" class="dropdown-item">Logout</a>
             {% if request.user.profile.is_expert %}
             <a href="{% url 'expert_dashboard' %}" class="dropdown-item">Expert Dashboard</a>
-            <a href="{% url 'manage_mentorship_requests' %}" class="dropdown-item">Manage Mentorship
-                Requests</a>
+            <a href="{% url 'manage_mentorship_requests' %}" class="dropdown-item">Manage Mentorship Requests</a>
             {% endif %}
             {% else %}
             <a href="{% url 'account_login' %}" class="dropdown-item">Login</a>

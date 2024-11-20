@@ -3,7 +3,6 @@ from django.views import View
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -13,31 +12,28 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.models import User
-from accounts.forms import MentorApplicationForm, ConcernReportForm
-from django.contrib.admin.models import LogEntry, ADDITION
-from django.contrib.contenttypes.models import ContentType
-from accounts.models import Profile
-from masteryhub.models import Feedback, Session
-from checkout.models import Payment
-from accounts.forms import (
-    CustomSignupForm,
-    CustomUserChangeForm,
-    ProfileForm,
+from masteryhub.forms import (    
     SessionForm,
     ForumPostForm,
     MentorApplicationForm,
 )
+from accounts.forms import (
+    CustomSignupForm,
+    CustomUserChangeForm, 
+)
+from .models import Profile
+from masteryhub.models import Feedback, Session
+from checkout.models import Payment
 
 # Create your views here.
-
 
 def get_user_profile(username):
     """Retrieve a user profile by username."""
     return get_object_or_404(Profile, user__username=username)
 
-
 @login_required
 def view_profile(request, username=None):
+    """View the user's profile or a specific user's profile."""
     if username:
         profile = get_object_or_404(Profile, user__username=username)
         is_own_profile = request.user.username == username
@@ -50,12 +46,10 @@ def view_profile(request, username=None):
         "is_own_profile": is_own_profile,
         "has_profile_picture": bool(profile.profile_picture),
     }
-
+    
     if profile.is_expert:
         return render(request, "profiles/view_mentor_profile.html", context)
-    else:
-        return render(request, "profiles/view_mentee_profile.html", context)
-
+    return render(request, "profiles/view_mentee_profile.html", context)
 
 @login_required
 def edit_profile(request):
@@ -71,15 +65,26 @@ def edit_profile(request):
         form = ProfileForm(instance=profile)
     return render(request, "profiles/edit_profile.html", {"form": form})
 
-
+@login_required
 def view_mentor_profile(request, username):
     """View a mentor's profile."""
     profile = get_object_or_404(Profile, user__username=username, is_expert=True)
-    is_own_profile = (
-        request.user.username == username if request.user.is_authenticated else False
-    )
+    is_own_profile = request.user.username == username if request.user.is_authenticated else False
     context = {
         "profile": profile,
         "is_own_profile": is_own_profile,
     }
     return render(request, "profiles/view_mentor_profile.html", context)
+
+@login_required
+def delete_profile(request, user_id):
+    """Delete a user profile."""
+    user = get_object_or_404(User, id=user_id)
+    
+    if request.user == user:
+        user.delete()
+        messages.success(request, "Your profile has been deleted successfully.")
+    else:
+        messages.error(request, "You do not have permission to delete this profile.")
+    
+    return redirect('profile_list')  

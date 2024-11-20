@@ -4,7 +4,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.db.models import Q
 from masteryhub.models import Mentorship, Session
-from accounts.models import Profile
+from profiles.models import Profile
 from .forms import ContactForm
 
 # Create your views here.
