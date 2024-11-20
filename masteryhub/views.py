@@ -13,41 +13,12 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.models import User
-from .forms import MentorApplicationForm, ConcernReportForm
-from django.contrib.admin.models import LogEntry, ADDITION
-from django.contrib.contenttypes.models import ContentType
+from .forms import MentorApplicationForm, ConcernReportForm, BookingForm, ReviewForm, SessionForm, ForumPostForm
+from .models import Feedback, Session, Category, Mentorship, Forum
 from profiles.models import Profile
-from .models import (
-    Feedback,
-    Session,
-    Category,
-    Mentorship,
-)
-from checkout.models import (
-    Payment,
-    Cart,
-    CartItem,
-    Order,
-)
-from .forms import BookingForm, ReviewForm
 import stripe
 import json
 import logging
-
-from accounts.forms import (
-    CustomSignupForm,
-    CustomUserChangeForm,    
-    SessionForm,   
-    MentorApplicationForm,
-)
-from .forms import (
-    ProfileForm,    
-    ForumPostForm,
-    MentorApplicationForm,
-)
-from .models import Mentorship, Session, Forum, Category, Feedback
-from profiles.models import Profile
-
 
 logger = logging.getLogger(__name__)
 
@@ -73,10 +44,7 @@ def become_mentor(request):
                     action_flag=ADDITION,
                     change_message=areas_of_expertise,
                 )
-            messages.success(
-                request,
-                "Your mentor application has been submitted successfully."
-            )
+            messages.success(request, "Your mentor application has been submitted successfully.")
             return redirect("home")
     else:
         form = MentorApplicationForm()
@@ -122,10 +90,7 @@ def search_mentors(request):
 
     print(f"Query: {query}, Mentors Count: {mentors.count()}")  
 
-    return render(
-        request,
-        "masteryhub/search_mentors.html", {"mentors": mentors, "query": query}
-    )
+    return render(request, "masteryhub/search_mentors.html", {"mentors": mentors, "query": query})
 
 
 @login_required
@@ -151,23 +116,15 @@ def request_mentorship(request, mentor_id):
         messages.success(request, message)
         return redirect("view_mentor_profile", username=mentor_user.username)
 
-    return render(
-        request, "masteryhub/request_mentorship.html", {"mentor": mentor_user}
-    )
+    return render(request, "masteryhub/request_mentorship.html", {"mentor": mentor_user})
 
 
 @login_required
 def manage_mentorship_requests(request):
-    """A view that handles the mentroship request management."""
+    """A view that handles the mentorship request management."""
     mentor_profile = get_object_or_404(Profile, user=request.user)
-    pending_requests = Mentorship.objects.filter(
-        mentor=mentor_profile, status="pending"
-    )
-    return render(
-        request,
-        "masteryhub/manage_mentorship_requests.html",
-        {"pending_requests": pending_requests},
-    )
+    pending_requests = Mentorship.objects.filter(mentor=mentor_profile, status="pending")
+    return render(request, "masteryhub/manage_mentorship_requests.html", {"pending_requests": pending_requests})
 
 
 def session_list(request):
@@ -178,9 +135,7 @@ def session_list(request):
     sessions = Session.objects.filter(status="scheduled")
 
     if query:
-        sessions = sessions.filter(
-            Q(title__icontains=query) | Q(description__icontains=query)
-        )
+        sessions = sessions.filter(Q(title__icontains=query) | Q(description__icontains=query))
 
     if selected_category:
         sessions = sessions.filter(category__name=selected_category)
@@ -205,15 +160,11 @@ def list_mentors(request):
     query = request.GET.get("q")
     if query:
         mentors = Profile.objects.filter(is_expert=True).filter(
-            Q(user__username__icontains=query)
-            | Q(mentorship_areas__icontains=query)
+            Q(user__username__icontains=query) | Q(mentorship_areas__icontains=query)
         )
     else:
         mentors = Profile.objects.filter(is_expert=True)
-    return render(
-        request, "masteryhub/list_mentors.html",
-        {"mentors": mentors, "query": query}
-    )
+    return render(request, "masteryhub/list_mentors.html", {"mentors": mentors, "query": query})
 
 
 @login_required
@@ -221,174 +172,15 @@ def mentor_matching_view(request):
     """A view that handles the mentor matching."""
     if request.user.is_authenticated:
         mentee = request.user
-        matches = match_mentor_mentee(mentee)
-        return render(
-            request, "masteryhub/matching_results.html", {"matches": matches})
-    else:
-        return redirect("login")
+        matches = match_mentor_mentee(mentee)        
+        return render(request, "masteryhub/mentor_matching.html", {"matches": matches})
 
-
-@login_required
-def expert_dashboard(request):
-    """A view that handles the expert dashboard."""
-    expert_profile = Profile.objects.get(user=request.user)
-    participants = Profile.objects.filter(
-        mentorship_areas__icontains=expert_profile.mentorship_areas
-    )
-    feedbacks = Feedback.objects.filter(mentor=expert_profile)
-    sessions = Session.objects.filter(host=expert_profile)
-
-    labels = []
-    data = []
-    for session in sessions:
-        labels.append(session.date.strftime("%B %Y"))
-        data.append(1)
-
-    context = {
-        "username": request.user.username,
-        "participants": participants,
-        "feedbacks": feedbacks,
-        "sessions": sessions,
-        "labels": labels,
-        "data": data,
-    }
-    return render(request, "masteryhub/expert_dashboard.html", context)
-
-
-@login_required
-def mentee_dashboard(request):
-    """A view that handles the mentee dashboard."""
-    profile = get_object_or_404(Profile, user=request.user)
-    feedbacks = Feedback.objects.filter(mentee=profile)
-    sessions = profile.sessions_participated.all()
-
-    labels = []
-    data = []
-
-    session_counts = (
-        sessions.values("date__month")
-        .annotate(count=Count("id"))
-        .order_by("date__month")
-    )
-
-    for entry in session_counts:
-        month_name = entry["date__month"]
-        labels.append(f"{month_name:02d}")
-        data.append(entry["count"])
-
-    skills = profile.skills.split(",") if profile.skills else []
-    goals = profile.goals.split(",") if profile.goals else []
-
-    payments = Payment.objects.filter(user=profile)
-    grand_total = payments.aggregate(Sum("amount"))["amount__sum"] or 0.00
-
-    context = {
-        "username": request.user.username,
-        "profile": profile,
-        "feedbacks": feedbacks,
-        "skills": skills,
-        "goals": goals,
-        "labels": labels,
-        "data": data,
-        "sessions": sessions,
-        "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
-        "grand_total": grand_total,
-    }
-    return render(request, "masteryhub/mentee_dashboard.html", context)
-
-
-@login_required
-def my_mentorships(request):
-    """A view that handles my mentorship."""
-    user_profile = request.user.profile
-    mentorships_as_mentor = Mentorship.objects.filter(mentor=user_profile)
-    mentorships_as_mentee = Mentorship.objects.filter(mentee=user_profile)
-    context = {
-        "mentorships_as_mentor": mentorships_as_mentor,
-        "mentorships_as_mentee": mentorships_as_mentee,
-    }
-    return render(request, "masteryhub/my_mentorships.html", context)
-
-
-@login_required
-def accept_mentorship(request, mentorship_id):
-    """A view that handles the accept mentorship."""
-    mentorship = get_object_or_404(
-        Mentorship, id=mentorship_id, mentor=request.user.profile
-    )
-    mentorship.status = "accepted"
-    mentorship.start_date = timezone.now().date()
-    mentorship.save()
-    messages.success(
-        request, f"Mentorship with {mentorship.mentee.user.username} accepted"
-    )
-    return redirect("manage_mentorship_requests")
-
-
-@login_required
-def reject_mentorship(request, mentorship_id):
-    """A view that handles the reject mentorship."""
-    mentorship = get_object_or_404(
-        Mentorship, id=mentorship_id, mentor=request.user.profile
-    )
-    mentorship.status = "rejected"
-    mentorship.save()
-    messages.success(
-        request, f"Mentorship with {mentorship.mentee.user.username} rejected"
-    )
-    return redirect("manage_mentorship_requests")
-
-
-@login_required
-def book_session(request, session_id):
-    """A view that handles the session booking."""
-    session = get_object_or_404(Session, id=session_id)
-    user_profile = request.user.profile
-
-    if session.is_full():
-        messages.error(request, "This session is already full.")
-    elif user_profile in session.participants.all():
-        messages.warning(request, "You are already booked for this session.")
-    else:
-        try:
-            price_in_cents = int(session.price * 100)
-            checkout_session = stripe.checkout.Session.create(
-                payment_method_types=["card"],
-                line_items=[
-                    {
-                        "price_data": {
-                            "currency": "usd",
-                            "unit_amount": price_in_cents,
-                            "product_data": {
-                                "name": session.title,
-                                "description": session.description,
-                            },
-                        },
-                        "quantity": 1,
-                    }
-                ],
-                mode="payment",
-                success_url=(
-                    request.build_absolute_uri(reverse("payment_success"))
-                    + f"?session_id={{CHECKOUT_SESSION_ID}}"
-                    + f"&django_session_id={session.id}"
-                ),
-                cancel_url=request.build_absolute_uri(
-                    reverse("payment_cancel")),
-                client_reference_id=str(session.id),
-                customer_email=request.user.email,
-            )
-            return redirect(checkout_session.url, code=303)
-        except Exception as e:
-            messages.error(
-                request, "Unable to process booking. Please try again later.")
-            return redirect("session_list")
-
-    return redirect("session_list")
+    return redirect("home")
 
 
 @login_required
 def view_session(request, session_id):
+    """A view that handles viewing a session."""
     session = get_object_or_404(Session, id=session_id)
     context = {
         "session": session,
@@ -399,12 +191,12 @@ def view_session(request, session_id):
 
 @login_required
 def create_session(request):
+    """A view that handles creating a new session."""
     if request.method == "POST":
         form = SessionForm(request.POST)
         if form.is_valid():
             session = form.save(commit=False)
-            session.host = request.user
-            session.price = form.cleaned_data["price"]
+            session.host = request.user.profile
             session.save()
             messages.success(request, "Session created successfully.")
             return redirect("view_session", session_id=session.id)
@@ -415,7 +207,8 @@ def create_session(request):
 
 @login_required
 def edit_session(request, session_id):
-    session = get_object_or_404(Session, id=session_id, host=request.user)
+    """A view that handles editing an existing session."""
+    session = get_object_or_404(Session, id=session_id, host=request.user.profile)
     if request.method == "POST":
         form = SessionForm(request.POST, instance=session)
         if form.is_valid():
@@ -429,30 +222,29 @@ def edit_session(request, session_id):
 
 @login_required
 def delete_session(request, session_id):
-    session = get_object_or_404(Session, id=session_id, host=request.user)
+    """A view that handles deleting a session."""
+    session = get_object_or_404(Session, id=session_id, host=request.user.profile)
     if request.method == "POST":
         session.delete()
         messages.success(request, "Session deleted successfully.")
         return redirect("session_list")
-    return render(
-     request, "masteryhub/delete_session.html", {"session": session})
+    return render(request, "masteryhub/delete_session.html", {"session": session})
 
 
 @login_required
 def create_feedback(request, session_id):
+    """A view that handles creating feedback for a session."""
     session = get_object_or_404(Session, id=session_id)
     if request.method == "POST":
         feedback_content = request.POST.get("feedback")
-        Feedback.objects.create(
-            session=session, user=request.user, content=feedback_content
-        )
+        Feedback.objects.create(session=session, user=request.user.profile, content=feedback_content)
         messages.success(request, "Thank you for your feedback!")
         return redirect("view_session", session_id=session_id)
-    return render(
-        request, "masteryhub/create_feedback.html", {"session": session})
+    return render(request, "masteryhub/create_feedback.html", {"session": session})
 
 
 def forum_posts(request):
+    """A view that lists all forum posts."""
     posts = Forum.objects.all()
     return render(request, "masteryhub/forum_posts.html", {"posts": posts})
 
@@ -462,16 +254,12 @@ def forum_list(request):
     """A view that handles the forum list."""
     categories = Category.objects.all()
     posts = Forum.objects.filter(parent_post=None)
-    return render(
-        request,
-        "masteryhub/forum_list.html",
-        {"categories": categories, "posts": posts},
-    )
+    return render(request, "masteryhub/forum_list.html", {"categories": categories, "posts": posts})
 
 
 @login_required
 def create_forum_post(request):
-    """A view that handles the create forum post."""
+    """A view that handles creating a forum post."""
     if request.method == "POST":
         form = ForumPostForm(request.POST)
         if form.is_valid():
@@ -486,20 +274,16 @@ def create_forum_post(request):
 
 
 @login_required
-@login_required
 def view_forum_post(request, post_id):
-    """A view that handles the view forum post."""
+    """A view that handles viewing a forum post."""
     post = get_object_or_404(Forum, id=post_id)
     comments = post.comments.all()
-    return render(
-        request,
-        "masteryhub/view_forum_post.html", {"post": post, "comments": comments}
-    )
+    return render(request, "masteryhub/view_forum_post.html", {"post": post, "comments": comments})
 
 
 @login_required
 def reply_forum_post(request, post_id):
-    """A view that handles the reply forum post."""
+    """A view that handles replying to a forum post."""
     parent_post = get_object_or_404(Forum, id=post_id)
     if request.method == "POST":
         form = ForumPostForm(request.POST)
@@ -512,17 +296,13 @@ def reply_forum_post(request, post_id):
             return redirect("view_forum_post", post_id=parent_post.id)
     else:
         form = ForumPostForm()
-    return render(
-        request,
-        "masteryhub/reply_forum_post.html",
-        {"form": form, "parent_post": parent_post},
-    )
+    return render(request, "masteryhub/reply_forum_post.html", {"form": form, "parent_post": parent_post})
 
 
 @login_required
 def edit_forum_post(request, post_id):
-    """A view that handles the edit forum post."""
-    post = get_object_or_404(Forum, id=post_id, author=request.user)
+    """A view that handles editing a forum post."""
+    post = get_object_or_404(Forum, id=post_id, author=request.user.profile)
     if request.method == "POST":
         form = ForumPostForm(request.POST, instance=post)
         if form.is_valid():
@@ -536,8 +316,8 @@ def edit_forum_post(request, post_id):
 
 @login_required
 def delete_forum_post(request, post_id):
-    """A view that handles the delete forum post."""
-    post = get_object_or_404(Forum, id=post_id, author=request.user)
+    """A view that handles deleting a forum post."""
+    post = get_object_or_404(Forum, id=post_id, author=request.user.profile)
     if request.method == "POST":
         post.delete()
         messages.success(request, "Forum post deleted successfully.")
@@ -551,27 +331,27 @@ def mentor_rules(request):
 
 
 def mentor_help(request):
+    """A view that handles mentor help."""
     return render(request, "masteryhub/mentor_help.html")
 
 
 def report_concern(request):
-    """A view that handles the report concern."""
+    """A view that handles reporting a concern."""
     if request.method == "POST":
         form = ConcernReportForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(
-                request,
-                "Your concern has been reported. We will review it shortly."
-            )
+            messages.success(request, "Your concern has been reported. We will review it shortly.")
             return redirect("home")
     else:
         form = ConcernReportForm()
 
     return render(request, "masteryhub/report_concern.html", {"form": form})
 
+
 def book_session(request, session_id):
-    session = Session.objects.get(id=session_id)
+    """A view that handles booking a session."""
+    session = get_object_or_404(Session, id=session_id)
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
@@ -584,15 +364,21 @@ def book_session(request, session_id):
 
     return render(request, 'masteryhub/book_session.html', {'form': form, 'session': session})
 
+
 def browse_skills_view(request):   
+    """A view that handles browsing skills."""
     return render(request, 'masteryhub/browse_skills.html')  
 
+
 def review_list(request):
+    """A view that lists all reviews."""
     reviews = Review.objects.all()
     return render(request, 'reviews/review_list.html', {'reviews': reviews})
 
+
 def create_review(request, session_id):
-    session = Session.objects.get(id=session_id)
+    """A view that handles creating a review for a session."""
+    session = get_object_or_404(Session, id=session_id)
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
