@@ -34,7 +34,8 @@
             {% endif %}
 
             {% if is_own_profile %}
-            <a href="{% url 'edit_profile' %}" class="btn btn-warning">Edit Profile</a>
+            <a href="{% url 'edit_profile' %}" class="btn btn-info">Edit Profile</a>
+            <a href="{% url 'delete_profile' %}" class="btn btn-warning">Delete Profile</a>
             {% endif %}
         </div>
     </div>
