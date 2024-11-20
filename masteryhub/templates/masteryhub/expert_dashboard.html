@@ -16,13 +16,13 @@
         <div class="col-md-9">
             <div id="dashboard" class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">Welcome back {{ username }}</h5>
+                    <h5 class="card-title">Welcome back, {{ profile.user.username }}</h5>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Active participants</th>
-                                <th>Total sessions</th>
-                                <th>Average rating</th>
+                                <th>Active Participants</th>
+                                <th>Total Sessions</th>
+                                <th>Average Rating</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -30,7 +30,11 @@
                             <tr>
                                 <td>{{ participant.user.username }}</td>
                                 <td>{{ participant.sessions.count }}</td>
-                                <td>{{ participant.average_rating }}</td>
+                                <td>{{ participant.average_rating|default:"N/A" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">No participants found.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -40,10 +44,14 @@
 
             <div id="my-sessions" class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">Upcoming sessions</h5>
-                    <ul class="list-unstyled">
+                    <h5 class="card-title">Upcoming Sessions</h5>
+                    <ul class="list-group">
                         {% for session in sessions %}
-                        <li>{{ session.date }} - {{ session.topic }}</li>
+                        <li class="list-group-item">
+                            <strong>{{ session.date }}</strong> - {{ session.topic }}
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-center">No upcoming sessions.</li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -54,11 +62,16 @@
                     <h5 class="card-title">Recent Feedback</h5>
                     <div class="row">
                         {% for feedback in feedbacks %}
-                        <div class="col-md-3">
-                            <div class="feedback-card">
-                                <p>"{{ feedback.comment }}" - {{ feedback.mentee.user.username }}</p>
+                        <div class="col-md-4 mb-3">
+                            <div class="card feedback-card">
+                                <div class="card-body">
+                                    <p class="card-text">"{{ feedback.comment }}"</p>
+                                    <footer class="blockquote-footer">{{ feedback.mentee.user.username }}</footer>
+                                </div>
                             </div>
                         </div>
+                        {% empty %}
+                        <div class="col-md-12 text-center">No feedback received yet.</div>
                         {% endfor %}
                     </div>
                 </div>
