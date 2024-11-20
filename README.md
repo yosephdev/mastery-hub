@@ -82,36 +82,20 @@ Users can search for mentors, view mentor profiles, request mentorship, and sche
 - [Testing](#testing)
 - [Bugs](#bugs)
 - [Credits](#credits)
-  * [Below is a list of sources of information that helped me and inspired me with their ideas:](#below-is-a-list-of-sources-of-information-that-helped-me-and-inspired-me-with-their-ideas-)
-    + [Deployment](#deployment)
-    + [ElephantSQL Database](#elephantsql-database)
-    + [Amazon AWS](#amazon-aws)
-      - [S3 Bucket](#s3-bucket)
-      - [IAM](#iam)
-      - [Final AWS Setup](#final-aws-setup)
-    + [Stripe API](#stripe-api)
-    + [Gmail API](#gmail-api)
-    + [Heroku Deployment](#heroku-deployment)
-    + [Local Deployment](#local-deployment)
-      - [Cloning](#cloning)
-      - [Forking](#forking)
-- [Acknowledgements](#acknowledgements)
-
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 <br>
 
-# UX
+## UX
 
-## The Strategy Plane
+### The Strategy Plane
 
-### Targeted Users
+#### Targeted Users
 
 - Professionals seeking to acquire new skills.
 - Experts looking to share their knowledge and mentor others.
 - Individuals interested in continuous learning and career advancement.
 
-### Site Goals
+#### Site Goals
 
 - Enabling users to easily find and join skill-sharing sessions.
 - Facilitating seamless mentor-mentee matching.
@@ -119,7 +103,7 @@ Users can search for mentors, view mentor profiles, request mentorship, and sche
 - Allowing users to track their skill development progress.
 - Offering users the ability to provide and receive feedback on sessions.
 
-### Project Goals
+#### Project Goals
 
 - Develop a functional skill-sharing platform.
 - Incorporate comprehensive features for an engaging and educational experience.
@@ -196,12 +180,10 @@ Note: Mobile wireframes will be developed in a future iteration of the project, 
 <br>
 
 ## Main plan
+
 - Designing a captivating homepage with striking hero images that clearly convey the website's purpose to visitors.
-
 - Implementing user account registration for secure access to content editing, profile management, and efficient checkout with saved user information.
-
 - Developing a fully responsive website to ensure smooth functionality across all devices and optimized navigation for mobile users.
-
 - Equipping superusers with the ability to create, view, update, and delete reviews for both users and products.
 
 <br>
@@ -218,7 +200,9 @@ Note: Mobile wireframes will be developed in a future iteration of the project, 
 
 ### Home Page Preview
 ![Home Page Preview](docs/readme_images/homepage-preview-image.png)
+
 The Home page of this online resource is an attractive and informative landing page, designed to capture users' attention.
+
 <br>
 
 [Back to Top](#table-of-contents)
@@ -265,11 +249,11 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 ![Alt text](docs/readme_images/image-8.png)
 ![Alt text](docs/readme_images/image-9.png)
 
- - At the very top there is an information board in which information about the terms of return, delivery, the minimum order amount for free delivery is updated every three seconds (to encourage the user to buy  more number of products), as well as a motivational phrase as a call to action.
+- At the very top, there is an information board in which information about the terms of return, delivery, and the minimum order amount for free delivery is updated every three seconds (to encourage the user to buy more products), as well as a motivational phrase as a call to action.
 
 ![Main Nav Menu Image](docs/readme_images/image-10.png)
 
-- Throughout the site, the user has access to the main navigation menu. Features include a search bar, account/profile access, cart link and subtotal if the user has added items to their carts, as well as links to filter products by gender, brand and sale page. Once logged in, users have access to the wishlist page.
+- Throughout the site, the user has access to the main navigation menu. Features include a search bar, account/profile access, cart link and subtotal if the user has added items to their carts, as well as links to filter products by gender, brand, and sale page. Once logged in, users have access to the wishlist page.
 
 <br>
 
@@ -291,117 +275,6 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 
 ### Search Bar
 ![Search Bar Image](docs/readme_images/image-12.png)
-
-![Search Bar Profile Image](docs/readme_images/image-13.png)
-
-![Search Bar Sessions Image](docs/readme_images/image-14.png)
-
-![Search Bar error](docs/readme_images/image-15.png)
-
-- Users can use the search bar in the navigation menu to find specific sessions and profiles. The search term is matched with the session title, description, and profile skills to provide the user with a list of relevant results. The search results page displays the number of matches found. If the user clicks the search button without entering any search terms, an error message is displayed, prompting the user to enter a search term.
-
-<br>
-
-[Back to Top](#table-of-contents)
-
-<br>
-
-### Session Details Page
-![Session Detail Image](docs/readme_images/image-16.png)
-The Session Details page provides a view of a session, including its image, name, price, category, rating, and other relevant information. Users can interact with this page in the following ways:
-
-<br>
-
-[Back to Top](#table-of-contents)
-
-<br>
-
-## My Account Dropdown
-
-- **Logged In Users**:
-  - The **My Account** drop-down menu includes a link to the user's profile.
-  
-  - If the user has administrator rights, an additional **Admin Dashboard** menu option is visible.
-  ![My Account Dropdown](docs/readme_images/image-21.gif)
-
-  <br>
-
-  ![Admin Dashboard Option](docs/readme_images/image-22.png)
-
-- **Admin Features**:
-  - **Add Sessions**: Admins can add new sessions via the admin dropdown in the navigation menu. The add session page features a form to enter session details.
-  ![Add Session Page](docs/readme_images/image-23.png)
-
-  - **Edit Sessions**: Admins can edit sessions by clicking the edit icon on the session card or individual session page. The edit page pre-fills the form with current session data.
-  ![Edit Session Page](docs/readme_images/image-24.png)
-
-  - **Delete Sessions**: Admins can delete sessions by clicking the delete icon on the session card or individual session page.
-  ![Delete Session Icon](docs/readme_images/image-25.png)
-
-- **Logged Out Users**:
-  - They are prompted to either register for a new account or log into an existing one.
-
-<br>
-
-[Back to Top](#table-of-contents)
-
-<br>
-
-## User Sign Up Page
-
-- **Registration**: Users can register by clicking the "Register" link in the navigation menu. They will complete a form to create their profile.
-  ![User Sign Up Image](docs/readme_images/image-26.png)
-  <br>
-  ![Sign Up Form](docs/readme_images/image-27.png)
-  <br>
-  ![Confirmation](docs/readme_images/image-28.png)
-- **Confirmation**: Users will receive a success alert upon form submission.
-
-<br>
-
-[Back to Top](#table-of-contents)
-
-## User Sign In Page
-
-- **Login**: Users can log in by clicking the "Login" link. They must enter their username or email and password. There is an option to remember the user on the device.
-  ![User Sign In Image](docs/readme_images/image-29.png)
-  <br>
-  ![Login Form](docs/readme_images/image-30.png)
-
-[Back to Top](#table-of-contents)
-
-## User Sign Out Page
-
-- **Logout**: Users can log out by clicking the "Logout" link. They are redirected to the login page.
-  ![User Sign Out Image](docs/readme_images/image-31.png)
-  ![Sign Out Confirmation](docs/readme_images/image-32.png)
-
-[Back to Top](#table-of-contents)
-
-## User Profile Page
-
-- **Profile Information**: Displays user information including default delivery address and previous orders.
-
-  ![User Profile Image](docs/readme_images/image-33.png)
-  <br>
-
-  ![Profile Details](docs/readme_images/image-34.png)
-  <br>
-
-- **Update Information**: Users can update their profile details.
-  ![Update Profile Form](docs/readme_images/image-35.png)
-
-  <br>
- 
-- **Confirmation**: Users will receive a success alert upon form submission.
-
-  ![Confirmation](docs/readme_images/image-36.png)
-
-  <br>
-
-- **Order History**: Shows a list of previous orders with details and links to view specific order confirmations.
-
-[Back to Top](#table-of-contents)
 
 ## Dropdown Menu Content
 
@@ -446,7 +319,6 @@ The Session Details page provides a view of a session, including its image, name
   ![Checkout Form](docs/readme_images/image-43.png)
 
 - **Payment Information**: Users must enter payment details, processed through Stripe.
-
   ![Payment Details](docs/readme_images/image-44.png)
 
 - **Order Summary**: Shows cart items, quantities, and total cost.
@@ -510,7 +382,7 @@ The Session Details page provides a view of a session, including its image, name
 - Background-color (#FFFFFF)
 
 ### Typography
- - The site chose the GT Walsheim Pro font due to its excellent readability, modern design and versatility
+- The site chose the GT Walsheim Pro font due to its excellent readability, modern design, and versatility.
 
 ### Images
 - All images used as educational material were taken from these sites [Freepik](https://www.freepik.com/), [Adobe](https://www.adobe.com/), [Craiyon](https://www.craiyon.com/).
@@ -530,14 +402,12 @@ This online resource follows a Business-to-Consumer (B2C) model, offering sessio
 ## **Marketing Strategy**
 
 ### **Social Media Marketing**
-
 This Facebook page primarily aims to inform followers about new sessions, notify subscribers about offers and promotions, and place targeted advertisements.
 
 ![Facebook 1](docs/readme_images/image-50.png)
 
 ### **Newsletter Marketing**
-
- In the footer of the website is a [Mailchimp](https://mailchimp.com/?currency=EUR) newsletter in the footer which is used to send emails to subscribers about the latest products, promotions and discounts.
+In the footer of the website is a [Mailchimp](https://mailchimp.com/?currency=EUR) newsletter in the footer which is used to send emails to subscribers about the latest products, promotions, and discounts.
 
 ![Newsletter Email](docs/readme_images/image-51.png)
 
@@ -546,7 +416,6 @@ This Facebook page primarily aims to inform followers about new sessions, notify
 ## **Search Engine Optimization (SEO)**
 
 ### **Keywords**
-
 Keywords were analyzed and added to the description of the online platform on the main page of the site.
 
 ![Keywords](docs/readme_images/image-52.png)
@@ -589,7 +458,7 @@ Keywords were analyzed and added to the description of the online platform on th
 
 ### Final List of Keywords
 
-This resulted in the final list of 10-15 keywords spanning general topics as well as more specific, long-tail phrases related to skills sharing, mentorship, online learning and professional development for careers.
+This resulted in the final list of 10-15 keywords spanning general topics as well as more specific, long-tail phrases related to skills sharing, mentorship, online learning, and professional development for careers.
 
 <br>
 
@@ -598,13 +467,11 @@ This resulted in the final list of 10-15 keywords spanning general topics as wel
 <br>
 
 ### **Sitemap.xml**
-
 I created a sitemap using [XML-Sitemaps](https://www.xml-sitemaps.com) on my live website [https://skill-sharing-446c0336ffb5.herokuapp.com/](https://skill-sharing-446c0336ffb5.herokuapp.com/)
 
 The XML that was created is in the root directory of the website.
 
 ### **Robots.txt**
-
 The robots.txt file was created using this guide [https://www.conductor.com/academy/robotstxt/](https://www.conductor.com/academy/robotstxt/).
 
 ![Robots](docs/readme_images/image-53.png)
@@ -628,14 +495,14 @@ The robots.txt file was created using this guide [https://www.conductor.com/acad
 ## Libraries And Installed Packages
 
 * [coverage](https://pypi.org/project/django-coverage/) - Used for running automated tests.
-* [crispy-bootstrap4](https://pypi.org/project/crispy-bootstrap4/) - Template pack used for django-crispy-forms
+* [crispy-bootstrap4](https://pypi.org/project/crispy-bootstrap4/) - Template pack used for django-crispy-forms.
 * [django-crispy-forms](https://pypi.org/project/crispy-bootstrap4/) - Used to render forms throughout the project.
 * [dj-database-url](https://pypi.org/project/dj-database-url/) - A package used to utilize DATABASE_URL environment variable. 
-* [django-allauth](https://django-allauth.readthedocs.io/en/latest/) - Allows authentication, registration and account management in Django.
+* [django-allauth](https://django-allauth.readthedocs.io/en/latest/) - Allows authentication, registration, and account management in Django.
 * [django-countries, v7.2.1](https://pypi.org/project/django-countries/7.2.1/) - Django application used to provide country choices for use with forms, and a country field for models.
 * [gunicorn](https://gunicorn.org/) - A Python WSGI HTTP Server for UNIX.
 * [psycopg2](https://pypi.org/project/psycopg2/) - A PostgreSQL database adapter.
-* [boto3](https://pypi.org/project/boto3/) - An Amazon Web Services (AWS) software development kit (SDK) used to connect to the S3 bucket
+* [boto3](https://pypi.org/project/boto3/) - An Amazon Web Services (AWS) software development kit (SDK) used to connect to the S3 bucket.
 * [Black](https://pypi.org/project/black/) - A Python code formatter.
 * [django storages](https://django-storages.readthedocs.io/en/latest/) - Collection of custom storage backends for Django.
 * [stripe](https://pypi.org/project/stripe/) - A Python library for Stripe’s API.
@@ -683,7 +550,6 @@ For all testing, please refer to the [TESTING.md](TESTING.md) file.
 
 ## Below is a list of sources of information that helped me and inspired me with their ideas:
 
-
 - [Boutique Ado Walkthrough Project](https://learn.codeinstitute.net/courses/course-v1:CodeInstitute+EA101+2021_T1/courseware/eb05f06e62c64ac89823cc956fcd8191/3adff2bf4a78469db72c5330b1afa836/)
 - [I Think Therefore I Blog Walkthrough Project](https://learn.codeinstitute.net/courses/course-v1:CodeInstitute+FSD101_WTS+2023_Q3/courseware/56a2da0940b4411d8a38c2b093a22c60/4565659a34d648b8b8edd063c3182180/)
 - [Tasks Walkthrough Project](https://learn.codeinstitute.net/courses/course-v1:CodeInstitute+DB101+2021_T1/courseware/c0c31790fcf540539fd2bd3678b12406/6e44128b0b37416ab40c1a87ef2cb32a/)
@@ -715,7 +581,7 @@ To obtain your own Postgres Database, sign-up with your GitHub account, then fol
 
 This project uses [AWS](https://aws.amazon.com) to store media and static files online, due to the fact that Heroku doesn't persist this type of data.
 
-Once you've created an AWS account and logged-in, follow these series of steps to get your project connected.
+Once you've created an AWS account and logged in, follow these series of steps to get your project connected.
 Make sure you're on the **AWS Management Console** page.
 
 #### S3 Bucket
@@ -841,7 +707,7 @@ Once on the IAM page, follow these steps:
 
 This project uses [Stripe](https://stripe.com) to handle the ecommerce payments.
 
-Once you've created a Stripe account and logged-in, follow these series of steps to get your project connected.
+Once you've created a Stripe account and logged in, follow these series of steps to get your project connected.
 
 - From your Stripe dashboard, click to expand the "Get your test API keys".
 - You'll have two keys here:
@@ -862,7 +728,7 @@ As a backup, in case users prematurely close the purchase-order page during paym
 
 This project uses [Gmail](https://mail.google.com) to handle sending emails to users for account verification and purchase order confirmations.
 
-Once you've created a Gmail (Google) account and logged-in, follow these series of steps to get your project connected.
+Once you've created a Gmail (Google) account and logged in, follow these series of steps to get your project connected.
 
 - Click on the **Account Settings** (cog icon) in the top-right corner of Gmail.
 - Click on the **Accounts and Import** tab.
@@ -982,7 +848,7 @@ You can clone the repository by following these steps:
 4. Open Git Bash or Terminal
 5. Change the current working directory to the one where you want the cloned directory
 6. In your IDE Terminal, type the following command to clone my repository:
-	- `git clone https://github.com/yosephdev/mastery-hub.git`
+   - `git clone https://github.com/yosephdev/mastery-hub.git`
 7. Press Enter to create your local clone.
 
 Alternatively, if using Gitpod, you can click below to create your own workspace using this repository.
