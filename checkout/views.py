@@ -6,12 +6,19 @@ from crispy_forms.layout import Layout, Field, ButtonHolder, Submit
 from django.core.exceptions import ValidationError
 import re
 from django.utils import timezone
+from django.shortcuts import render, get_object_or_404, redirect
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+import stripe
+from django.http import JsonResponse
 
 from profiles.models import Profile
 from masteryhub.models import Session
-from .models import Order
+from .models import Order, CartItem
 
 User = get_user_model()
+
+stripe.api_key = settings.STRIPE_SECRET_KEY  
 
 
 def validate_phone(value):
@@ -114,3 +121,177 @@ class ProfileForm(forms.ModelForm):
         if mentor_since and mentor_since > timezone.now().date():
             raise ValidationError("The 'Mentor Since' date cannot be in the future.")
         return mentor_since
+
+
+def pricing(request):
+    """A view that displays pricing information."""
+    pricing_plans = [
+        {
+            'name': 'Basic',
+            'price': 9.99,
+            'features': [
+                'Access to 5 sessions per month',
+                'Basic mentorship features',
+                'Email support'
+            ],
+            'button_class': 'btn-outline-primary'
+        },
+        {
+            'name': 'Pro',
+            'price': 19.99,
+            'features': [
+                'Access to 15 sessions per month',
+                'Advanced mentorship features',
+                'Priority email support'
+            ],
+            'button_class': 'btn-success'
+        },
+        {
+            'name': 'Enterprise',
+            'price': 49.99,
+            'features': [
+                'Unlimited access to sessions',
+                'Premium mentorship features',
+                '24/7 phone and email support'
+            ],
+            'button_class': 'btn-black'
+        }
+    ]
+
+    context = {
+        'pricing_plans': pricing_plans
+    }
+
+    return render(request, 'checkout/pricing.html', context)
+
+
+def increase_quantity(request, item_id):
+    """A view that increases the quantity of an item in the cart."""
+    cart_item = get_object_or_404(CartItem, id=item_id)
+    cart_item.quantity += 1  
+    cart_item.save()  
+
+    return redirect('cart')  
+
+
+def decrease_quantity(request, item_id):
+    """A view that decreases the quantity of an item in the cart."""
+    cart_item = get_object_or_404(CartItem, id=item_id)
+    if cart_item.quantity > 1:
+        cart_item.quantity -= 1  
+        cart_item.save()  
+    else:
+        cart_item.delete() 
+
+    return redirect('cart')  
+
+
+def remove_from_cart(request, item_id):
+    """A view that removes an item from the cart."""
+    cart_item = get_object_or_404(CartItem, id=item_id)
+    cart_item.delete()
+
+    return redirect('cart')
+
+
+def checkout(request):
+    """A view that displays the checkout page."""
+    if request.method == 'POST':
+        order_form = OrderForm(request.POST)
+        session_form = SessionForm(request.POST)
+
+        if order_form.is_valid() and session_form.is_valid():            
+            order = order_form.save()
+            session = session_form.save(commit=False)
+            session.order = order 
+            session.save()
+            return redirect('success')  
+    else:
+        order_form = OrderForm()
+        session_form = SessionForm()
+
+    context = {
+        'order_form': order_form,
+        'session_form': session_form,
+    }
+
+    return render(request, 'checkout/checkout.html', context)
+
+
+def add_to_cart(request, session_id):
+    """A view that adds a session to the cart."""
+    session = get_object_or_404(Session, id=session_id)
+    cart_item, created = CartItem.objects.get_or_create(session=session, user=request.user)  
+    cart_item.quantity += 1  
+    cart_item.save()  
+
+    return redirect('cart') 
+
+
+def view_cart(request):
+    """A view that displays the items in the cart."""
+    cart_items = CartItem.objects.filter(user=request.user) 
+    total_price = sum(item.session.price * item.quantity for item in cart_items)  
+
+    context = {
+        'cart_items': cart_items,
+        'total_price': total_price,
+    }
+
+    return render(request, 'checkout/cart.html', context)  
+
+
+@csrf_exempt
+def create_checkout_session(request):
+    """A view that creates a checkout session with Stripe."""
+    
+    if os.environ.get('ENV') == 'PRODUCTION':
+        YOUR_DOMAIN = "https://skill-sharing-446c0336ffb5.herokuapp.com"
+    else:
+        YOUR_DOMAIN = "http://localhost:8000"  
+
+    checkout_session = stripe.checkout.Session.create(
+        payment_method_types=['card'],
+        line_items=[
+            {
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': 'Session Name',  
+                    },
+                    'unit_amount': 2000,  
+                },
+                'quantity': 1,
+            },
+        ],
+        mode='payment',
+        success_url=YOUR_DOMAIN + '/success/',
+        cancel_url=YOUR_DOMAIN + '/cancel/',
+    )
+
+    return redirect(checkout_session.url, code=303)
+
+
+def checkout_success(request):
+    """A view that displays a success message after checkout."""
+    return render(request, 'checkout/checkout_success.html')  
+
+
+def payment_cancel(request):
+    """A view that displays a cancellation message after payment is canceled."""
+    return render(request, 'checkout/cancel.html')  
+
+
+@csrf_exempt
+def cache_checkout_data(request):
+    """A view that caches checkout data."""
+    if request.method == 'POST':        
+        cart_data = request.POST.get('cart_data')  
+        user_info = request.POST.get('user_info')  
+       
+        request.session['cart_data'] = cart_data
+        request.session['user_info'] = user_info
+
+        return JsonResponse({'status': 'success', 'message': 'Checkout data cached successfully.'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400) 
