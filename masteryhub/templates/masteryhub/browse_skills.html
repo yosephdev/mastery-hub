@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Browse Skills</h1>
+    <p class="text-center">Explore a variety of skills offered by our mentors. Click on a skill to learn more or connect with a mentor.</p>
+
+    <div class="row">
+        {% for skill in skills %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ skill.name }}</h5>
+                    <p class="card-text">{{ skill.description }}</p>
+                    <a href="{% url 'search_mentors' %}?q={{ skill.name|urlencode }}" class="btn btn-primary">Find Mentors</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-center">No skills available at the moment. Please check back later!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
