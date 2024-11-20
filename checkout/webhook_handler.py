@@ -45,7 +45,7 @@ class StripeWH_Handler:
         pid = intent.id
         session_id = intent.metadata.session_id
         save_info = intent.metadata.save_info
-      
+
         stripe_charge = stripe.Charge.retrieve(intent.latest_charge)
 
         billing_details = stripe_charge.billing_details
@@ -87,11 +87,12 @@ class StripeWH_Handler:
             except Order.DoesNotExist:
                 attempt += 1
                 time.sleep(1)
+
         if order_exists:
             self._send_confirmation_email(order)
             return HttpResponse(
-                content=f'Webhook received: {event["type"]} | SUCCESS: \
-                    Verified order already in database',
+                content=f'Webhook received: {event["type"]} | SUCCESS: '
+                        'Verified order already in database',
                 status=200,
             )
         else:
@@ -124,10 +125,11 @@ class StripeWH_Handler:
                     content=f'Webhook received: {event["type"]} | ERROR: {e}',
                     status=500,
                 )
+
         self._send_confirmation_email(order)
         return HttpResponse(
-            content=f'Webhook received: {event["type"]} | SUCCESS: \
-                Created order in webhook',
+            content=f'Webhook received: {event["type"]} | SUCCESS: '
+                    'Created order in webhook',
             status=200,
         )
 
