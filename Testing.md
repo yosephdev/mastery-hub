@@ -54,7 +54,7 @@ I have used the recommended [JShint Validator](https://jshint.com) to validate a
 I have used the recommended [CI Python Linter](https://pep8ci.herokuapp.com) to validate all of my Python files for MasteryHub.
 
 | File                        | CI URL | Screenshot                                                 | Notes           |
-| --------------------------- | ------ | ---------------------------------------------------------- | --------------- 
+| --------------------------- | ------ | ---------------------------------------------------------- | --------------- |
 | masteryhub urls.py          | n/a    | ![screenshot](docs/readme_images/masteryhub_urls.png)      | Pass: No Errors |
 | masteryhub views.py         | n/a    | ![screenshot](docs/readme_images/masteryhub_views.png)     | Pass: No Errors |
 | masteryhub models.py        | n/a    | ![screenshot](docs/readme_images/masteryhub_models.png)    | Pass: No Errors |
@@ -68,7 +68,7 @@ I have used the recommended [CI Python Linter](https://pep8ci.herokuapp.com) to 
 | checkout models.py          | n/a    | ![screenshot](docs/readme_images/checkouts_models.png)      | Pass: No Errors |
 | checkout views.py           | n/a    | ![screenshot](docs/readme_images/checkouts_views.png)       | Pass: No Errors |
 | checkout forms.py           | n/a    | ![screenshot](docs/readme_images/checkouts_forms.png)       | Pass: No Errors |
-| checkout urls.py            | n/a    | ![screenshot](docs/readme_images/checkouts_urls.png)        | Pass: No Errors ||
+| checkout urls.py            | n/a    | ![screenshot](docs/readme_images/checkouts_urls.png)        | Pass: No Errors |
 | checkout contexts.py      | n/a    | ![screenshot](docs/readme_images/checkout_contexts.png)  | Pass: No Errors |
 | home urls.py          | n/a    | ![screenshot](docs/readme_images/home_urls.png)      | Pass: No Errors |
 | home views.py         | n/a    | ![screenshot](docs/readme_images/home_views.png)     | Pass: No Errors |
@@ -76,7 +76,6 @@ I have used the recommended [CI Python Linter](https://pep8ci.herokuapp.com) to 
 | skill_sharing_platform settings.py            | n/a    | ![screenshot](docs/readme_images/base_settings.png)        | Pass: No Errors |
 | skill_sharing_platform urls.py                | n/a    | ![screenshot](docs/readme_images/base_urls.png)            | Pass: No Errors |
 | skill_sharing_platform views.py               | n/a    | ![screenshot](docs/readme_images/base_views.png)           | Pass: No Errors |
-
 
 ## Browser Compatibility
 
@@ -87,7 +86,6 @@ I've tested my deployed project on multiple browsers to check for compatibility 
 | Chrome  | ![screenshot](docs/readme_images/image-74.png) | Works as expected             |
 | Firefox | ![screenshot](docs/readme_images/image-75.png) | Works as expected             |
 | Edge    | ![screenshot](docs/readme_images/image-76.png) | Works as expected             |
-
 
 ## Responsiveness
 
@@ -122,8 +120,8 @@ I've tested my deployed project using the Lighthouse Audit tool to check for any
 | Search         | Mobile  | ![screenshot](docs/readme_images/search_mobile.png)  | Some minor warnings |
 | Log Out        | Desktop | ![screenshot](docs/readme_images/logout_desktop.png) | No major warnings   |
 | Log Out        | Mobile  | ![screenshot](docs/readme_images/logout_mobile.png)  | Some minor warnings |
-| Cart         | Desktop | ![screenshot](docs/readme_images/basket_desktop.png) | Some minor warnings |
-| Cart        | Mobile  | ![screenshot](docs/readme_images/basket_mobile.png)  | Some minor warnings |
+| Cart           | Desktop | ![screenshot](docs/readme_images/basket_desktop.png) | Some minor warnings |
+| Cart           | Mobile  | ![screenshot](docs/readme_images/basket_mobile.png)  | Some minor warnings |
 | Checkout       | Desktop | ![screenshot](docs/readme_images/checkout_desktop.png) | Some minor warnings |
 | Checkout       | Mobile  | ![screenshot](docs/readme_images/checkout_mobile.png)  | Some minor warnings |
 | Profile        | Desktop | ![screenshot](docs/readme_images/profile_desktop.png) | Some minor warnings |
@@ -174,7 +172,7 @@ Below are the results of manual testing for the MasterHub Skill Sharing app:
 |                           | Click on "Subscribe" button on blank newsletter form                                   | Displays an error message prompting the user to complete the field                                                        | Pass      |                                                                                                                |
 |                           | Click on "Subscribe" button on a filled newsletter form                                | Displays an alert message confirming subscription to the mailing list                                                     | Pass      |                                                                                                                |
 |                           | Try to subscribe to the newsletter with an already subscribed email address            | Displays a message indicating that the email address is already subscribed                                              | Pass      |                                                                                                                |
-| **Contact      Page**         |                                                                                       |                                                                                                                           |           |                                                                                                                |
+| **Contact Page**          |                                                                                       |                                                                                                                           |           |                                                                                                                |
 |                           | Click on "Contact Us" link in footer                                                   | Redirects user to the Contact Us page                                                                                     | Pass      |                                                                                                                |
 |                           | Enter name                                                                            | Form submits only if all fields are filled                                                                              | Pass      |                                                                                                                |
 |                           | Enter a valid email address                                                             | Field accepts only valid email address format                                                                           | Pass      |                                                                                                                |
@@ -182,11 +180,9 @@ Below are the results of manual testing for the MasterHub Skill Sharing app:
 |                           | Click "Send" with missing fields                                                        | Displays a message indicating all fields are required                                                                    | Pass      |                                                                                                                |
 |                           | Click "Send" with all valid fields                                                      | Displays a success message in the upper right corner and notifies administrators in the admin panel                      | Pass      |                                                                                                                |
 
-
 ## Automated Testing
 
 Automatic testing results are below.
-
 
 ### Python (Unit Testing)
 
@@ -210,4 +206,4 @@ During testing, two specific issues were identified:
    - **Error:** An `AttributeError` occurred due to the `cart_item` attribute not being set properly.
    - **Action Taken:** Commented out the test to address the attribute issue separately.
 
-The problematic tests will be re-evaluated and fixed.
+The problematic tests were re-evaluated and fixed.
