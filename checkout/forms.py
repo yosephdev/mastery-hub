@@ -16,16 +16,21 @@ User = get_user_model()
 
 def validate_phone(value):
     if not re.match(r'^\+?1?\d{9,15}$', value):
-        raise ValidationError('Phone number must be in the format: "+999999999". Up to 15 digits allowed.')
+        raise ValidationError(
+            'Phone number must be in the format: "+999999999". Up to 15 digits allowed.'
+        )
+
 
 def validate_postal_code(value):
     if not re.match(r'^\d{5}(?:[-\s]\d{4})?$', value):
-        raise ValidationError('Postal code must be in the format: "12345" or "12345-6789".')
+        raise ValidationError(
+            'Postal code must be in the format: "12345" or "12345-6789".'
+        )
 
 
 class SessionForm(forms.ModelForm):
     """
-    Form class for handling order information in the checkout process.
+    Form class for handling session information in the checkout process.
     """
 
     class Meta:
@@ -46,8 +51,7 @@ class SessionForm(forms.ModelForm):
                 attrs={"type": "time", "class": "form-control"}
             ),
             "price": forms.NumberInput(attrs={"class": "form-control"}),
-            "description": forms.Textarea(
-                attrs={"class": "form-control", "rows": 4}),
+            "description": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
         }
 
 
@@ -82,17 +86,15 @@ class OrderForm(forms.ModelForm):
             "street_address2": "Street Address 2",
             "county": "County, State or Locality",
         }
-        
-        self.fields["full_name"].widget.attrs["autofocus"] = True       
+
+        self.fields["full_name"].widget.attrs["autofocus"] = True
         for field in self.fields:
             if field != "country":
                 placeholder = placeholders.get(field, field)
                 if self.fields[field].required:
                     placeholder += " *"
                 self.fields[field].widget.attrs["placeholder"] = placeholder
-            self.fields[field].widget.attrs[
-                "class"
-            ] = "border-black rounded-0 profile-form-input"
+            self.fields[field].widget.attrs["class"] = "border-black rounded-0 profile-form-input"
             self.fields[field].label = False
 
         self.fields['phone_number'].validators.append(validate_phone)
@@ -101,8 +103,8 @@ class OrderForm(forms.ModelForm):
 
 class CheckoutForm(forms.Form):
     phone_number = forms.CharField(validators=[validate_phone])
-    postal_code = forms.CharField(validators=[validate_postal_code]) 
-   
+    postal_code = forms.CharField(validators=[validate_postal_code])
+
 
 class ProfileForm(forms.ModelForm):
     mentor_since = forms.DateField(widget=forms.SelectDateWidget())
