@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Book Session: {{ session.title }}</h2>
+    <p><strong>Description:</strong> {{ session.description }}</p>
+    <p><strong>Price:</strong> ${{ session.price }}</p>
+    <p><strong>Duration:</strong> {{ session.duration }} hours</p>
+    <p><strong>Host:</strong> {{ session.host.user.username }}</p>
+    <p><strong>Available Spots:</strong> {{ session.available_spots }}</p>
+
+    <h3>Booking Form</h3>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Book Now</button>
+    </form>
+
+    <a href="{% url 'session_list' %}" class="btn btn-secondary mt-3">Back to Sessions</a>
+</div>
+{% endblock %}
