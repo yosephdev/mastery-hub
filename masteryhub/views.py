@@ -14,7 +14,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.models import User
 from .forms import MentorApplicationForm, ConcernReportForm, BookingForm, ReviewForm, SessionForm, ForumPostForm
-from .models import Feedback, Session, Category, Mentorship, Forum
+from .models import Feedback, Session, Category, Mentorship, Forum, Review
 from profiles.models import Profile
 import stripe
 import json
@@ -36,6 +36,9 @@ def become_mentor(request):
 
             admin_user = User.objects.filter(is_superuser=True).first()
             if admin_user:
+                from django.contrib.admin.models import LogEntry, ADDITION
+                from django.contrib.contenttypes.models import ContentType
+
                 LogEntry.objects.log_action(
                     user_id=admin_user.pk,
                     content_type_id=ContentType.objects.get_for_model(User).pk,
@@ -390,3 +393,81 @@ def create_review(request, session_id):
     else:
         form = ReviewForm()
     return render(request, 'reviews/create_review.html', {'form': form, 'session': session})
+
+
+@login_required
+def expert_dashboard(request):
+    """A view that displays the expert's dashboard with relevant information."""    
+    profile = get_object_or_404(Profile, user=request.user)
+  
+    mentees = Mentorship.objects.filter(mentor=profile)
+
+    upcoming_sessions = Session.objects.filter(host=profile, status="scheduled")
+  
+    feedbacks = Feedback.objects.filter(session__host=profile)
+
+    context = {
+        'profile': profile,
+        'mentees': mentees,
+        'upcoming_sessions': upcoming_sessions,
+        'feedbacks': feedbacks,
+    }
+
+    return render(request, 'masteryhub/expert_dashboard.html', context)
+
+
+@login_required
+def mentee_dashboard(request):
+    """A view that displays the mentee's dashboard with relevant information."""
+    mentee_profile = request.user.profile  
+    mentorships = Mentorship.objects.filter(mentee=mentee_profile)
+    sessions = Session.objects.filter(participants=mentee_profile)
+
+    context = {
+        'mentorships': mentorships,
+        'sessions': sessions,
+    }
+
+    return render(request, 'masteryhub/mentee_dashboard.html', context)
+
+
+@login_required
+def accept_mentorship(request, mentorship_id):
+    """A view that allows a mentor to accept a mentorship request."""
+    mentorship = get_object_or_404(Mentorship, id=mentorship_id)
+    
+    if request.user == mentorship.mentor.user:
+        mentorship.status = 'accepted'  
+        mentorship.save()        
+        messages.success(request, "Mentorship request accepted successfully.")
+    else:
+        messages.error(request, "You are not authorized to accept this request.")
+
+    return redirect('manage_mentorship_requests')  
+
+
+@login_required
+def reject_mentorship(request, mentorship_id):
+    """A view that allows a mentor to reject a mentorship request."""
+    mentorship = get_object_or_404(Mentorship, id=mentorship_id)
+   
+    if request.user == mentorship.mentor.user:
+        mentorship.status = 'rejected'  
+        mentorship.save()        
+        messages.success(request, "Mentorship request rejected successfully.")
+    else:
+        messages.error(request, "You are not authorized to reject this request.")
+
+    return redirect('manage_mentorship_requests') 
+
+
+@login_required
+def my_mentorships(request):
+    """A view that displays the current user's mentorships."""
+    mentorships = Mentorship.objects.filter(mentee=request.user.profile)  
+
+    context = {
+        'mentorships': mentorships,
+    }
+
+    return render(request, 'masteryhub/my_mentorships.html', context)
