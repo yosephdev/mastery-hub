@@ -26,10 +26,14 @@ from .views import (
     create_session,
     delete_session,
     create_feedback,
-    forum_posts,
+    review_list,
+    create_review,
 )
 
 urlpatterns = [
+    path('reviews/', review_list, name='review_list'),
+    path('reviews/create/<int:session_id>/', create_review, name='create_review'),
+    path('browse-skills/', views.browse_skills_view, name='browse_skills'),
     # Mentors
     path("mentors/", list_mentors, name="list_mentors"),
     path("search-mentors/", search_mentors, name="search_mentors"),
@@ -40,26 +44,10 @@ urlpatterns = [
     path("expert-dashboard/", expert_dashboard, name="expert_dashboard"),
     path("mentee-dashboard/", mentee_dashboard, name="mentee_dashboard"),
     path("mentor-matching/", mentor_matching_view, name="mentor_matching"),
-    path(
-        "request-mentorship/<int:mentor_id>/",
-        request_mentorship,
-        name="request_mentorship",
-    ),
-    path(
-        "manage-mentorship-requests/",
-        manage_mentorship_requests,
-        name="manage_mentorship_requests",
-    ),
-    path(
-        "accept-mentorship/<int:mentorship_id>/",
-        accept_mentorship,
-        name="accept_mentorship",
-    ),
-    path(
-        "reject-mentorship/<int:mentorship_id>/",
-        reject_mentorship,
-        name="reject_mentorship",
-    ),
+    path("request-mentorship/<int:mentor_id>/", request_mentorship, name="request_mentorship"),
+    path("manage-mentorship-requests/", manage_mentorship_requests, name="manage_mentorship_requests"),
+    path("accept-mentorship/<int:mentorship_id>/", accept_mentorship, name="accept_mentorship"),
+    path("reject-mentorship/<int:mentorship_id>/", reject_mentorship, name="reject_mentorship"),
     path("my-mentorships/", my_mentorships, name="my_mentorships"),
     path("report-concern/", report_concern, name="report_concern"),
     # Sessions
@@ -67,11 +55,11 @@ urlpatterns = [
     path("sessions/", views.session_list, name="session_list"),
     path("sessions/create/", create_session, name="create_session"),
     path("sessions/<int:session_id>/edit/", edit_session, name="edit_session"),
+    path("sessions/<int:session_id>/delete/", delete_session, name="delete_session"),
     path("session/<int:session_id>/book/", book_session, name="book_session"),
     # Forums
     path("forums/", forum_list, name="forum_list"),
     path("forums/new/", create_forum_post, name="create_forum_post"),
     path("forums/<int:post_id>/", view_forum_post, name="view_forum_post"),
-    path(
-        "forums/<int:post_id>/reply/", reply_forum_post, name="reply_forum_post"),
+    path("forums/<int:post_id>/reply/", reply_forum_post, name="reply_forum_post"),
 ]
