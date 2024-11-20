@@ -14,6 +14,13 @@
                         <h3>{{ mentor.username }}</h3>
                         <p><strong>Areas of Expertise:</strong> {{ mentor.profile.mentorship_areas }}</p>
                         <p><strong>Bio:</strong> {{ mentor.profile.bio }}</p>
+                        <p><strong>Status:</strong> 
+                            {% if mentor.profile.is_available %}
+                                <span class="text-success">Available for Mentorship</span>
+                            {% else %}
+                                <span class="text-danger">Not Accepting Requests</span>
+                            {% endif %}
+                        </p>
                     </div>
                     <form method="post">
                         {% csrf_token %}
