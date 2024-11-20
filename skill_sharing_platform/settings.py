@@ -3,11 +3,9 @@ import sys
 from pathlib import Path
 import dj_database_url
 from django.contrib.messages import constants as messages
-
 from dotenv import load_dotenv
 
 load_dotenv()
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -16,18 +14,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
     (
         "localhost,"
         "127.0.0.1,"
+        "127.0.0.1:8000,"
         "8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net,"
         ".herokuapp.com"
     ),
 ).split(",")
 
+print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
 
 # Application definition
 INSTALLED_APPS = [
@@ -70,7 +70,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.gzip.GZipMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'masteryhub.middleware.BrotliMiddleware', 
+    "masteryhub.middleware.BrotliMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
@@ -169,14 +169,7 @@ SOCIALACCOUNT_PROVIDERS = {
             "https://skill-sharing-446c0336ffb5.herokuapp.com/"
             "accounts/google/login/callback/"
         ),
-
-    }
-}
-
-SOCIALACCOUNT_GOOGLE_CLIENT_ID = os.getenv("SOCIALACCOUNT_GOOGLE_CLIENT_ID")
-SOCIALACCOUNT_GOOGLE_SECRET = os.getenv("SOCIALACCOUNT_GOOGLE_SECRET")
-
-SOCIALACCOUNT_PROVIDERS = {
+    },
     "facebook": {
         "METHOD": "oauth2",
         "SCOPE": ["email", "public_profile"],
@@ -201,8 +194,9 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-SOCIALACCOUNT_FACEBOOK_CLIENT_ID = os.getenv(
-    "SOCIALACCOUNT_FACEBOOK_CLIENT_ID")
+SOCIALACCOUNT_GOOGLE_CLIENT_ID = os.getenv("SOCIALACCOUNT_GOOGLE_CLIENT_ID")
+SOCIALACCOUNT_GOOGLE_SECRET = os.getenv("SOCIALACCOUNT_GOOGLE_SECRET")
+SOCIALACCOUNT_FACEBOOK_CLIENT_ID = os.getenv("SOCIALACCOUNT_FACEBOOK_CLIENT_ID")
 SOCIALACCOUNT_FACEBOOK_SECRET = os.getenv("SOCIALACCOUNT_FACEBOOK_SECRET")
 
 # Email settings (for development)
@@ -244,7 +238,6 @@ AUTH_PASSWORD_VALIDATORS = [
         ),
     },
 ]
-
 
 # Internationalization
 LANGUAGE_CODE = "en-us"
