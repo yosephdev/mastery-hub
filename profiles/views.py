@@ -12,15 +12,8 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.models import User
-from masteryhub.forms import (    
-    SessionForm,
-    ForumPostForm,
-    MentorApplicationForm,
-)
-from accounts.forms import (
-    CustomSignupForm,
-    CustomUserChangeForm, 
-)
+from masteryhub.forms import SessionForm, ForumPostForm, MentorApplicationForm
+from accounts.forms import CustomSignupForm, CustomUserChangeForm
 from .models import Profile
 from masteryhub.models import Feedback, Session
 from checkout.models import Payment
@@ -87,4 +80,4 @@ def delete_profile(request, user_id):
     else:
         messages.error(request, "You do not have permission to delete this profile.")
     
-    return redirect('profile_list')  
+    return redirect('profile_list')
