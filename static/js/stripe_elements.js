@@ -7,6 +7,12 @@
 */
 
 var stripePublicKey = JSON.parse(document.getElementById('id_stripe_public_key').textContent);
+console.log('Stripe Public Key:', stripePublicKey);
+if (!stripePublicKey) {
+    console.error('Stripe publishable key is missing or empty');
+    return;
+}
+
 var clientSecret = JSON.parse(document.getElementById('id_client_secret').textContent);
 
 var stripe = Stripe(stripePublicKey);

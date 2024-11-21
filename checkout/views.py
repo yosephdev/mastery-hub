@@ -8,6 +8,7 @@ import re
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 import stripe
 from django.http import JsonResponse
@@ -171,22 +172,22 @@ def pricing(request):
 def increase_quantity(request, item_id):
     """A view that increases the quantity of an item in the cart."""
     if request.method == 'POST':
-        cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)  # Ensure the item belongs to the user's cart
+        cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)  
         cart_item.quantity += 1  
         cart_item.save()  
-        return redirect('view_cart')  # Redirect to the cart view
+        return redirect('view_cart')  
 
 
 def decrease_quantity(request, item_id):
     """A view that decreases the quantity of an item in the cart."""
     if request.method == 'POST':
-        cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)  # Ensure the item belongs to the user's cart
+        cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)  
         if cart_item.quantity > 1:
             cart_item.quantity -= 1  
             cart_item.save()  
         else:
             cart_item.delete() 
-        return redirect('view_cart')  # Redirect to the cart view
+        return redirect('view_cart') 
 
 
 def remove_from_cart(request, item_id):
@@ -212,10 +213,30 @@ def checkout(request):
     else:
         order_form = OrderForm()
         session_form = SessionForm()
+  
+    cart = Cart.objects.get(user=request.user) 
+    total_amount = int(cart.get_total_price() * 100)  
+ 
+    order_id = f"ORDER-{timezone.now().strftime('%Y%m%d%H%M%S')}-{request.user.id}"
+
+    try:
+        payment_intent = stripe.PaymentIntent.create(
+            amount=total_amount,
+            currency='usd',  
+            automatic_payment_methods={'enabled': True},
+            metadata={'order_id': order_id}
+        )
+        client_secret = payment_intent.client_secret
+    except stripe.error.StripeError as e:       
+        messages.error(request, f"An error occurred: {str(e)}")
+        client_secret = None
 
     context = {
         'order_form': order_form,
         'session_form': session_form,
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+        'client_secret': client_secret,
+        'order_id': order_id,  
     }
 
     return render(request, 'checkout/checkout.html', context)
@@ -235,26 +256,23 @@ def add_to_cart(request, session_id):
 
         try:
             session = get_object_or_404(Session, id=session_id)
-            # Get or create the user's cart
-            cart, created = Cart.objects.get_or_create(user=request.user)  # Create cart if it doesn't exist
             
-            # Log cart creation
+            cart, created = Cart.objects.get_or_create(user=request.user)           
+          
             if created:
                 logger.info(f"Created a new cart for user: {request.user.username}")
 
-            cart_item, created = CartItem.objects.get_or_create(session=session, cart=cart)  # Use cart instead of user
+            cart_item, created = CartItem.objects.get_or_create(session=session, cart=cart)  
             cart_item.quantity += 1  
             cart_item.save()  
-
-            # Log the addition of the item
+           
             logger.info(f"Added session '{session.title}' to cart for user: {request.user.username}. New quantity: {cart_item.quantity}")
 
-            # Calculate the total price of items in the cart
             total = calculate_cart_total(request.user)  
             return JsonResponse({'success': True, 'total': total})
 
         except Exception as e:
-            logger.error(f"Error adding to cart: {e}")  # Log the error
+            logger.error(f"Error adding to cart: {e}") 
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
@@ -263,7 +281,7 @@ def add_to_cart(request, session_id):
 def view_cart(request):
     """View to display the user's cart."""
     if not request.user.is_authenticated:
-        return redirect('login')  # Redirect to login if the user is not authenticated
+        return redirect('login')  
 
     cart = get_object_or_404(Cart, user=request.user)  
     cart_items = cart.items.all()  
@@ -271,11 +289,11 @@ def view_cart(request):
     total_price = sum(item.session.price * item.quantity for item in cart_items)  
 
     context = {
-        'cart': cart,  # Ensure you are passing the cart object
+        'cart': cart,  
         'total_items': total_items,
-        'grand_total': total_price,  # Ensure you are passing the total price
+        'grand_total': total_price,  
     }
-    return render(request, 'checkout/cart.html', context)  # Ensure you are rendering the correct template
+    return render(request, 'checkout/cart.html', context)  
 
 
 @csrf_exempt
