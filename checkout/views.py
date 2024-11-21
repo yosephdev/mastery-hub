@@ -11,12 +11,15 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 import stripe
 from django.http import JsonResponse
+import logging
 
 from profiles.models import Profile
 from masteryhub.models import Session
 from .models import Order, CartItem, Cart
 
 User = get_user_model()
+
+logger = logging.getLogger(__name__)
 
 stripe.api_key = settings.STRIPE_SECRET_KEY  
 
@@ -167,23 +170,23 @@ def pricing(request):
 
 def increase_quantity(request, item_id):
     """A view that increases the quantity of an item in the cart."""
-    cart_item = get_object_or_404(CartItem, id=item_id)
-    cart_item.quantity += 1  
-    cart_item.save()  
-
-    return redirect('cart')  
+    if request.method == 'POST':
+        cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)  # Ensure the item belongs to the user's cart
+        cart_item.quantity += 1  
+        cart_item.save()  
+        return redirect('view_cart')  # Redirect to the cart view
 
 
 def decrease_quantity(request, item_id):
     """A view that decreases the quantity of an item in the cart."""
-    cart_item = get_object_or_404(CartItem, id=item_id)
-    if cart_item.quantity > 1:
-        cart_item.quantity -= 1  
-        cart_item.save()  
-    else:
-        cart_item.delete() 
-
-    return redirect('cart')  
+    if request.method == 'POST':
+        cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)  # Ensure the item belongs to the user's cart
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1  
+            cart_item.save()  
+        else:
+            cart_item.delete() 
+        return redirect('view_cart')  # Redirect to the cart view
 
 
 def remove_from_cart(request, item_id):
@@ -218,29 +221,61 @@ def checkout(request):
     return render(request, 'checkout/checkout.html', context)
 
 
+def calculate_cart_total(user):
+    """Calculate the total price of items in the user's cart."""
+    cart = get_object_or_404(Cart, user=user)  
+    total = sum(item.session.price * item.quantity for item in cart.items.all())
+    return total
+
 def add_to_cart(request, session_id):
     """A view that adds a session to the cart."""
-    session = get_object_or_404(Session, id=session_id)
-    cart_item, created = CartItem.objects.get_or_create(session=session, user=request.user)  
-    cart_item.quantity += 1  
-    cart_item.save()  
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return JsonResponse({'success': False, 'error': 'User is not authenticated.'}, status=403)
 
-    return redirect('cart') 
+        try:
+            session = get_object_or_404(Session, id=session_id)
+            # Get or create the user's cart
+            cart, created = Cart.objects.get_or_create(user=request.user)  # Create cart if it doesn't exist
+            
+            # Log cart creation
+            if created:
+                logger.info(f"Created a new cart for user: {request.user.username}")
+
+            cart_item, created = CartItem.objects.get_or_create(session=session, cart=cart)  # Use cart instead of user
+            cart_item.quantity += 1  
+            cart_item.save()  
+
+            # Log the addition of the item
+            logger.info(f"Added session '{session.title}' to cart for user: {request.user.username}. New quantity: {cart_item.quantity}")
+
+            # Calculate the total price of items in the cart
+            total = calculate_cart_total(request.user)  
+            return JsonResponse({'success': True, 'total': total})
+
+        except Exception as e:
+            logger.error(f"Error adding to cart: {e}")  # Log the error
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
 
 
 def view_cart(request):
     """View to display the user's cart."""
+    if not request.user.is_authenticated:
+        return redirect('login')  # Redirect to login if the user is not authenticated
+
     cart = get_object_or_404(Cart, user=request.user)  
     cart_items = cart.items.all()  
     total_items = cart_items.count()  
     total_price = sum(item.session.price * item.quantity for item in cart_items)  
 
     context = {
-        'cart_items': cart_items,
+        'cart': cart,  # Ensure you are passing the cart object
         'total_items': total_items,
-        'total_price': total_price,
+        'grand_total': total_price,  # Ensure you are passing the total price
     }
-    return render(request, 'checkout/cart.html', context)
+    return render(request, 'checkout/cart.html', context)  # Ensure you are rendering the correct template
 
 
 @csrf_exempt
@@ -297,3 +332,9 @@ def cache_checkout_data(request):
         return JsonResponse({'status': 'success', 'message': 'Checkout data cached successfully.'})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400) 
+
+def calculate_cart_total(user):
+    """Calculate the total price of items in the user's cart."""
+    cart = get_object_or_404(Cart, user=user)  
+    total = sum(item.session.price * item.quantity for item in cart.items.all())
+    return total
