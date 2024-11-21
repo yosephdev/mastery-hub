@@ -7,9 +7,9 @@
 
 <div class="container mt-5">
     <div class="header-content text-center mb-5">
-        <h1>Skill-Sharing Sessions</h1>
-        <h2>Connect, Learn, and Grow with Expert-Led 1-on-1 Sessions</h2>
-        <p>Explore various skill-sharing sessions and register for the ones that interest you.</p>
+        <h1 class="display-4 font-weight-bold">Skill-Sharing Sessions</h1>
+        <h2 class="font-weight-light">Connect, Learn, and Grow with Expert-Led 1-on-1 Sessions</h2>
+        <p class="lead">Explore various skill-sharing sessions and register for the ones that interest you.</p>
     </div>
 
     <div class="row">
@@ -33,7 +33,7 @@
             <div class="row">
                 {% for session in sessions %}
                 <div class="col-md-4 mb-4">
-                    <div class="card h-100">
+                    <div class="card h-100 shadow-sm border-light">
                         {% if session.image %}
                         <img class="card-img-top" src="{{ session.image.url }}" 
                            loading="lazy" alt="{{ session.title }}">
@@ -42,11 +42,11 @@
                              loading="lazy" alt="No Image Available">
                         {% endif %}
                         <div class="card-body">
-                            <h5 class="card-title">{{ session.title }}</h5>
+                            <h5 class="card-title font-weight-bold">{{ session.title }}</h5>
                             <p class="card-text">{{ session.description|truncatewords:15 }}</p>
                             <p class="card-text"><small class="text-muted">{{ session.classes_count }} class{{ session.classes_count|pluralize }} ({{ session.total_duration }})</small></p>
                             <p class="card-text"><small class="text-muted">Available spots: {{ session.max_participants|sub:session.participants.count }}</small></p>
-                            <p class="card-text"><strong>${{ session.price }}</strong></p>
+                            <p class="card-text"><strong class="text-success">${{ session.price }}</strong></p>
                             <a href="{% url 'view_session' session.id %}" class="btn btn-info btn-block">View Details</a>
                             <button onclick="addToBag('{{ session.id }}', '{{ session.title }}', '{{ session.price }}')" class="btn btn-primary btn-block mt-2">Add to Bag</button>
                         </div>

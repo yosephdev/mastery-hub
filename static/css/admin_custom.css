@@ -8,32 +8,32 @@
     color: #fff;
 }
 
-#branding h1, #branding h1 a:link, #branding h1 a:visited {
+#branding h1, #branding h1 a {
     color: #fff;
 }
 
-.module h2, .module caption, .inline-group h2 {
+.module h2, .module caption, .inline-group h2, div.breadcrumbs {
     background: var(--secondary-color);
 }
 
-div.breadcrumbs {
-    background: var(--secondary-color);
-}
-
-a:link, a:visited {
+a:link, a:visited, .actions-container ul li a {
     color: var(--primary-color);
+    text-decoration: none;
 }
 
 .button, input[type=submit], input[type=button], .submit-row input, a.button {
     background: var(--primary-color);
 }
 
-.button:active, input[type=submit]:active, input[type=button]:active, .button:focus, input[type=submit]:focus, input[type=button]:focus, .button:hover, input[type=submit]:hover, input[type=button]:hover {
+.button:active, input[type=submit]:active, input[type=button]:active, 
+.button:focus, input[type=submit]:focus, input[type=button]:focus, 
+.button:hover, input[type=submit]:hover, input[type=button]:hover {
     background: #0056b3;
 }
 
-.object-tools a:focus, .object-tools a:hover {
+.object-tools a:focus, .object-tools a:hover, .custom-nav .nav-link:hover {
     background-color: var(--primary-color);
+    text-decoration: underline;
 }
 
 .custom-nav {
@@ -44,11 +44,6 @@ a:link, a:visited {
 .custom-nav .nav-link {
     color: #fff;
     margin-left: 15px;
-    text-decoration: none;
-}
-
-.custom-nav .nav-link:hover {
-    text-decoration: underline;
 }
 
 .dashboard-grid {
@@ -79,9 +74,4 @@ a:link, a:visited {
 
 .actions-container ul li {
     margin-bottom: 10px;
-}
-
-.actions-container ul li a {
-    text-decoration: none;
-    color: var(--primary-color);
 }
