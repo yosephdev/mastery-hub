@@ -52,7 +52,7 @@
                     </div>
                 </div>
 
-                {% for item in order.cart.cartitem_set.all %}
+                {% for item in order.lineitems.all %}
                 <div class="row">
                     <div class="col-12 col-md-4">
                         <p class="small mb-0 text-black font-weight-bold">{{ item.session.title }}</p>

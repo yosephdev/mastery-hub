@@ -2,12 +2,8 @@ import uuid
 from django.contrib.auth.models import User
 from django_countries.fields import CountryField
 from django.db import models
-from django.conf import settings
 from masteryhub.models import Session
 from profiles.models import Profile
-
-# Create your models here.
-
 
 class Payment(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
@@ -18,7 +14,6 @@ class Payment(models.Model):
     def __str__(self):
         return f"{self.user.user.username} - {self.amount} on {self.date}"
 
-
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -28,7 +23,6 @@ class Cart(models.Model):
 
     def get_total_price(self):
         return sum(item.get_cost() for item in self.items.all())
-    
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
@@ -40,7 +34,6 @@ class CartItem(models.Model):
 
     def get_cost(self):
         return self.quantity * self.session.price
-
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -59,5 +52,25 @@ class Order(models.Model):
     delivery_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     grand_total = models.DecimalField(max_digits=10, decimal_places=2)
 
+    def _generate_order_number(self):
+        """Generate a random, unique order number using UUID"""
+        return uuid.uuid4().hex.upper()
+
+    def save(self, *args, **kwargs):
+        """Override the original save method to set the order number if not set"""
+        if not self.order_number:
+            self.order_number = self._generate_order_number()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.order_number
+
+
+class OrderLineItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='lineitems')
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f'Session {self.session.title} on order {self.order.order_number}'

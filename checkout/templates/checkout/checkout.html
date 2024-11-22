@@ -4,10 +4,16 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    {{ stripe_public_key|json_script:"id_stripe_public_key" }}
+    {{ client_secret|json_script:"id_client_secret" }}
 {% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-12 text-center">
@@ -61,7 +67,7 @@
         </div>
         <div class="col-12 col-lg-6">
             <p class="text-muted">Please fill out the form below to complete your order</p>
-            <form action="{% url 'checkout' %}" method="POST" id="payment-form">
+            <form id="payment-form" method="POST" action="{% url 'checkout' %}">
                 {% csrf_token %}
                 <fieldset class="rounded px-3 mb-5">
                     <legend class="fieldset-label small text-black px-2 w-auto">Details</legend>
@@ -135,9 +141,7 @@
 
 {% block postloadjs %}
 {{ block.super }}
-{{ stripe_public_key|json_script:"id_stripe_public_key" }}
-{{ client_secret|json_script:"id_client_secret" }}
 <script src="https://js.stripe.com/v3/"></script>
-<script  src="{% static 'js/countryfield.js' %}"></script>
+<script src="{% static 'js/countryfield.js' %}"></script>
 <script src="{% static 'js/stripe_elements.js' %}"></script>
 {% endblock %}

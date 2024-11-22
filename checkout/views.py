@@ -5,6 +5,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, ButtonHolder, Submit
 from django.core.exceptions import ValidationError
 import re
+import os
 from django.utils import timezone
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
@@ -13,10 +14,11 @@ from django.views.decorators.csrf import csrf_exempt
 import stripe
 from django.http import JsonResponse
 import logging
+import uuid
 
 from profiles.models import Profile
 from masteryhub.models import Session
-from .models import Order, CartItem, Cart
+from .models import Order, CartItem, Cart, OrderLineItem
 
 User = get_user_model()
 
@@ -200,46 +202,71 @@ def remove_from_cart(request, item_id):
 
 def checkout(request):
     """A view that displays the checkout page."""
-    if request.method == 'POST':
-        order_form = OrderForm(request.POST)
-        session_form = SessionForm(request.POST)
+    stripe_public_key = settings.STRIPE_PUBLIC_KEY
+    
+    if not stripe_public_key:
+        messages.warning(request, 'Stripe public key is missing. \
+            Did you forget to set it in your environment?')
 
-        if order_form.is_valid() and session_form.is_valid():            
-            order = order_form.save()
-            session = session_form.save(commit=False)
-            session.order = order 
-            session.save()
-            return redirect('success')  
-    else:
-        order_form = OrderForm()
-        session_form = SessionForm()
-  
-    cart = Cart.objects.get(user=request.user) 
-    total_amount = int(cart.get_total_price() * 100)  
- 
-    order_id = f"ORDER-{timezone.now().strftime('%Y%m%d%H%M%S')}-{request.user.id}"
+    if not request.user.is_authenticated:
+        messages.error(request, 'Please log in to proceed with checkout.')
+        return redirect('account_login')
 
     try:
-        payment_intent = stripe.PaymentIntent.create(
-            amount=total_amount,
-            currency='usd',  
-            automatic_payment_methods={'enabled': True},
-            metadata={'order_id': order_id}
-        )
-        client_secret = payment_intent.client_secret
-    except stripe.error.StripeError as e:       
-        messages.error(request, f"An error occurred: {str(e)}")
-        client_secret = None
+        cart = Cart.objects.get(user=request.user)
+        if not cart.items.exists():
+            messages.error(request, 'Your cart is empty.')
+            return redirect('view_cart')            
+        
+        total_price = cart.get_total_price()
+        grand_total = total_price  
+        
+        if request.method == 'POST':
+            order_form = OrderForm(request.POST)
+            if order_form.is_valid():
+                order = order_form.save(commit=False)
+                order.user = request.user
+                order.order_total = total_price
+                order.grand_total = grand_total
+                order.save()                
+                
+                for cart_item in cart.items.all():
+                    OrderLineItem.objects.create(
+                        order=order,
+                        session=cart_item.session,
+                        quantity=cart_item.quantity,
+                        price=cart_item.session.price
+                    )
+                
+                return redirect('checkout_success', order_number=order.order_number)
+        else:
+            order_form = OrderForm()
+        
+        try:
+            intent = stripe.PaymentIntent.create(
+                amount=int(grand_total * 100),  
+                currency=settings.STRIPE_CURRENCY,
+                metadata={'username': request.user.username}
+            )
+            client_secret = intent.client_secret
+        except Exception as e:
+            messages.error(request, 'Sorry, there was an error processing your payment. Please try again later.')
+            return redirect('view_cart')
 
-    context = {
-        'order_form': order_form,
-        'session_form': session_form,
-        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
-        'client_secret': client_secret,
-        'order_id': order_id,  
-    }
-
-    return render(request, 'checkout/checkout.html', context)
+        context = {
+            'order_form': order_form,
+            'stripe_public_key': stripe_public_key,
+            'client_secret': client_secret,
+            'cart': cart,
+            'total_price': total_price,
+            'grand_total': grand_total,
+        }
+        
+        return render(request, 'checkout/checkout.html', context)
+        
+    except Cart.DoesNotExist:
+        messages.error(request, 'There was an error with your cart.')
+        return redirect('view_cart')
 
 
 def calculate_cart_total(user):
@@ -327,9 +354,25 @@ def create_checkout_session(request):
     return redirect(checkout_session.url, code=303)
 
 
-def checkout_success(request):
-    """A view that displays a success message after checkout."""
-    return render(request, 'checkout/checkout_success.html')  
+def checkout_success(request, order_number):
+    """Handle successful checkouts"""
+    order = get_object_or_404(Order, order_number=order_number)
+    
+    if request.user.is_authenticated:
+        profile = Profile.objects.get(user=request.user)        
+        order.user_profile = profile
+        order.save()
+
+    messages.success(request, f'Order successfully processed! \
+        Your order number is {order_number}. A confirmation \
+        email will be sent to {order.email}.')
+
+    template = 'checkout/checkout_success.html'
+    context = {
+        'order': order,
+    }
+
+    return render(request, template, context)
 
 
 def payment_cancel(request):
