@@ -4,15 +4,16 @@
     height: 40px;
     padding: 10px 12px;
     border: 1px solid transparent;
-    border-radius: 0;
-    background-color: #fff;
+    border-radius: 4px;
+    background-color: white;
     box-shadow: 0 1px 3px 0 #e6ebf1;
+    -webkit-transition: box-shadow 150ms ease;
     transition: box-shadow 150ms ease;
 }
 
 .StripeElement--focus,
-.stripe-style-input:active,
-.stripe-style-input:focus {
+.stripe-style-input:focus,
+.stripe-style-input:active {
     box-shadow: 0 1px 3px 0 #cfd7df;
 }
 
@@ -22,27 +23,6 @@
 
 .stripe-style-input::placeholder {
     color: #aab7c4;
-}
-
-.fieldset-label {
-    position: relative;
-    right: .5rem;
-}
-
-#card-element,
-#payment-form .form-control {
-    color: #000;
-    border: 1px solid #000;
-}
-
-select,
-select option {
-    color: #000;
-}
-
-select option[value=""],
-select:invalid {
-    color: #aab7c4 !important;
 }
 
 #loading-overlay {

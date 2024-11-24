@@ -1,27 +1,12 @@
 /*
-    Core logic/payment flow for this comes from here:
+    Core logic/payment flow comes from Stripe docs:
     https://stripe.com/docs/payments/accept-a-payment
-
-    CSS from here: 
-    https://stripe.com/docs/stripe-js
 */
 
-// Get the values
-const stripePublicKey = document.getElementById('id_stripe_public_key').textContent.trim();
-const clientSecret = document.getElementById('id_client_secret').textContent.trim();
-
-// Debug logging (remove in production)
-console.log('Public Key:', stripePublicKey);
-console.log('Client Secret:', clientSecret);
-
-if (!stripePublicKey || !clientSecret) {
-    console.error('Stripe keys are missing!');
-    return;
-}
-
-// Initialize Stripe
-const stripe = Stripe(stripePublicKey);
-const elements = stripe.elements();
+var stripePublicKey = document.getElementById('id_stripe_public_key').textContent.trim();
+var clientSecret = document.getElementById('id_client_secret').textContent.trim();
+var stripe = Stripe(stripePublicKey);
+var elements = stripe.elements();
 
 var style = {
     base: {
@@ -39,10 +24,10 @@ var style = {
     }
 };
 
-var card = elements.create('card', { style: style });
-
+var card = elements.create('card', {style: style});
 card.mount('#card-element');
 
+// Handle realtime validation errors on the card element
 card.addEventListener('change', function (event) {
     var errorDiv = document.getElementById('card-errors');
     if (event.error) {
@@ -58,6 +43,7 @@ card.addEventListener('change', function (event) {
     }
 });
 
+// Handle form submit
 var form = document.getElementById('payment-form');
 
 form.addEventListener('submit', function(ev) {
@@ -67,6 +53,15 @@ form.addEventListener('submit', function(ev) {
     $('#payment-form').fadeToggle(100);
     $('#loading-overlay').fadeToggle(100);
 
+    var saveInfo = Boolean($('#id-save-info').attr('checked'));
+    var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+    var postData = {
+        'csrfmiddlewaretoken': csrfToken,
+        'client_secret': clientSecret,
+        'save_info': saveInfo,
+    };
+
+    // Complete payment when the submit button is clicked
     stripe.confirmCardPayment(clientSecret, {
         payment_method: {
             card: card,

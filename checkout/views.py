@@ -1,8 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth import get_user_model
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, ButtonHolder, Submit
 from django.core.exceptions import ValidationError
 import re
 import os
@@ -177,6 +174,7 @@ def increase_quantity(request, item_id):
         cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)  
         cart_item.quantity += 1  
         cart_item.save()  
+        messages.success(request, f'Updated quantity of {cart_item.session.title}')
         return redirect('view_cart')  
 
 
@@ -186,27 +184,32 @@ def decrease_quantity(request, item_id):
         cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)  
         if cart_item.quantity > 1:
             cart_item.quantity -= 1  
-            cart_item.save()  
+            cart_item.save()
+            messages.success(request, f'Updated quantity of {cart_item.session.title}')  
         else:
-            cart_item.delete() 
+            cart_item.delete()
+            messages.success(request, f'Removed {cart_item.session.title} from cart') 
         return redirect('view_cart') 
 
 
 def remove_from_cart(request, item_id):
     """A view that removes an item from the cart."""
-    cart_item = get_object_or_404(CartItem, id=item_id)
-    cart_item.delete()
-
-    return redirect('view_cart')
+    if request.method == 'POST':
+        cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+        session_title = cart_item.session.title
+        cart_item.delete()
+        messages.success(request, f'Removed {session_title} from cart')
+        return redirect('view_cart')
 
 
 def checkout(request):
     """A view that displays the checkout page."""
     stripe_public_key = settings.STRIPE_PUBLIC_KEY
-    
+    stripe_secret_key = settings.STRIPE_SECRET_KEY
+
     if not stripe_public_key:
-        messages.warning(request, 'Stripe public key is missing. \
-            Did you forget to set it in your environment?')
+        messages.warning(request, 'Stripe public key is missing.')
+        return redirect('view_cart')
 
     if not request.user.is_authenticated:
         messages.error(request, 'Please log in to proceed with checkout.')
@@ -226,6 +229,7 @@ def checkout(request):
             if order_form.is_valid():
                 order = order_form.save(commit=False)
                 order.user = request.user
+                order.order_number = uuid.uuid4().hex.upper()
                 order.order_total = total_price
                 order.grand_total = grand_total
                 order.save()                
@@ -238,19 +242,30 @@ def checkout(request):
                         price=cart_item.session.price
                     )
                 
+                cart.items.all().delete()
+                
                 return redirect('checkout_success', order_number=order.order_number)
         else:
             order_form = OrderForm()
         
-        try:
+        try:            
+            cart_items_string = ", ".join([
+                f"{item.session.title} (x{item.quantity})"
+                for item in cart.items.all()
+            ])
+            
             intent = stripe.PaymentIntent.create(
-                amount=int(grand_total * 100),  
+                amount=int(grand_total * 100),
                 currency=settings.STRIPE_CURRENCY,
-                metadata={'username': request.user.username}
+                metadata={
+                    'username': request.user.username,
+                    'cart_items': cart_items_string,  
+                    'order_total': f"${grand_total:.2f}"
+                }
             )
             client_secret = intent.client_secret
-        except Exception as e:
-            messages.error(request, 'Sorry, there was an error processing your payment. Please try again later.')
+        except stripe.error.StripeError as e:
+            messages.error(request, f'Payment error: {str(e)}')
             return redirect('view_cart')
 
         context = {
@@ -283,20 +298,25 @@ def add_to_cart(request, session_id):
 
         try:
             session = get_object_or_404(Session, id=session_id)
+            cart, created = Cart.objects.get_or_create(user=request.user)          
+                      
+            cart_item, item_created = CartItem.objects.get_or_create(
+                cart=cart,
+                session=session,
+                defaults={'quantity': 1}  
+            )
             
-            cart, created = Cart.objects.get_or_create(user=request.user)           
-          
-            if created:
-                logger.info(f"Created a new cart for user: {request.user.username}")
+            if not item_created:
+                messages.info(request, f'{session.title} is already in your cart.')
+            else:
+                messages.success(request, f'Added {session.title} to your cart.')
 
-            cart_item, created = CartItem.objects.get_or_create(session=session, cart=cart)  
-            cart_item.quantity += 1  
-            cart_item.save()  
-           
-            logger.info(f"Added session '{session.title}' to cart for user: {request.user.username}. New quantity: {cart_item.quantity}")
-
-            total = calculate_cart_total(request.user)  
-            return JsonResponse({'success': True, 'total': total})
+            total = calculate_cart_total(request.user)
+            return JsonResponse({
+                'success': True, 
+                'total': total,
+                'cart_count': cart.items.count()
+            })
 
         except Exception as e:
             logger.error(f"Error adding to cart: {e}") 
@@ -395,7 +415,33 @@ def cache_checkout_data(request):
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400) 
 
 def calculate_cart_total(user):
-    """Calculate the total price of items in the user's cart."""
+    """A view that calculates the total price of items in the user's cart."""
     cart = get_object_or_404(Cart, user=user)  
     total = sum(item.session.price * item.quantity for item in cart.items.all())
     return total
+
+def update_cart_quantity(request, item_id):
+    """A view that updates the quantity of an item in the cart."""
+    if request.method == 'POST':
+        try:
+            cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+            quantity = int(request.POST.get('quantity', 1))
+            
+            if quantity > 0:
+                cart_item.quantity = quantity
+                cart_item.save()
+                messages.success(request, 'Cart updated successfully')
+            else:
+                cart_item.delete()
+                messages.success(request, 'Item removed from cart')
+                
+            return JsonResponse({
+                'success': True,
+                'total': calculate_cart_total(request.user),
+                'cart_count': cart_item.cart.items.count()
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+            
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
