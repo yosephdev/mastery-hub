@@ -94,6 +94,10 @@ h6 {
     box-shadow: var(--box-shadow);
 }
 
+.card-header {  
+    background: linear-gradient(45deg, #2193b0, #6dd5ed) !important;  
+}
+
 /* Navigation */
 .navbar {
     padding: 1rem 0;

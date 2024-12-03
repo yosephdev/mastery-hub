@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5 pt-5">
+<div class="container pt-4 mt-5">
     <h1>All Profiles</h1>
     <form method="get" action="{% url 'profiles:list_profiles' %}">
         <input type="text" name="q" placeholder="Search profiles..." value="{{ request.GET.q }}">
