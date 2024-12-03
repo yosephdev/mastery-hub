@@ -3,25 +3,159 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h1 class="h4">Report a Concern</h1>
-                </div>
-                <div class="card-body">
-                    <p class="mb-4">Help us maintain a safe and respectful community by reporting any concerns.</p>
-                    <form method="post" action="{% url 'report_concern' %}">
-                        {% csrf_token %}
-                        {{ form|crispy }}
-                        <div class="text-right">
-                            <button type="submit" class="btn btn-primary">Submit Report</button>
+<section class="report-section">
+    <div class="container mt-5 pt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="report-card card">
+                    <div class="report-header text-center">
+                        <div class="report-icon">
+                            <i class="fas fa-shield-alt"></i>
                         </div>
-                    </form>
+                        <h1 class="h3 mb-3">Report a Concern</h1>
+                        <p class="mb-0">Help us maintain a safe and respectful community</p>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div class="guidelines mb-4">
+                            <h5 class="text-primary mb-3">Before Submitting</h5>
+                            <ul class="guidelines-list">
+                                <li>Provide specific details about the incident</li>
+                                <li>Include relevant dates and times</li>
+                                <li>Be honest and accurate in your report</li>
+                                <li>Avoid including personal opinions or bias</li>
+                            </ul>
+                        </div>
+
+                        <form method="post" action="{% url 'masteryhub:report_concern' %}">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+
+                            <div class="alert alert-info mb-4" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Your report will be handled confidentially by our trust and safety team.
+                            </div>
+
+                            <div class="text-end">
+                                <button type="button" class="btn btn-dark me-2" onclick="history.back()">
+                                    <i class="fas fa-arrow-left me-2"></i>Go Back
+                                </button>
+                                <button type="submit" class="btn btn-report">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Report
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <p class="text-muted">
+                        Need immediate assistance?
+                        <a href="{% url 'home:contact' %}" class="text-primary">Contact our support team</a>
+                    </p>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+{% block extra_css %}
+<style>
+    .report-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+        padding: 4rem 0;
+        min-height: 80vh;
+    }
+
+    .report-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .report-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .report-header {
+        background: linear-gradient(45deg, #2193b0, #6dd5ed) !important;
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 2rem;
+    }
+
+    .report-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(33, 147, 176, 0.25);
+        border-color: #2193b0;
+    }
+
+    .btn-report {
+        background: linear-gradient(45deg, #2193b0, #6dd5ed);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-report:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(33, 147, 176, 0.3);
+    }
+
+    .guidelines {
+        background: rgba(33, 147, 176, 0.1);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .guidelines-list {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    .guidelines-list li {
+        padding: 0.5rem 0;
+        padding-left: 1.5rem;
+        position: relative;
+    }
+
+    .guidelines-list li:before {
+        content: "•";
+        color: #2193b0;
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const submitButton = this.querySelector('button[type="submit"]');
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+        submitButton.disabled = true;
+    });
+</script>
+{% endblock %}
 {% endblock %}

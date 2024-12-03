@@ -7,13 +7,13 @@
 {% block head_title %}{% trans "Sign In" %}{% endblock %}
 
 {% block content %}
-<div class="container-fluid d-flex align-items-center justify-content-center min-vh-100">
+<div class="container mt-5 pt-5">
   <div class="row justify-content-center w-100">
     <div class="col-md-6 col-lg-5">
       <div class="card shadow-sm">
         <div class="card-body p-5">
           <h2 class="text-center mb-4">{% trans "Welcome back!" %}</h2>
-          
+
           {% get_providers as socialaccount_providers %}
 
           {% if socialaccount_providers %}
@@ -23,34 +23,35 @@
 
           <div class="d-flex justify-content-center mb-4">
             {% for provider in socialaccount_providers %}
-              {% if provider.id == "google" %}
-                <a href="{% provider_login_url provider.id process='login' %}" class="btn btn-outline-dark mx-2">
-                  <i class="fab fa-google"></i> {% trans "Sign in with Google" %}
-                </a>
-              {% endif %}
-            {% empty %}             
-              <p class="text-center">{% trans "No social login providers are available." %}</p>
+            {% if provider.id == "google" %}
+            <a href="{% provider_login_url provider.id process='login' %}" class="btn btn-outline-dark mx-2">
+              <i class="fab fa-google"></i> {% trans "Sign in with Google" %}
+            </a>
+            {% endif %}
+            {% empty %}
+            <p class="text-center">{% trans "No social login providers are available." %}</p>
             {% endfor %}
           </div>
-          {% else %}            
-            <p class="text-center">{% trans "No social login providers are available." %}</p>
+          {% else %}
+          <p class="text-center">{% trans "No social login providers are available." %}</p>
           {% endif %}
 
-          <form class="login" method="POST" action="{% url 'account_login' %}">
+          <form class="login" method="POST" action="{% url 'accounts:login' %}">
             {% csrf_token %}
             {{ form|crispy }}
             {% if redirect_field_value %}
-              <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
             {% endif %}
             <div class="d-grid gap-2 mt-4">
               <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>
-              <a class="btn btn-outline-dark btn-block" href="{% url 'home' %}">{% trans "Back to Home" %}</a>
+              <a class="btn btn-outline-dark btn-block" href="{% url 'home:index' %}">{% trans "Back to Home" %}</a>
             </div>
           </form>
           <div class="text-center mt-4">
-            <a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-            <p class="text-center mb-4">{% trans "Don't have an account?" %} 
-              <a href="{% url 'account_signup' %}">{% trans "Sign up" %}</a></p>
+            <a href="{% url 'accounts:reset_password' %}">{% trans "Forgot Password?" %}</a>
+            <p class="text-center mb-4">{% trans "Don't have an account?" %}
+              <a href="{% url 'accounts:signup' %}">{% trans "Sign up" %}</a>
+            </p>
           </div>
         </div>
       </div>

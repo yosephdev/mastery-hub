@@ -2,15 +2,15 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 pt-5">
     <div class="row">
         <div class="col-md-4">
             {% if profile.profile_picture %}
-            <img src="{{ profile.profile_picture.url }}" loading="lazy"
-               alt="{{ profile.user.username }}" class="img-fluid rounded-circle mb-3">
+            <img src="{{ profile.profile_picture.url }}" loading="lazy" alt="{{ profile.user.username }}"
+                class="img-fluid rounded-circle mb-3">
             {% else %}
-            <img src="{% static 'images/default_profile.jpg' %}" loading="lazy" 
-               alt="{{ profile.user.username }}" class="img-fluid rounded-circle mb-3">
+            <img src="{% static 'images/default_profile.jpg' %}" loading="lazy" alt="{{ profile.user.username }}"
+                class="img-fluid rounded-circle mb-3">
             {% endif %}
         </div>
         <div class="col-md-8">
@@ -34,8 +34,14 @@
             {% endif %}
 
             {% if is_own_profile %}
-            <a href="{% url 'edit_profile' %}" class="btn btn-info">Edit Profile</a>
-            <a href="{% url 'delete_profile' %}" class="btn btn-warning">Delete Profile</a>
+            <a href="{% url 'profiles:edit_profile' %}" class="btn btn-info">Edit Profile</a>
+            <form action="{% url 'profiles:delete_profile' user.id %}" method="POST" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('Are you sure you want to delete your profile? This cannot be undone.')">
+                    Delete Profile
+                </button>
+            </form>
             {% endif %}
         </div>
     </div>

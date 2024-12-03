@@ -76,7 +76,9 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
+cert.crt
+cert.key
+key.key
 # Spyder project settings
 .spyderproject
 .spyproject

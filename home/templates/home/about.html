@@ -1,43 +1,128 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/about.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="text-center mb-4">
-        <h1 class="display-4">About MasteryHub</h1>
-        <p class="lead">Connecting learners with expert mentors to foster skill development and career growth.</p>
+<div class="about-header mt-5 pt-5">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold text-primary mb-3">About MasteryHub</h1>
+        <p class="lead mb-0">Connecting learners with expert mentors to foster skill development and career growth.</p>
     </div>
+</div>
 
-    <section class="mb-5">
-        <h2 class="h3">Our Mission</h2>
-        <p>At MasteryHub, our mission is to provide a supportive environment where individuals can find mentors who are
-            experienced professionals in their respective industries. We believe in the power of mentorship to
-            accelerate learning and enhance career opportunities.</p>
+<div class="container p-4">
+    <section class="mb-5 animate-on-scroll">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="h2 mb-4">Our Mission</h2>
+                <p class="lead">At MasteryHub, we're dedicated to democratizing access to expert mentorship and
+                    professional guidance. We believe everyone deserves the opportunity to learn from industry leaders
+                    and accelerate their career growth.</p>
+            </div>
+        </div>
     </section>
 
     <section class="mb-5">
-        <h2 class="h3">How It Works</h2>
-        <p>Users can browse through profiles of mentors, read about their expertise and mentorship areas, and connect
-            with them to seek guidance. Whether you are looking to gain technical skills, career advice, or industry
-            insights, MasteryHub aims to facilitate meaningful mentorship relationships.</p>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="stat-card animate-on-scroll">
+                    <div class="stat-number" data-value="1000">0</div>
+                    <div class="stat-label">Expert Mentors</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card animate-on-scroll">
+                    <div class="stat-number" data-value="5000">0</div>
+                    <div class="stat-label">Active Learners</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card animate-on-scroll">
+                    <div class="stat-number" data-value="10000">0</div>
+                    <div class="stat-label">Sessions Completed</div>
+                </div>
+            </div>
+        </div>
     </section>
 
     <section class="mb-5">
-        <h2 class="h3">Why Choose MasteryHub?</h2>
-        <ul class="list-unstyled">
-            <li class="mb-2"><strong>Expert Mentors:</strong> Our platform carefully selects mentors based on their
-                proven expertise and professional background.</li>
-            <li class="mb-2"><strong>Personalized Guidance:</strong> Each mentoring relationship is personalized to
-                cater to the unique goals and aspirations of the mentee.</li>
-            <li class="mb-2"><strong>Community Support:</strong> Join a community of learners and mentors dedicated to
-                continuous improvement and knowledge sharing.</li>
-        </ul>
+        <h2 class="h2 text-center mb-4">Our Values</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="value-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-star fa-lg"></i>
+                    </div>
+                    <h3 class="h4">Excellence</h3>
+                    <p>We maintain high standards in mentor selection and platform quality.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="value-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-users fa-lg"></i>
+                    </div>
+                    <h3 class="h4">Community</h3>
+                    <p>We foster a supportive environment for learning and growth.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="value-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt fa-lg"></i>
+                    </div>
+                    <h3 class="h4">Trust</h3>
+                    <p>We build reliable connections between mentors and learners.</p>
+                </div>
+            </div>
+        </div>
     </section>
 
     <section class="mb-5">
-        <h2 class="h3">Contact Us</h2>
-        <p>For inquiries or feedback, please contact us at <a href="mailto:info@masteryhub.com">info@masteryhub.com</a>.
-        </p>
+        <h2 class="h2 text-center mb-4">Our Journey</h2>
+        <div class="timeline">
+            <div class="timeline-item animate-on-scroll">
+                <h3 class="h5">2021: The Beginning</h3>
+                <p>MasteryHub was founded with a vision to transform professional mentorship.</p>
+            </div>
+            <div class="timeline-item animate-on-scroll">
+                <h3 class="h5">2022: Growing Community</h3>
+                <p>Reached our first 1,000 mentors and 5,000 learners milestone.</p>
+            </div>
+            <div class="timeline-item animate-on-scroll">
+                <h3 class="h5">2023: Innovation</h3>
+                <p>Launched advanced matching algorithm and mobile platform.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-section text-center animate-on-scroll">
+        <h2 class="h2 mb-4">Get in Touch</h2>
+        <p class="mb-4">Have questions or feedback? We'd love to hear from you!</p>
+        <div class="row justify-content-center">
+            <div class="col-md-4 mb-3">
+                <i class="fas fa-envelope fa-2x mb-3 text-primary"></i>
+                <h3 class="h5">Email</h3>
+                <p><a href="mailto:info@masteryhub.com" class="text-decoration-none">info@masteryhub.com</a></p>
+            </div>
+            <div class="col-md-4 mb-3">
+                <i class="fas fa-phone fa-2x mb-3 text-primary"></i>
+                <h3 class="h5">Phone</h3>
+                <p>+1 (555) 123-4567</p>
+            </div>
+            <div class="col-md-4 mb-3">
+                <i class="fas fa-map-marker-alt fa-2x mb-3 text-primary"></i>
+                <h3 class="h5">Location</h3>
+                <p>San Francisco, CA</p>
+            </div>
+        </div>
     </section>
 </div>
 {% endblock %}

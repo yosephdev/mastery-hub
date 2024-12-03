@@ -56,10 +56,10 @@
                             </li>
                         {% endif %}
                     {% else %}
-                        {% url 'account_login' as login_url %}
+                        {% url 'account_login' as login_url %} 
                         {% if login_url %}
                             <li>
-                                <a href="{{ login_url }}">{% trans "Sign In" %}</a>
+                                <a href="{{ login_url }}">{% trans "Sign In" %}</a> 
                             </li>
                         {% endif %}
                         {% url 'account_signup' as signup_url %}

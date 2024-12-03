@@ -8,7 +8,7 @@
 {% endblock head_title %}
 
 {% block content %}
-<div class="container my-4">
+<div class="container pt-5">
     <div class="google-signin-container text-center">
         {% if process == "connect" %}
             <h1>{% trans "Connect" %} {{ provider.name }}</h1>
@@ -20,7 +20,7 @@
         <form method="POST" class="google-signin-form mt-4">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary">{% trans "Continue" %}</button>
-            <a class="btn btn-outline-dark" href="{% url 'home' %}">{% trans "Back to Home" %}</a>
+            <a class="btn btn-outline-dark" href="{% url 'home:index' %}">{% trans "Back to Home" %}</a>
         </form>
     </div>
 </div>

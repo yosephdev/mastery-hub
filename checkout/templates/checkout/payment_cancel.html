@@ -4,11 +4,11 @@
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 
-<div class="container mt-5">
+<div class="container mt-5 pt-5">
     <div class="text-center">
         <h2>Payment Cancelled</h2>
         <p>Your payment was not successful. Please try again.</p>
-        <a href="{% url 'session_list' %}" class="btn btn-primary mt-4">Browse Sessions</a>
+        <a href="{% url 'masteryhub:session_list' %}" class="btn btn-primary mt-4">Browse Sessions</a>
     </div>
 </div>
 

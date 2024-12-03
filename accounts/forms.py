@@ -1,7 +1,7 @@
 from django import forms
 from django_countries.fields import CountryField
 from django_countries.widgets import CountrySelectWidget
-from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth.forms import UserChangeForm, SetPasswordForm
 from django.contrib.auth import get_user_model
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, ButtonHolder, Submit, Div
@@ -10,7 +10,7 @@ from allauth.account.forms import SignupForm as AllAuthSignupForm
 from django.utils import timezone
 
 from profiles.models import Profile
-from masteryhub.models import Session, Forum, ConcernReport
+from masteryhub.models import Session, ConcernReport
 
 User = get_user_model()
 
@@ -181,19 +181,24 @@ class ConcernReportForm(forms.ModelForm):
 
 
 class OrderForm(forms.Form):
-    full_name = forms.CharField(max_length=50, required=True, label="Full Name")
+    full_name = forms.CharField(
+        max_length=50, required=True, label="Full Name")
     email = forms.EmailField(max_length=254, required=True, label="Email")
-    street_address1 = forms.CharField(max_length=80, required=True, label="Street Address 1")
-    street_address2 = forms.CharField(max_length=80, required=False, label="Street Address 2")
+    street_address1 = forms.CharField(
+        max_length=80, required=True, label="Street Address 1")
+    street_address2 = forms.CharField(
+        max_length=80, required=False, label="Street Address 2")
     county = forms.CharField(max_length=80, required=False, label="County")
-    town_or_city = forms.CharField(max_length=80, required=True, label="Town/City")
+    town_or_city = forms.CharField(
+        max_length=80, required=True, label="Town/City")
     postcode = forms.CharField(max_length=20, required=True, label="Postcode")
     country = CountryField(blank_label="Country").formfield(
         widget=CountrySelectWidget(
             attrs={"class": "border-black rounded-0 profile-form-input"}
         )
     )
-    phone_number = forms.CharField(max_length=20, required=True, label="Phone Number")
+    phone_number = forms.CharField(
+        max_length=20, required=True, label="Phone Number")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -217,3 +222,16 @@ class OrderForm(forms.Form):
                 self.fields[field].widget.attrs["placeholder"] = placeholder
             self.fields[field].widget.attrs["class"] = "stripe-style-input"
             self.fields[field].label = False
+
+
+class CustomSetPasswordForm(SetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['new_password1'].widget.attrs.update({
+            'placeholder': 'New Password',
+            'class': 'form-control'
+        })
+        self.fields['new_password2'].widget.attrs.update({
+            'placeholder': 'Confirm Password',
+            'class': 'form-control'
+        })

@@ -1,35 +1,36 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container">
+<div class="container mt-5 pt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card mt-5">
-                <div class="card-header">
-                    <h2 class="text-center">Request Mentorship</h2>
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2>Request Mentorship</h2>
                 </div>
                 <div class="card-body">
-                    <div class="mentor-profile">
-                        <h3>{{ mentor.username }}</h3>
-                        <p><strong>Areas of Expertise:</strong> {{ mentor.profile.mentorship_areas }}</p>
+                    <div class="mentor-profile text-center mb-4">
+                        <h3>{{ mentor.user.get_full_name }}</h3>
+                        <p><strong>Areas of Expertise:</strong> {{ mentor.profile.mentorship_areas|join:", " }}</p>
                         <p><strong>Bio:</strong> {{ mentor.profile.bio }}</p>
-                        <p><strong>Status:</strong> 
+                        <p><strong>Status:</strong>
                             {% if mentor.profile.is_available %}
-                                <span class="text-success">Available for Mentorship</span>
+                            <span class="text-success">Available for Mentorship</span>
                             {% else %}
-                                <span class="text-danger">Not Accepting Requests</span>
+                            <span class="text-danger">Not Accepting Requests</span>
                             {% endif %}
                         </p>
                     </div>
                     <form method="post">
                         {% csrf_token %}
                         <p class="text-center mt-4">
-                            Are you sure you want to send a mentorship request to {{ mentor.username }}?
+                            Are you sure you want to send a mentorship request to {{ mentor.user.get_full_name }}?
                         </p>
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary mr-2">Send Request</button>
-                            <a href="{% url 'view_mentor_profile' mentor.username %}"
+                            <button type="submit" class="btn btn-primary me-2">Send Request</button>
+                            <a href="{% url 'view_mentor_profile' mentor.user.username %}"
                                 class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>

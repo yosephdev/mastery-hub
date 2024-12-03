@@ -1,122 +1,218 @@
-<div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <!-- Main logo and navigation links -->
-    <a href="{% url 'home' %}" class="nav-link main-logo-link">
-        <h3 class="logo-font text-black my-0"><strong>MasteryHub</strong></h3>
-    </a>
-    <!-- Dropdown navigation for different categories -->
-    <ul class="navbar-nav mx-auto">
-        <!-- Courses -->
-        <li class="nav-item dropdown">
-            <a class="logo-font font-weight-bold nav-link text-black" href="#" id="courses-link" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">
-                Courses
-            </a>
-            <div class="dropdown-menu border-0" aria-labelledby="courses-link">
-                <div class="row">
-                    <div class="col">
-                        <h6 class="dropdown-header text-black font-weight-bold">Categories:</h6>
-                        <a href="{% url 'session_list' %}?category={{ 'Web Development'|urlencode }}" class="dropdown-item">Technology</a>
-                        <a href="{% url 'session_list' %}?category={{ 'Leadership'|urlencode }}" class="dropdown-item">Soft Skills</a>
-                        <a href="{% url 'session_list' %}?category={{ 'Business'|urlencode }}" class="dropdown-item">Business</a>
-                        <a href="{% url 'session_list' %}?category={{ 'all'|urlencode }}" class="dropdown-item">All Categories</a>
-                    </div>                    
-                </div>
-            </div>
-        </li>
-        <!-- Mentors -->
-        <li class="nav-item dropdown">
-            <a class="logo-font font-weight-bold nav-link text-black" href="#" id="mentors-link" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">
-                Mentors
-            </a>
-            <div class="dropdown-menu border-0" aria-labelledby="mentors-link">
-                <div class="row">
-                    <div class="col">
-                        <h6 class="dropdown-header text-black font-weight-bold">Find a Mentor:</h6>
-                        <a href="{% url 'search_mentors' %}" class="dropdown-item">Technology</a>
-                        <a href="{% url 'search_mentors' %}" class="dropdown-item">Soft Skills</a>
-                        <a href="{% url 'search_mentors' %}" class="dropdown-item">Business</a>
-                        <a href="{% url 'search_mentors' %}" class="dropdown-item">All Mentors</a>
-                    </div>
-                </div>
-            </div>
-        </li>       
-        <!-- About-->
-        <li class="nav-item">
-            <a class="logo-font font-weight-bold nav-link text-black" href="{% url 'about' %}">
-                About
-            </a>
-        </li>
-        <!-- Contact -->
-        <li class="nav-item">
-            <a class="logo-font font-weight-bold nav-link text-black" href="{% url 'contact' %}">
-                Contact
-            </a>
-        </li>
-    </ul>
-    <!-- Search form -->
-    <form method="GET" action="{% url 'search' %}" class="header-search-form">
-        <div class="input-group w-100">
-            <input class="form-control border border-black rounded-0" type="text" name="q" placeholder="Search">
-            <div class="input-group-append">
-                <button class="form-control btn btn-dark border border-black rounded-0" type="submit">
-                    <span class="icon">
-                        <i class="fas fa-search" aria-hidden="true"></i>
-                    </span>
-                </button>
-            </div>
-        </div>
-    </form>
-</div>
-
-<!-- User account and notifications links -->
-<ul class="account-block list-inline list-unstyled text-center text-lg-right my-0">
-    <!-- User account dropdown -->
-    <li class="list-inline-item dropdown">
-        <a class="text-black nav-link" href="#" id="user-options" data-toggle="dropdown" aria-haspopup="true"
+<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="browseDropdown" role="button" data-bs-toggle="dropdown"
             aria-expanded="false">
-            <div class="text-center">
-                <div><i class="fas fa-user fa-lg"></i></div>
-                <p class="my-0">My Account</p>
-            </div>
+            <i class="fas fa-compass me-1"></i>Browse
         </a>
-        <div class="dropdown-menu border-0" aria-labelledby="user-options">
-            {% if request.user.is_authenticated %}
-            {% if request.user.is_superuser %}
-            <a href="{% url 'admin_dashboard' %}" class="dropdown-item">Admin Dashboard</a>
-            {% endif %}
-            {% if not request.user.profile.is_expert %}
-            <a href="{% url 'mentee_dashboard' %}" class="dropdown-item">Mentee Dashboard</a>
-            {% endif %}
-            <a href="{% url 'mentor_matching' %}" class="dropdown-item">Mentor Matching</a>
-            <a href="{% url 'view_own_profile' %}" class="dropdown-item">My Profile</a>
-            <a href="{% url 'account_logout' %}" class="dropdown-item">Logout</a>
-            {% if request.user.profile.is_expert %}
-            <a href="{% url 'expert_dashboard' %}" class="dropdown-item">Expert Dashboard</a>
-            <a href="{% url 'manage_mentorship_requests' %}" class="dropdown-item">Manage Mentorship Requests</a>
-            {% endif %}
-            {% else %}
-            <a href="{% url 'account_login' %}" class="dropdown-item">Login</a>
-            <a href="{% url 'account_signup' %}" class="dropdown-item">Sign Up</a>
-            {% endif %}
-        </div>
+        <ul class="dropdown-menu dropdown-menu-animated shadow-sm border-0" aria-labelledby="browseDropdown">
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:browse_skills' %}">
+                    <i class="fas fa-laptop-code fa-fw text-primary me-2"></i>
+                    <div>
+                        <span class="d-block">All Skills</span>
+                        <small class="text-muted">Browse all available skills</small>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:session_list' %}">
+                    <i class="fas fa-calendar-alt fa-fw text-success me-2"></i>
+                    <div>
+                        <span class="d-block">Live Sessions</span>
+                        <small class="text-muted">Upcoming learning sessions</small>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:search_mentors' %}">
+                    <i class="fas fa-users fa-fw text-info me-2"></i>
+                    <div>
+                        <span class="d-block">Find Mentors</span>
+                        <small class="text-muted">Connect with expert mentors</small>
+                    </div>
+                </a>
+            </li>
+        </ul>
     </li>
-    <!-- Notifications link (visible if the user is authenticated) -->
+
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="communityDropdown" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            <i class="fas fa-users me-1"></i>Community
+        </a>
+        <ul class="dropdown-menu dropdown-menu-animated shadow-sm border-0" aria-labelledby="communityDropdown">
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:forum_list' %}">
+                    <i class="fas fa-comments fa-fw text-primary me-2"></i>
+                    <div>
+                        <span class="d-block">Discussion Forums</span>
+                        <small class="text-muted">Join the conversation</small>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:matching_results' %}">
+                    <i class="fas fa-handshake fa-fw text-success me-2"></i>
+                    <div>
+                        <span class="d-block">Mentor Matching</span>
+                        <small class="text-muted">Find your perfect mentor match</small>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </li>
+
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="resourcesDropdown" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            <i class="fas fa-book me-1"></i>Resources
+        </a>
+        <ul class="dropdown-menu dropdown-menu-animated shadow-sm border-0" aria-labelledby="resourcesDropdown">
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:mentor_help' %}">
+                    <i class="fas fa-question-circle fa-fw text-warning me-2"></i>
+                    <div>
+                        <span class="d-block">Help Center</span>
+                        <small class="text-muted">Get support and guidance</small>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'home:about' %}">
+                    <i class="fas fa-info-circle fa-fw text-info me-2"></i>
+                    <div>
+                        <span class="d-block">About Us</span>
+                        <small class="text-muted">Learn about MasteryHub</small>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<form class="d-flex mx-lg-3 search-form" method="GET" action="{% url 'home:search_results' %}">
+    <div class="input-group">
+        <input class="form-control search-input" type="search" name="q" placeholder="Search skills, mentors..."
+            aria-label="Search">
+        <button class="btn btn-dark" type="submit">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+</form>
+
+<ul class="navbar-nav ms-auto">
     {% if request.user.is_authenticated %}
-    <li class="list-inline-item">
-        <a class="{% if grand_total %}text-black font-weight-bold{% else %}text-black{% endif %} nav-link"
-            href="{% url 'view_cart' %}">
-            <div class="text-center">
-                <div><i class="fas fa-shopping-bag fa-lg"></i></div>
-                <p class="my-0">
-                    {% if grand_total %}
-                    ${{ grand_total|floatformat:2 }}
-                    {% else %}
-                    $0.00
-                    {% endif %}
-                </p>
-            </div>
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle user-menu" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            {% if request.user.profile.avatar %}
+            <img src="{{ request.user.profile.avatar.url }}" alt="Profile" class="rounded-circle me-2" width="32"
+                height="32">
+            {% else %}
+            <i class="fas fa-user-circle fa-lg me-2"></i>
+            {% endif %}
+            {{ request.user.get_short_name|default:request.user.username }}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-animated shadow-sm border-0"
+            aria-labelledby="userDropdown">
+            <li class="dropdown-header">
+                <h6 class="mb-0">Welcome!</h6>
+                <small class="text-muted">{{ request.user.email }}</small>
+            </li>
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'profiles:edit_profile' %}">
+                    <i class="fas fa-user-edit fa-fw text-primary me-2"></i>Edit Profile
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:my_mentorships' %}">
+                    <i class="fas fa-graduation-cap fa-fw text-success me-2"></i>My Learning
+                </a>
+            </li>
+            {% if request.user.profile.is_expert %}
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:expert_dashboard' %}">
+                    <i class="fas fa-chalkboard-teacher fa-fw text-info me-2"></i>Mentor Dashboard
+                </a>
+            </li>
+            {% endif %}
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center text-danger" href="{% url 'account_logout' %}">
+                    <i class="fas fa-sign-out-alt fa-fw me-2"></i>Sign Out
+                </a>
+            </li>
+        </ul>
+    </li>
+    {% else %}
+    <li class="nav-item">
+        <a href="{% url 'accounts:login' %}" class="nav-link">
+            <i class="fas fa-sign-in-alt me-1"></i>Sign In
+        </a>
+    </li>
+    <li class="nav-item">
+        <a href="{% url 'accounts:signup' %}" class="btn btn-primary ms-2">
+            <i class="fas fa-user-plus me-1"></i>Sign Up
         </a>
     </li>
     {% endif %}
+
+    <li class="nav-item dropdown">
+        <a class="nav-link position-relative" href="{% url 'checkout:view_cart' %}">
+            <i class="fas fa-shopping-cart fa-lg"></i>
+            {% if item_count %}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                {{ item_count }}
+                <span class="visually-hidden">items in cart</span>
+            </span>
+            {% endif %}
+        </a>
+
+        <div class="dropdown-menu dropdown-menu-end cart-preview p-3" style="width: 300px;">
+            {% if cart_items %}
+            <div class="cart-items-preview">
+                {% for item in cart_items|slice:":3" %}
+                <div class="cart-item-mini d-flex align-items-center mb-2">
+                    <img src="{{ item.session.image.url }}" alt="{{ item.session.title }}" class="rounded"
+                        style="width: 50px; height: 50px; object-fit: cover;">
+                    <div class="ms-3">
+                        <h6 class="mb-0">{{ item.session.title|truncatechars:20 }}</h6>
+                        <small class="text-muted">${{ item.session.price }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+                {% if cart_items|length > 3 %}
+                <small class="text-muted">and {{ cart_items|length|add:"-3" }} more items...</small>
+                {% endif %}
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span>Total:</span>
+                <strong>${{ total }}</strong>
+            </div>
+            <div class="d-grid gap-2">
+                <a href="{% url 'checkout:view_cart' %}" class="btn btn-primary">
+                    View Cart
+                </a>
+                <a href="{% url 'checkout:checkout' %}" class="btn btn-success">
+                    Checkout
+                </a>
+            </div>
+            {% else %}
+            <div class="text-center py-3">
+                <i class="fas fa-shopping-cart fa-2x text-muted mb-2"></i>
+                <p class="mb-0">Your cart is empty</p>
+            </div>
+            {% endif %}
+        </div>
+    </li>
+
 </ul>

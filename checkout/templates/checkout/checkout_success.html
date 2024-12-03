@@ -7,7 +7,7 @@
 
 
 {% block content %}
-<div class="container">
+<div class="container mt-5 pt-5">
     <div class="row">
         <div class="col">
             <hr>
@@ -192,7 +192,7 @@
                 <span class="text-uppercase">Back to Profile</span>
             </a>
             {% else %}
-            <a href="{% url 'session_list' %}" class="btn btn-dark rounded-0 my-2">
+            <a href="{% url 'masteryhub:session_list' %}" class="btn btn-dark rounded-0 my-2">
                 <span class="icon mr-2">
                     <i class="fas fa-gifts"></i>
                 </span>

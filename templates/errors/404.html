@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="container h-100 mt-5">
+<div class="container mt-5 pt-5">
     <div class="row justify-content-center align-items-center">
         <div class="col-md-6 col-lg-5 text-center order-md-2">
             <img src="{% static 'images/404.webp' %}" alt="404 Error" class="img-fluid mb-4" style="max-height: 300px;">
@@ -16,10 +16,10 @@
                 <li><i class="fas fa-lock text-secondary me-2"></i> You do not have permission to view this page.</li>
             </ul>
             <div class="mt-5">
-                <a href="{% url 'session_list' %}" class="btn btn-lg btn-primary me-3 mb-3">
+                <a href="{% url 'masteryhub:session_list' %}" class="btn btn-lg btn-primary me-3 mb-3">
                     <i class="fas fa-list-alt me-2"></i>  Return to Sessions
                 </a>
-                <a href="{% url 'home' %}" class="btn btn-lg btn-outline-secondary mb-3">
+                <a href="{% url 'home:index' %}" class="btn btn-lg btn-outline-dark mb-3">
                     <i class="fas fa-home me-2"></i> Return to Home
                 </a>
             </div>

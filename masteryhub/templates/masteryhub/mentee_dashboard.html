@@ -2,10 +2,9 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 pt-5">
     <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-3">
+        <div class="col-md-3 pt-3">
             <div class="list-group">
                 <a href="#dashboard" class="list-group-item list-group-item-action active">Dashboard</a>
                 <a href="#assessment" class="list-group-item list-group-item-action">My Assessment</a>
@@ -15,36 +14,42 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="col-md-9">
-            <!-- Dashboard Overview -->
             <div id="dashboard" class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Skill Assessment and Tracking</h5>
-                    <p>Welcome, {{ username }}. Here is an overview of your skills, goals, and feedback.</p>
+                    <p>Welcome, {{ request.user.get_full_name }}. Here is an overview of your skills, goals, and
+                        feedback.</p>
                 </div>
             </div>
 
-            <!-- Book Session Button -->
+            {% if sessions %}
+            <h5>Available Sessions</h5>
             {% for session in sessions %}
             <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">{{ session.title }}</h5>
                     <p>{{ session.description }}</p>
-                    <a href="{% url 'book_session' session_id=session.id %}" class="btn btn-primary">Book Session</a>
+                    <p><strong>Price:</strong> ${{ session.price }}</p>
+                    <p><strong>Duration:</strong> {{ session.duration }} hours</p>
+                    <p><strong>Available Spots:</strong> {{ session.available_spots }}</p>
+                    <a href="{% url 'masteryhub:book_session' session_id=session.id %}" class="btn btn-primary">Book
+                        Session</a>
                 </div>
             </div>
             {% empty %}
             <p>No sessions available</p>
             {% endfor %}
+            {% else %}
+            <p>No sessions available</p>
+            {% endif %}
 
-            <!-- Skill Assessment -->
             <div id="assessment" class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Skill Assessment</h5>
                     <ul class="list-unstyled">
                         {% for skill in skills %}
-                        <li><i class="fas fa-chalkboard-teacher"></i> {{ skill }}</li>
+                        <li><i class="fas fa-chalkboard-teacher"></i> {{ skill.title }}: {{ skill.description }}</li>
                         {% empty %}
                         <li>No skills listed</li>
                         {% endfor %}
@@ -52,13 +57,12 @@
                 </div>
             </div>
 
-            <!-- Goal Setting -->
-            <div id="goal" class="card mb-4">
+            <div id="goals" class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Goal Setting</h5>
                     <ul class="list-unstyled">
                         {% for goal in goals %}
-                        <li><i class="fas fa-calendar-alt"></i> {{ goal }}</li>
+                        <li><i class="fas fa-calendar-alt"></i> {{ goal.name }}: {{ goal.description }}</li>
                         {% empty %}
                         <li>No goals listed</li>
                         {% endfor %}
@@ -66,13 +70,12 @@
                 </div>
             </div>
 
-            <!-- Expert Feedback -->
             <div id="feedback" class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Expert Feedback</h5>
                     {% for feedback in feedbacks %}
                     <div class="mb-2">
-                        <p><strong>"{{ feedback.comment }}"</strong> - {{ feedback.mentor.user.username }}</p>
+                        <p><strong>"{{ feedback.comment }}"</strong> - {{ feedback.mentor.user.get_full_name }}</p>
                     </div>
                     {% empty %}
                     <p>No feedback available</p>
@@ -80,7 +83,6 @@
                 </div>
             </div>
 
-            <!-- Progress Tracking -->
             <div id="progress" class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Progress Tracking</h5>
@@ -99,7 +101,6 @@
                 </div>
             </div>
 
-            <!-- Performance Insights -->
             <div id="analytics" class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Performance Insights</h5>

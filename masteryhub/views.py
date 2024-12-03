@@ -1,23 +1,14 @@
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
-from django.views import View
 from django.conf import settings
-from django.core.mail import send_mail
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from django.db.models import Q, Count, Sum
-from django.urls import reverse_lazy, reverse
+from django.db.models import Q, Count, Avg
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.models import User
 from .forms import MentorApplicationForm, ConcernReportForm, BookingForm, ReviewForm, SessionForm, ForumPostForm
-from .models import Feedback, Session, Category, Mentorship, Forum, Review
+from .models import Feedback, Session, Category, Mentorship, Forum, Review, Skill, Mentor
 from profiles.models import Profile
 import stripe
-import json
 import logging
 
 logger = logging.getLogger(__name__)
@@ -48,7 +39,7 @@ def become_mentor(request):
                     change_message=areas_of_expertise,
                 )
             messages.success(request, "Your mentor application has been submitted successfully.")
-            return redirect("home")
+            return redirect("home:index")
     else:
         form = MentorApplicationForm()
     return render(request, "masteryhub/become_mentor.html", {"form": form})
@@ -86,14 +77,39 @@ def match_mentor_mentee(mentee):
 
 def search_mentors(request):
     """A view that handles the mentor searching."""
-    query = request.GET.get("q")
-    mentors = Profile.objects.filter(is_expert=True)
+    query = request.GET.get('q', '')
+    skills = request.GET.getlist('skills')
+    rating = request.GET.get('rating')
+    available_now = request.GET.get('available_now')
+   
+    mentors = Mentor.objects.all()
+
     if query:
-        mentors = mentors.filter(mentorship_areas__icontains=query)
+        mentors = mentors.filter(
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(bio__icontains=query) |
+            Q(user__skills__title__icontains=query)
+        ).distinct()
 
-    print(f"Query: {query}, Mentors Count: {mentors.count()}")  
+    if skills:
+        mentors = mentors.filter(user__skills__id__in=skills).distinct()
 
-    return render(request, "masteryhub/search_mentors.html", {"mentors": mentors, "query": query})
+    if rating:
+        mentors = mentors.filter(rating__gte=rating)
+
+    if available_now:
+        mentors = mentors.filter(is_available=True)
+
+    # Query all skills
+    all_skills = Skill.objects.all()
+
+    context = {
+        'mentors': mentors,
+        'skills': all_skills,
+        'query': query,
+    }
+    return render(request, 'masteryhub/search_mentors.html', context)
 
 
 @login_required
@@ -159,26 +175,142 @@ def session_list(request):
 
 
 def list_mentors(request):
-    """A view that handles the mentor list."""
-    query = request.GET.get("q")
+    query = request.GET.get('q', '')
+    areas = request.GET.getlist('areas')
+    rating = request.GET.get('rating')
+    available_now = request.GET.get('available_now')
+    
+    mentors = Profile.objects.filter(is_expert=True)
+
     if query:
-        mentors = Profile.objects.filter(is_expert=True).filter(
-            Q(user__username__icontains=query) | Q(mentorship_areas__icontains=query)
-        )
-    else:
-        mentors = Profile.objects.filter(is_expert=True)
-    return render(request, "masteryhub/list_mentors.html", {"mentors": mentors, "query": query})
+        mentors = mentors.filter(
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
+            Q(skills__icontains=query) |
+            Q(mentorship_areas__icontains=query)
+        ).distinct()
+
+    if areas:
+        mentors = mentors.filter(mentorship_areas__id__in=areas).distinct()
+
+    if rating:
+        mentors = mentors.filter(rating__gte=rating)
+
+    if available_now:
+        mentors = mentors.filter(is_available=True)
+
+    skills = Skill.objects.all()
+    categories = Category.objects.all()
+
+    context = {
+        'mentors': mentors,
+        'skills': skills,
+        'categories': categories,
+        'query': query,
+    }
+    return render(request, 'masteryhub/list_mentors.html', context)
 
 
 @login_required
 def mentor_matching_view(request):
-    """A view that handles the mentor matching."""
-    if request.user.is_authenticated:
-        mentee = request.user
-        matches = match_mentor_mentee(mentee)        
-        return render(request, "masteryhub/mentor_matching.html", {"matches": matches})
+    """A view that handles mentor matching based on multiple criteria."""
+    categories = Category.objects.all()
+    skills = Skill.objects.all()
+    
+    if request.method == 'POST':        
+        learning_goal = request.POST.get('learning_goal')
+        experience_level = request.POST.get('experience_level')
+        learning_style = request.POST.get('learning_style')
+        availability = request.POST.get('availability')
+        budget = request.POST.get('budget')        
+      
+        mentors = Profile.objects.filter(is_expert=True).annotate(
+            student_count=Count('mentorships_as_mentor')
+        )
+       
+        budget_ranges = {
+            'low': (0, 50),
+            'medium': (51, 100),
+            'high': (101, 1000)
+        }
+        if budget in budget_ranges:
+            min_price, max_price = budget_ranges[budget]
+            mentors = mentors.filter(
+                user__skills__price__range=(min_price, max_price)
+            ).distinct()
+       
+        if learning_goal:
+            mentors = mentors.filter(
+                Q(sessions_hosted__category_id=learning_goal) |
+                Q(user__skills__category=learning_goal)
+            ).distinct()
+        
+        matched_mentors = []
+        for mentor in mentors:          
+            mentor_reviews = Review.objects.filter(
+                session__host=mentor
+            ).aggregate(avg_rating=Avg('rating'))
+            avg_rating = mentor_reviews['avg_rating'] or 0
+           
+            relevant_skills = mentor.user.skills.filter(category=learning_goal).count() if learning_goal else 0
+            total_skills = mentor.user.skills.count()
+            skill_match = (relevant_skills / total_skills * 100) if total_skills > 0 else 0
 
-    return redirect("home")
+            match_score = {
+                'mentor': mentor,
+                'skill_match': skill_match,
+                'style_match': 80,
+                'availability_match': 90,
+                'rating_score': (avg_rating / 5) * 100
+            }            
+           
+            total_match = (
+                match_score['skill_match'] * 0.35 +
+                match_score['style_match'] * 0.25 +
+                match_score['availability_match'] * 0.20 +
+                match_score['rating_score'] * 0.20
+            )
+            
+            matched_mentors.append({
+                'mentor': mentor,
+                'total_match': round(total_match, 1),
+                'skill_match': round(match_score['skill_match']),
+                'style_match': match_score['style_match'],
+                'availability_match': match_score['availability_match']
+            })
+       
+        matched_mentors.sort(key=lambda x: x['total_match'], reverse=True)
+        
+        return render(request, 'masteryhub/matching_results.html', {
+            'matches': matched_mentors[:10], 
+            'form_submitted': True
+        })    
+   
+    context = {
+        'categories': categories,
+        'skills': skills,
+        'experience_levels': [
+            ('beginner', 'Beginner'),
+            ('intermediate', 'Intermediate'),
+            ('advanced', 'Advanced')
+        ],
+        'learning_styles': [
+            ('hands_on', 'Hands-on Practice'),
+            ('theoretical', 'Theoretical Learning'),
+            ('mixed', 'Mixed Approach')
+        ],
+        'availability_options': [
+            ('weekdays', 'Weekdays'),
+            ('weekends', 'Weekends'),
+            ('flexible', 'Flexible')
+        ],
+        'budget_ranges': [
+            ('low', '$20-50'),
+            ('medium', '$51-100'),
+            ('high', '$101+')
+        ]
+    }
+    return render(request, 'masteryhub/mentor_matching.html', context)
 
 
 @login_required
@@ -202,7 +334,7 @@ def create_session(request):
             session.host = request.user.profile
             session.save()
             messages.success(request, "Session created successfully.")
-            return redirect("view_session", session_id=session.id)
+            return redirect("masteryhub:view_session", session_id=session.id)
     else:
         form = SessionForm()
     return render(request, "masteryhub/create_session.html", {"form": form})
@@ -217,7 +349,7 @@ def edit_session(request, session_id):
         if form.is_valid():
             form.save()
             messages.success(request, "Session updated successfully.")
-            return redirect("view_session", session_id=session.id)
+            return redirect("masteryhub:view_session", session_id=session.id)
     else:
         form = SessionForm(instance=session)
     return render(request, "masteryhub/edit_session.html", {"form": form})
@@ -230,7 +362,7 @@ def delete_session(request, session_id):
     if request.method == "POST":
         session.delete()
         messages.success(request, "Session deleted successfully.")
-        return redirect("session_list")
+        return redirect("masteryhub:session_list")
     return render(request, "masteryhub/delete_session.html", {"session": session})
 
 
@@ -242,7 +374,7 @@ def create_feedback(request, session_id):
         feedback_content = request.POST.get("feedback")
         Feedback.objects.create(session=session, user=request.user.profile, content=feedback_content)
         messages.success(request, "Thank you for your feedback!")
-        return redirect("view_session", session_id=session_id)
+        return redirect("masteryhub:view_session", session_id=session_id)
     return render(request, "masteryhub/create_feedback.html", {"session": session})
 
 
@@ -296,7 +428,7 @@ def reply_forum_post(request, post_id):
             reply.parent_post = parent_post
             reply.save()
             messages.success(request, "Reply posted successfully.")
-            return redirect("view_forum_post", post_id=parent_post.id)
+            return redirect("masteryhub:view_forum_post", post_id=parent_post.id)
     else:
         form = ForumPostForm()
     return render(request, "masteryhub/reply_forum_post.html", {"form": form, "parent_post": parent_post})
@@ -345,7 +477,7 @@ def report_concern(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Your concern has been reported. We will review it shortly.")
-            return redirect("home")
+            return redirect("home:index")
     else:
         form = ConcernReportForm()
 
@@ -359,18 +491,47 @@ def book_session(request, session_id):
         form = BookingForm(request.POST)
         if form.is_valid():
             booking = form.save(commit=False)
+            booking.session = session
             booking.user = request.user  
-            booking.save()
+            booking.booking_date = timezone.now()  
+            booking.save()           
             return redirect('booking_success')  
     else:
         form = BookingForm()
-
     return render(request, 'masteryhub/book_session.html', {'form': form, 'session': session})
 
 
 def browse_skills_view(request):   
     """A view that handles browsing skills."""
-    return render(request, 'masteryhub/browse_skills.html')  
+    query = request.GET.get("q")
+    selected_category = request.GET.get("category")
+   
+    skills = Skill.objects.select_related('category').all()    
+ 
+    categories = Category.objects.filter(
+        skills__isnull=False
+    ).distinct().order_by('name')
+
+    if query:
+        skills = skills.filter(
+            Q(title__icontains=query) | 
+            Q(description__icontains=query)
+        )
+
+    if selected_category:
+        try:
+            category_id = int(selected_category)
+            skills = skills.filter(category_id=category_id)
+        except (ValueError, TypeError):
+            pass  
+
+    context = {
+        "skills": skills,
+        "categories": categories,
+        "selected_category": selected_category,
+    }
+    
+    return render(request, 'masteryhub/browse_skills.html', context)
 
 
 def review_list(request):
@@ -471,3 +632,25 @@ def my_mentorships(request):
     }
 
     return render(request, 'masteryhub/my_mentorships.html', context)
+
+
+def view_mentor_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    mentor = get_object_or_404(Mentor, user=user)
+    return render(request, 'masteryhub/mentor_profile.html', {'mentor': mentor})
+
+
+def browse_skills(request):
+    categories = Category.objects.all()
+    selected_category = request.GET.get('category')
+    skills = Skill.objects.all()
+
+    if selected_category:
+        skills = skills.filter(category__id=selected_category)
+
+    context = {
+        'categories': categories,
+        'selected_category': selected_category,
+        'skills': skills,
+    }
+    return render(request, 'masteryhub/browse_skills.html', context)

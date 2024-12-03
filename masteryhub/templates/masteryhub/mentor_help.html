@@ -2,42 +2,102 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 pt-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h1 class="h4">Mentor Help Center</h1>
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient text-white py-4"
+                    style="background: linear-gradient(45deg, #2193b0, #6dd5ed);">
+                    <h1 class="h4 mb-0"><i class="fas fa-hands-helping me-2"></i>Mentor Help Center</h1>
                 </div>
-                <div class="card-body">
-                    <p>Find resources and answers to common questions for MasteryHub mentors.</p>
-                    
-                    <h2 class="mt-4">Frequently Asked Questions</h2>
-                    <ul class="list-unstyled">
-                        <li>
-                            <h3>How do I schedule a session?</h3>
-                            <p>Log into your mentor dashboard and click on "Schedule Session". Choose an available time slot and confirm.</p>
-                        </li>
-                        <li>
-                            <h3>What if a mentee doesn't show up?</h3>
-                            <p>Wait for 15 minutes. If the mentee doesn't arrive, mark the session as "No Show" in your dashboard.</p>
-                        </li>
-                        <li>
-                            <h3>How do I receive payment?</h3>
-                            <p>Payments are processed every two weeks. Ensure your payment details are up to date in your profile settings.</p>
-                        </li>
-                    </ul>
-                    
-                    <h2 class="mt-4">Useful Resources</h2>
-                    <ul class="list-unstyled">
-                        <li><a href="https://www.mentoring.org/resource/mentor-handbook/" class="text-info"><i class="fas fa-book"></i> Mentor Handbook</a></li>
-                        <li><a href="https://www.coursera.org/courses?query=online%20skill%20workshops" class="text-info"><i class="fas fa-chalkboard-teacher"></i> Online Skill Workshops</a></li>
-                        <li><a href="https://www.udemy.com/topic/video-courses/" class="text-info"><i class="fas fa-video"></i> On-Demand Video Courses</a></li>
-                        <li><a href="https://www.webinar.net/" class="text-info"><i class="fas fa-users"></i> Live Expert Webinars</a></li>
-                    </ul>
+                <div class="card-body p-4">
+                    <p class="lead text-muted">Find resources and answers to common questions for MasteryHub mentors.
+                    </p>
+
+                    <h2 class="mt-5 mb-4 text-primary"><i class="fas fa-question-circle me-2"></i>Frequently Asked
+                        Questions</h2>
+                    <div class="faq-section">
+                        <div class="mb-4 p-3 bg-light rounded">
+                            <h3 class="h5 text-primary"><i class="fas fa-calendar-alt me-2"></i>How do I schedule a
+                                session?</h3>
+                            <p class="mb-0 ms-4">Log into your mentor dashboard and click on "Schedule Session". Choose
+                                an available time slot and confirm.</p>
+                        </div>
+                        <div class="mb-4 p-3 bg-light rounded">
+                            <h3 class="h5 text-primary"><i class="fas fa-user-clock me-2"></i>What if a mentee doesn't
+                                show up?</h3>
+                            <p class="mb-0 ms-4">Wait for 15 minutes. If the mentee doesn't arrive, mark the session as
+                                "No Show" in your dashboard.</p>
+                        </div>
+                        <div class="mb-4 p-3 bg-light rounded">
+                            <h3 class="h5 text-primary"><i class="fas fa-money-bill-wave me-2"></i>How do I receive
+                                payment?</h3>
+                            <p class="mb-0 ms-4">Payments are processed every two weeks. Ensure your payment details are
+                                up to date in your profile settings.</p>
+                        </div>
+                    </div>
+
+                    <h2 class="mt-5 mb-4 text-primary"><i class="fas fa-bookmark me-2"></i>Useful Resources</h2>
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        <div class="col">
+                            <a href="https://www.mentoring.org/resource/mentor-handbook/"
+                                class="card h-100 text-decoration-none hover-shadow transition">
+                                <div class="card-body">
+                                    <i class="fas fa-book fa-2x mb-3 text-primary"></i>
+                                    <h3 class="h5 text-dark">Mentor Handbook</h3>
+                                    <p class="text-muted mb-0">Comprehensive guide for mentors</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a href="https://www.coursera.org/courses?query=online%20skill%20workshops"
+                                class="card h-100 text-decoration-none hover-shadow transition">
+                                <div class="card-body">
+                                    <i class="fas fa-chalkboard-teacher fa-2x mb-3 text-primary"></i>
+                                    <h3 class="h5 text-dark">Online Skill Workshops</h3>
+                                    <p class="text-muted mb-0">Enhance your mentoring skills</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a href="https://www.udemy.com/topic/video-courses/"
+                                class="card h-100 text-decoration-none hover-shadow transition">
+                                <div class="card-body">
+                                    <i class="fas fa-video fa-2x mb-3 text-primary"></i>
+                                    <h3 class="h5 text-dark">On-Demand Video Courses</h3>
+                                    <p class="text-muted mb-0">Learn at your own pace</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col">
+                            <a href="https://www.webinar.net/"
+                                class="card h-100 text-decoration-none hover-shadow transition">
+                                <div class="card-body">
+                                    <i class="fas fa-users fa-2x mb-3 text-primary"></i>
+                                    <h3 class="h5 text-dark">Live Expert Webinars</h3>
+                                    <p class="text-muted mb-0">Interactive learning sessions</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+        transform: translateY(-3px);
+    }
+
+    .transition {
+        transition: all .3s ease;
+    }
+
+    .bg-gradient {
+        background: linear-gradient(45deg, #2193b0, #6dd5ed) !important;
+    }
+</style>
 {% endblock %}

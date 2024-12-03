@@ -1,50 +1,86 @@
 {% extends 'base.html' %}
+{% load static %}
+
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">My Mentorships</h2>
+<div class="container mt-5 pt-5">
+    <h2 class="display-4 fw-bold text-center mb-5">My Mentorships</h2>
 
     <div class="row">
         <div class="col-md-6">
-            <h3>As Mentor</h3>
-            <ul class="list-group mb-4">
-                {% for mentorship in mentorships_as_mentor %}
-                <li class="list-group-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <span>Mentee: {{ mentorship.mentee.username }}</span>
-                            <span class="ml-3">Status: {{ mentorship.status }}</span>
-                            {% if mentorship.start_date %}
-                            <span class="ml-3">Started: {{ mentorship.start_date }}</span>
-                            {% endif %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="h4 mb-0">As Mentor</h3>
+                </div>
+                <div class="card-body">
+                    {% for mentorship in mentorships_as_mentor %}
+                    <div
+                        class="mentorship-card mb-3 p-3 border rounded {% if mentorship.status == 'active' %}border-success{% endif %}">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-user-graduate me-2"></i>
+                                <strong>{{ mentorship.mentee.username }}</strong>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span
+                                    class="badge {% if mentorship.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ mentorship.status|title }}
+                                </span>
+                                {% if mentorship.start_date %}
+                                <span class="badge bg-info">
+                                    <i class="far fa-calendar-alt me-1"></i>
+                                    {{ mentorship.start_date|date:"M d, Y" }}
+                                </span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                </li>
-                {% empty %}
-                <li class="list-group-item">You are not mentoring anyone at the moment.</li>
-                {% endfor %}
-            </ul>
+                    {% empty %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-user-friends fa-3x mb-3"></i>
+                        <p>You are not mentoring anyone at the moment.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
 
         <div class="col-md-6">
-            <h3>As Mentee</h3>
-            <ul class="list-group">
-                {% for mentorship in mentorships_as_mentee %}
-                <li class="list-group-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <span>Mentor: {{ mentorship.mentor.username }}</span>
-                            <span class="ml-3">Status: {{ mentorship.status }}</span>
-                            {% if mentorship.start_date %}
-                            <span class="ml-3">Started: {{ mentorship.start_date }}</span>
-                            {% endif %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="h4 mb-0">As Mentee</h3>
+                </div>
+                <div class="card-body">
+                    {% for mentorship in mentorships_as_mentee %}
+                    <div
+                        class="mentorship-card mb-3 p-3 border rounded {% if mentorship.status == 'active' %}border-success{% endif %}">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-chalkboard-teacher me-2"></i>
+                                <strong>{{ mentorship.mentor.username }}</strong>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span
+                                    class="badge {% if mentorship.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ mentorship.status|title }}
+                                </span>
+                                {% if mentorship.start_date %}
+                                <span class="badge bg-info">
+                                    <i class="far fa-calendar-alt me-1"></i>
+                                    {{ mentorship.start_date|date:"M d, Y" }}
+                                </span>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                </li>
-                {% empty %}
-                <li class="list-group-item">You are not being mentored at the moment.</li>
-                {% endfor %}
-            </ul>
+                    {% empty %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-user-friends fa-3x mb-3"></i>
+                        <p>You are not being mentored at the moment.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 </div>

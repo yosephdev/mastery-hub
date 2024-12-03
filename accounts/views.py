@@ -1,35 +1,20 @@
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
-from django.views import View
-from django.conf import settings
-from django.core.mail import send_mail
+from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth import authenticate, login as auth_login, logout
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from django.contrib.auth.views import LoginView, LogoutView
-from django.db.models import Q, Count, Sum
-from django.urls import reverse_lazy, reverse
+from django.contrib.auth.views import (
+    LoginView, LogoutView, PasswordResetView,
+    PasswordResetDoneView, PasswordResetConfirmView,
+    PasswordResetCompleteView
+)
+from django.urls import reverse_lazy
 from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import Http404
-from django.utils import timezone
-from django.contrib.auth.models import User
-from .forms import MentorApplicationForm, ConcernReportForm
-from django.contrib.admin.models import LogEntry, ADDITION
+from django.shortcuts import render, redirect
 from allauth.account.views import ConfirmEmailView
 from allauth.account.models import EmailConfirmationHMAC
-from django.contrib.contenttypes.models import ContentType
 
-from profiles.models import Profile
-from checkout.models import Payment, Cart, CartItem, Order
-from masteryhub.models import Feedback, Session, Category, Mentorship
-from .forms import CustomSignupForm, CustomUserChangeForm
-from checkout.forms import OrderForm
-import stripe
-import json
-import logging
-
-# Create your views here.
+from .forms import (
+    CustomSignupForm,
+    CustomSetPasswordForm,
+)
 
 
 def signup_view(request):
@@ -49,7 +34,7 @@ def signup_view(request):
                         request,
                         f"Welcome, {user.username}! Registration successful!"
                     )
-                    return redirect("home")
+                    return redirect("home:index")
                 else:
                     messages.error(request, "Authentication failed.")
             except Exception as e:
@@ -78,7 +63,6 @@ class CustomConfirmEmailView(ConfirmEmailView):
 
 class CustomLoginView(LoginView):
     """Handle user login."""
-
     template_name = "account/login.html"
 
     def form_valid(self, form):
@@ -90,9 +74,9 @@ class CustomLoginView(LoginView):
         if user.is_superuser:
             return redirect("admin:index")
         elif user.profile.is_expert:
-            return redirect("view_mentor_profile", username=user.username)
+            return redirect("profiles:view_mentor_profile", username=user.username)
         else:
-            return redirect("view_profile", username=user.username)
+            return redirect("profiles:view_profile", username=user.username)
 
     def form_invalid(self, form):
         messages.error(
@@ -104,14 +88,14 @@ class CustomLoginView(LoginView):
 
 class CustomLogoutView(LogoutView):
     """Handle user logout."""
-
     template_name = "account/logout.html"
-    next_page = reverse_lazy("home")
+    next_page = reverse_lazy("home:index")
 
     def dispatch(self, request, *args, **kwargs):
         if request.method == "POST":
             if not self.request.session.get("message_sent", False):
-                messages.success(request, "You have been logged out successfully.")
+                messages.success(
+                    request, "You have been logged out successfully.")
                 self.request.session["message_sent"] = True
             logout(request)
             return HttpResponseRedirect(self.get_next_page())
@@ -119,3 +103,23 @@ class CustomLogoutView(LogoutView):
 
     def get_next_page(self):
         return str(self.next_page)
+
+
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'account/password_reset.html'
+    email_template_name = 'account/password_reset_email.html'
+    success_url = reverse_lazy('accounts:reset_password_done')
+
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'account/password_reset_done.html'
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'account/password_reset_from_key.html'
+    success_url = reverse_lazy('accounts:reset_password_complete')
+    form_class = CustomSetPasswordForm
+
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'account/password_reset_complete.html'

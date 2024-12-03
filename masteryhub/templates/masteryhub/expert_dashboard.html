@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 pt-5">
     <div class="row">
         <div class="col-md-3">
             <div class="list-group">
@@ -79,7 +79,7 @@
 
             <div id="analytics" class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">Performance Insights</h5>                    
+                    <h5 class="card-title">Performance Insights</h5>
                     <canvas id="performance-graph"></canvas>
                 </div>
             </div>
@@ -90,15 +90,15 @@
 
 {% block extra_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         var ctx = document.getElementById('performance-graph').getContext('2d');
         var performanceGraph = new Chart(ctx, {
-            type: 'bar', 
+            type: 'bar',
             data: {
-                labels: ["January", "February", "March", "April", "May", "June"], 
+                labels: ["January", "February", "March", "April", "May", "June"],
                 datasets: [{
                     label: 'Sessions Completed',
-                    data: [5, 10, 3, 8, 6, 7], 
+                    data: [5, 10, 3, 8, 6, 7],
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1

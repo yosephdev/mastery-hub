@@ -71,6 +71,7 @@ class ProfileForm(forms.ModelForm):
             ),
         }
 
+
 class ForumPostForm(forms.ModelForm):
     class Meta:
         model = Forum
@@ -150,7 +151,7 @@ class OrderForm(forms.Form):
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
-        fields = ['session', 'scheduled_time']
+        fields = ['skill', 'scheduled_time', 'status']
         widgets = {
             'scheduled_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }

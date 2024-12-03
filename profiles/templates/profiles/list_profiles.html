@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <h1>All Profiles</h1>
+    <form method="get" action="{% url 'profiles:list_profiles' %}">
+        <input type="text" name="q" placeholder="Search profiles..." value="{{ request.GET.q }}">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <ul>
+        {% for profile in profiles %}
+        <li>
+            <a href="{% url 'profiles:view_profile' profile.user.username %}">
+                {{ profile.user.get_full_name or profile.user.username }}
+            </a>
+        </li>
+        {% empty %}
+        <p>No profiles found.</p>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

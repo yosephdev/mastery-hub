@@ -1,13 +1,18 @@
 /*
-    Core logic/payment flow comes from Stripe docs:
-    https://stripe.com/docs/payments/accept-a-payment
+Core logic/payment flow for this comes from here:
+https://stripe.com/docs/payments/accept-a-payment
+CSS from here:
+https://stripe.com/docs/stripe-js
 */
 
+// Stripe Configuration
 var stripePublicKey = document.getElementById('id_stripe_public_key').textContent.trim();
 var clientSecret = document.getElementById('id_client_secret').textContent.trim();
+console.log('Client Secret:', clientSecret);
 var stripe = Stripe(stripePublicKey);
 var elements = stripe.elements();
 
+// Styling the card element
 var style = {
     base: {
         color: '#000',
@@ -24,10 +29,10 @@ var style = {
     }
 };
 
-var card = elements.create('card', {style: style});
+var card = elements.create('card', { style: style });
 card.mount('#card-element');
 
-// Handle realtime validation errors on the card element
+// Handle real-time validation errors
 card.addEventListener('change', function (event) {
     var errorDiv = document.getElementById('card-errors');
     if (event.error) {
@@ -43,17 +48,17 @@ card.addEventListener('change', function (event) {
     }
 });
 
-// Handle form submit
+// Handle form submission
 var form = document.getElementById('payment-form');
 
 form.addEventListener('submit', function(ev) {
     ev.preventDefault();
-    card.update({ 'disabled': true});
+    card.update({ 'disabled': true });
     $('#submit-button').attr('disabled', true);
     $('#payment-form').fadeToggle(100);
     $('#loading-overlay').fadeToggle(100);
 
-    var saveInfo = Boolean($('#id-save-info').attr('checked'));
+    var saveInfo = $('#id-save-info').is(':checked');
     var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
     var postData = {
         'csrfmiddlewaretoken': csrfToken,
@@ -69,7 +74,7 @@ form.addEventListener('submit', function(ev) {
                 name: $.trim(form.full_name.value),
                 phone: $.trim(form.phone_number.value),
                 email: $.trim(form.email.value),
-                address:{
+                address: {
                     line1: $.trim(form.street_address1.value),
                     line2: $.trim(form.street_address2.value),
                     city: $.trim(form.town_or_city.value),
@@ -89,7 +94,7 @@ form.addEventListener('submit', function(ev) {
             $(errorDiv).html(html);
             $('#payment-form').fadeToggle(100);
             $('#loading-overlay').fadeToggle(100);
-            card.update({ 'disabled': false});
+            card.update({ 'disabled': false });
             $('#submit-button').attr('disabled', false);
         } else {
             if (result.paymentIntent.status === 'succeeded') {

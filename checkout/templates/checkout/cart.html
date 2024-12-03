@@ -3,11 +3,12 @@
 {% load crispy_forms_tags %}
 
 {% block meta %}
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Your cart contains the sessions you have selected. Review your cart and proceed to checkout to confirm your purchase.">
-    <meta name="keywords" content="skill sharing, cart, checkout, sessions, purchase, learning">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description"
+    content="Your cart contains the sessions you have selected. Review your cart and proceed to checkout to confirm your purchase.">
+<meta name="keywords" content="skill sharing, cart, checkout, sessions, purchase, learning">
 {% endblock %}
 
 {% block extra_css %}
@@ -15,50 +16,52 @@
 {% endblock %}
 
 {% block content %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-
-<div class="container mt-5">
-    <h2 class="logo-font mb-4">Your Cart</h2>
+<div class="container mt-5 pt-5">
+    <h2 class="logo-font mb-4 text-center">Your Cart</h2>
     {% if cart.items.exists %}
-        <div class="card">
-            <div class="card-body">
-                <ul class="list-group mb-3">
-                    {% for item in cart.items.all %}
-                        <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center lh-condensed">
-                            <div class="mb-3 mb-md-0">
-                                <h6 class="my-0">{{ item.session.title }}</h6>
-                                <small class="text-muted">Quantity: {{ item.quantity }}</small>
-                            </div>
-                            <div class="btn-group mb-3 mb-md-0" role="group" aria-label="Adjust quantity">
-                                <form action="{% url 'decrease_quantity' item.id %}" method="POST" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-dark">-</button>
-                                </form>
-                                <form action="{% url 'increase_quantity' item.id %}" method="POST" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-dark">+</button>
-                                </form>
-                                <form action="{% url 'remove_from_cart' item.id %}" method="POST" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
-                                </form>
-                            </div>
-                            <span class="text-muted">${{ item.session.price }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-                <div class="d-flex justify-content-between">
-                    <h5>Total Items: {{ total_items }}</h5>
-                    <h5>Total:</h5>
-                    <h5>${{ grand_total|floatformat:2 }}</h5>
-                </div>
-                <a href="{% url 'checkout' %}" class="btn btn-dark btn-block mt-4">Proceed to Checkout</a>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <ul class="list-group mb-3">
+                {% for item in cart.items.all %}
+                <li
+                    class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-center lh-condensed">
+                    <div class="mb-3 mb-md-0">
+                        <h6 class="my-0">{{ item.session.title }}</h6>
+                        <small class="text-muted">Quantity: {{ item.quantity }}</small>
+                    </div>
+                    <div class="btn-group mb-3 mb-md-0" role="group" aria-label="Adjust quantity">
+                        <form action="{% url 'checkout:decrease_quantity' item.id %}" method="POST"
+                            style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-dark" aria-label="Decrease quantity">-</button>
+                        </form>
+                        <form action="{% url 'checkout:increase_quantity' item.id %}" method="POST"
+                            style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-dark" aria-label="Increase quantity">+</button>
+                        </form>
+                        <form action="{% url 'checkout:remove_from_cart' item.id %}" method="POST"
+                            style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" aria-label="Remove item">Remove</button>
+                        </form>
+                    </div>
+                    <span class="text-muted">${{ item.session.price | floatformat:2 }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="d-flex justify-content-between align-items-center">
+                <h5>Total Items: {{ total_items }}</h5>
+                <h5>Total: <strong>${{ grand_total|floatformat:2 }}</strong></h5>
             </div>
+            <a href="{% url 'checkout:checkout' %}" class="btn btn-dark btn-block mt-4">Proceed to Checkout</a>
         </div>
+    </div>
     {% else %}
-        <p class="text-muted">Your cart is empty.</p>
-        <a href="{% url 'session_list' %}" class="btn btn-dark">Browse Sessions</a>
+    <p class="text-muted text-center">Your cart is empty.</p>
+    <div class="text-center">
+        <a href="{% url 'masteryhub:session_list' %}" class="btn btn-dark">Browse Sessions</a>
+    </div>
     {% endif %}
 </div>
-
 {% endblock %}

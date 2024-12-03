@@ -2,63 +2,64 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 pt-5">
     <h1>Search Results{% if query %} for "{{ query }}"{% endif %}</h1>
 
     {% if error_message %}
-        <div class="alert alert-warning">{{ error_message }}</div>
+    <div class="alert alert-warning">{{ error_message }}</div>
     {% else %}
-        <h2>Profiles</h2>
-        <div class="row">
-            {% if profiles %}
-                {% for profile in profiles %}
-                <div class="col-md-4">
-                    <div class="card mb-4">
-                        {% if profile.profile_picture %}
-                        <img class="card-img-top" src="{{ profile.profile_picture.url }}" 
-                             loading="lazy" alt="{{ profile.user.username }}">
-                        {% else %}
-                        <img class="card-img-top" src="{% static 'images/default_profile.webp' %}" 
-                             loading="lazy" alt="No Image Available">
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">{{ profile.user.username }}</h5>
-                            <p class="card-text">{{ profile.bio|truncatewords:20 }}</p>
-                            <a href="{% url 'view_profile' profile.user.username %}" class="btn btn-primary">View Profile</a>
-                        </div>
-                    </div>
+    <h2>Profiles</h2>
+    <div class="row">
+        {% if profiles %}
+        {% for profile in profiles %}
+        <div class="col-md-4">
+            <div class="card mb-4">
+                {% if profile.profile_picture %}
+                <img class="card-img-top" src="{{ profile.profile_picture.url }}" loading="lazy"
+                    alt="{{ profile.user.username }}">
+                {% else %}
+                <img class="card-img-top" src="{% static 'images/default_profile.webp' %}" loading="lazy"
+                    alt="No Image Available">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ profile.user.username }}</h5>
+                    <p class="card-text">{{ profile.bio|truncatewords:20 }}</p>
+                    <a href="{% url 'profiles:view_mentor_profile' profile.user.username %}"
+                        class="btn btn-primary">View Profile</a>
                 </div>
-                {% endfor %}
-            {% else %}
-                <p>No profiles found.</p>
-            {% endif %}
+            </div>
         </div>
+        {% endfor %}
+        {% else %}
+        <p>No profiles found.</p>
+        {% endif %}
+    </div>
 
-        <h2>Sessions</h2>
-        <div class="row">
-            {% if sessions %}
-                {% for session in sessions %}
-                <div class="col-md-4">
-                    <div class="card mb-4">
-                        {% if session.image %}
-                        <img class="card-img-top" src="{{ session.image.url }}" 
-                             loading="lazy" alt="{{ session.title }}">
-                        {% else %}
-                        <img class="card-img-top" src="{% static 'images/no-image-available.webp' %}" 
-                             loading="lazy" alt="No Image Available">
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">{{ session.title }}</h5>
-                            <p class="card-text">{{ session.description|truncatewords:20 }}</p>
-                            <a href="{% url 'view_session' session.id %}" class="btn btn-primary">View Session</a>
-                        </div>
-                    </div>
+    <h2>Sessions</h2>
+    <div class="row">
+        {% if sessions %}
+        {% for session in sessions %}
+        <div class="col-md-4">
+            <div class="card mb-4">
+                {% if session.image %}
+                <img class="card-img-top" src="{{ session.image.url }}" loading="lazy" alt="{{ session.title }}">
+                {% else %}
+                <img class="card-img-top" src="{% static 'images/no-image-available.webp' %}" loading="lazy"
+                    alt="No Image Available">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ session.title }}</h5>
+                    <p class="card-text">{{ session.description|truncatewords:20 }}</p>
+                    <a href="{% url 'masteryhub:view_session' session_id=session.id %}" class="btn btn-primary">View
+                        Session</a>
                 </div>
-                {% endfor %}
-            {% else %}
-                <p>No sessions found.</p>
-            {% endif %}
+            </div>
         </div>
+        {% endfor %}
+        {% else %}
+        <p>No sessions found.</p>
+        {% endif %}
+    </div>
     {% endif %}
 </div>
 {% endblock %}

@@ -7,29 +7,45 @@
 {% endblock head_title %}
 
 {% block content %}
-<div class="container d-flex align-items-center justify-content-center">
-  <div class="card shadow">
-    <div class="card-body p-5">
-      <hr>
-      <h2 class="logo-font mb-4 text-center">{% trans "Sign Out" %}</h2>
-      <hr>
-      {% if request.user.is_authenticated %}
-      <p class="text-center">{% trans "We hope to see you again soon! Are you sure you want to sign out?" %}</p>
-      {% url 'account_logout' as action_url %}
-      <form method="post" action="{{ action_url }}">
-        {% csrf_token %}
-        {{ redirect_field }}
-        <div class="d-flex justify-content-center mt-4">
-          <button type="submit" class="btn btn-danger">{% trans 'Sign Out' %}</button>
-          <a href="{% url 'home' %}" class="btn btn-secondary ml-2">{% trans "Cancel" %}</a>
+<div class="container mt-5 pt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-lg border-0 rounded-lg">
+        <div class="card-body p-5">
+          <div class="text-center mb-4">
+            <i class="fas fa-sign-out-alt fa-3x text-muted mb-3"></i>
+            <h2 class="logo-font">{% trans "Sign Out" %}</h2>
+          </div>
+
+          {% if request.user.is_authenticated %}
+          <div class="text-center mb-4">
+            <p class="text-muted">{% trans "We hope to see you again soon!" %}</p>
+            <p class="lead">{% trans "Are you sure you want to sign out?" %}</p>
+          </div>
+
+          {% url 'account_logout' as action_url %}
+          <form method="post" action="{{ action_url }}">
+            {% csrf_token %}
+            {{ redirect_field }}
+            <div class="d-flex justify-content-center gap-3 mt-4">
+              <a href="{% url 'home:index' %}" class="btn btn-outline-dark px-4">
+                {% trans "Cancel" %}
+              </a>
+              <button type="submit" class="btn btn-danger px-4">
+                <i class="fas fa-sign-out-alt me-2"></i>{% trans 'Sign Out' %}
+              </button>
+            </div>
+          </form>
+          {% else %}
+          <div class="text-center">
+            <p class="text-muted mb-4">{% trans "You are already logged out." %}</p>
+            <a href="{% url 'home:index' %}" class="btn btn-primary px-4">
+              <i class="fas fa-home me-2"></i>{% trans "Go to Home" %}
+            </a>
+          </div>
+          {% endif %}
         </div>
-      </form>
-      {% else %}
-      <p class="text-center">{% trans "You are already logged out." %}</p>
-      <div class="d-flex justify-content-center mt-4">
-        <a href="{% url 'home' %}" class="btn btn-primary">{% trans "Go to Home" %}</a>
       </div>
-      {% endif %}
     </div>
   </div>
 </div>

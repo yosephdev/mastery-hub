@@ -1,0 +1,64 @@
+{% load static %}
+
+<div class="mobile-nav d-lg-none">   
+    <li class="nav-item">
+        <a class="nav-link d-flex align-items-center" href="#" id="mobile-search-trigger" 
+           data-bs-toggle="collapse" data-bs-target="#mobile-search" 
+           aria-expanded="false" aria-controls="mobile-search">
+            <i class="fas fa-search fa-lg"></i>
+        </a>
+    </li>
+    
+    <div class="collapse mobile-search-wrapper" id="mobile-search">
+        <div class="container py-3">
+            <form class="mobile-search-form" method="GET" action="{% url 'home:search_results' %}">
+                <div class="input-group">
+                    <input class="form-control mobile-search-input" type="search" name="q"
+                           placeholder="Search skills, mentors..." aria-label="Search">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+   
+    <div class="mobile-user-menu">
+        {% if request.user.is_authenticated %}
+            <div class="dropdown">
+                <a class="nav-link d-flex align-items-center" href="#" role="button"
+                   id="mobileUserDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% if request.user.profile.avatar %}
+                        <div class="mobile-avatar-wrapper">
+                            <img src="{{ request.user.profile.avatar.url }}" alt="Profile"
+                                 class="rounded-circle mobile-avatar">
+                            <span class="mobile-user-status"></span>
+                        </div>
+                    {% else %}
+                        <i class="fas fa-user-circle fa-lg"></i>
+                    {% endif %}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end mobile-dropdown-menu shadow-lg border-0"
+                    aria-labelledby="mobileUserDropdown">
+                    <li class="dropdown-header text-center">
+                        <div class="mobile-user-info">
+                            <h6 class="mb-0">{{ request.user.get_full_name }}</h6>
+                            <small class="text-muted">{{ request.user.email }}</small>
+                        </div>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>                    
+                    {% include "includes/mobile-menu-items.html" %}
+                </ul>
+            </div>
+        {% else %}
+            <div class="mobile-auth-buttons">
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary btn-sm me-2">
+                    <i class="fas fa-sign-in-alt me-1"></i>Sign In
+                </a>
+                <a href="{% url 'accounts:signup' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-user-plus me-1"></i>Sign Up
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>

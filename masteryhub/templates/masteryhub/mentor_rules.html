@@ -2,24 +2,26 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 pt-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h1 class="h4">Mentor Rules & Requirements</h1>
+            <div class="card shadow-lg">
+                <div class="card-header bg-gradient text-dark text-center">
+                    <h1 class="h4 mb-0 font-weight-bold"><i class="fas fa-balance-scale me-2"></i>Mentor Rules &
+                        Requirements</h1>
                 </div>
                 <div class="card-body">
-                    <p>Learn about the guidelines and expectations for MasteryHub mentors.</p>
-                    
-                    <h2 class="mt-4">Qualifications</h2>
+                    <p class="lead">Learn about the guidelines and expectations for MasteryHub mentors.</p>
+
+                    <h2 class="mt-4 text-info">Qualifications</h2>
                     <ul class="list-unstyled pl-3">
-                        <li><i class="fas fa-check-circle text-primary"></i> Minimum of 3 years professional experience in your field</li>
-                        <li><i class="fas fa-check-circle text-primary"></i> Relevant certifications or degrees</li>
-                        <li><i class="fas fa-check-circle text-primary"></i> Excellent communication skills</li>
+                        <li><i class="fas fa-check-circle text-success"></i> Minimum of 3 years professional experience
+                            in your field</li>
+                        <li><i class="fas fa-check-circle text-success"></i> Relevant certifications or degrees</li>
+                        <li><i class="fas fa-check-circle text-success"></i> Excellent communication skills</li>
                     </ul>
-                    
-                    <h2 class="mt-4">Code of Conduct</h2>
+
+                    <h2 class="mt-4 text-info">Code of Conduct</h2>
                     <ol class="pl-3">
                         <li>Always maintain professionalism and respect</li>
                         <li>Protect mentee privacy and confidentiality</li>
@@ -27,17 +29,34 @@
                         <li>Be punctual and prepared for all sessions</li>
                         <li>Continuously update your skills and knowledge</li>
                     </ol>
-                    
-                    <h2 class="mt-4">Session Guidelines</h2>
+
+                    <h2 class="mt-4 text-info">Session Guidelines</h2>
                     <ul class="list-unstyled pl-3">
-                        <li><i class="fas fa-check-circle text-primary"></i> Sessions should be focused and goal-oriented</li>
-                        <li><i class="fas fa-check-circle text-primary"></i> Provide clear explanations and examples</li>
-                        <li><i class="fas fa-check-circle text-primary"></i> Encourage mentee participation and questions</li>
-                        <li><i class="fas fa-check-circle text-primary"></i> Stay within the scheduled time frame</li>
+                        <li><i class="fas fa-check-circle text-success"></i> Sessions should be focused and
+                            goal-oriented</li>
+                        <li><i class="fas fa-check-circle text-success"></i> Provide clear explanations and examples
+                        </li>
+                        <li><i class="fas fa-check-circle text-success"></i> Encourage mentee participation and
+                            questions</li>
+                        <li><i class="fas fa-check-circle text-success"></i> Stay within the scheduled time frame</li>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+        transform: translateY(-3px);
+    }
+
+    .transition {
+        transition: all .3s ease;
+    }
+
+    .bg-gradient {
+        background: linear-gradient(45deg, #2193b0, #6dd5ed) !important;
+    }
+</style>
 {% endblock %}

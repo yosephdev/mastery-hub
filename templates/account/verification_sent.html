@@ -6,31 +6,37 @@
 {% block head_title %}{% trans "Email Verification Sent" %}{% endblock head_title %}
 
 {% block content %}
-<div class="container-fluid mt-5">
+<div class="container mt-5 pt-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <h2 class="logo-font mb-4 text-center">{% trans "Verify Your Email Address" %}</h2>
-            <p class="text-center">{% trans "We have sent an account verification email to" %} <strong>{{ email }}</strong>.</p>
-            <p class="text-center">{% trans "Please check your email and click on the verification link to activate your account." %}</p>
-            <p class="text-center">{% trans "If you do not see the email in your inbox, please check your spam folder." %}</p>
-            
+            <p class="text-center">{% trans "We have sent an account verification email to" %} <strong>{{ email
+                    }}</strong>.</p>
+            <p class="text-center">{% trans "Please check your email and click on the verification link to activate your
+                account." %}</p>
+            <p class="text-center">{% trans "If you do not see the email in your inbox, please check your spam folder."
+                %}</p>
+
             <div class="text-center mt-4">
-                <p>{% trans "Did not get the email?" %} <a href="#" id="resend-email-link">{% trans "Click here to resend" %}</a></p>
+                <p>{% trans "Did not get the email?" %} <a href="#" id="resend-email-link">{% trans "Click here to
+                        resend" %}</a></p>
             </div>
 
             <div id="resend-form" style="display: none;">
                 <h3 class="mt-4 text-center">{% trans "Resend Verification Email" %}</h3>
-                <p class="text-center">{% trans "If you did not receive the verification email, you can resend it below." %}</p>
-                <form method="POST" action="{% url 'account_email' %}" class="mt-3">
+                <p class="text-center">{% trans "If you did not receive the verification email, you can resend it
+                    below." %}</p>
+                <form method="POST" action="{% url 'accounts:resend_verification' %}" class="mt-3">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="email">{% trans "Your Email address *" %}</label>
                         <input type="email" name="email" id="email" value="{{ email }}" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-outline-primary w-100">{% trans "Send me the verification email again" %}</button>
+                    <button type="submit" class="btn btn-outline-primary w-100">{% trans "Send me the verification email
+                        again" %}</button>
                 </form>
                 <p class="text-center mt-3">
-                    <a href="{% url 'account_login' %}" class="btn btn-outline-dark">{% trans "Go back to login" %}</a>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-dark">{% trans "Go back to login" %}</a>
                 </p>
             </div>
         </div>
@@ -38,11 +44,11 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const resendLink = document.getElementById('resend-email-link');
         const resendForm = document.getElementById('resend-form');
 
-        resendLink.addEventListener('click', function(e) {
+        resendLink.addEventListener('click', function (e) {
             e.preventDefault();
             resendForm.style.display = resendForm.style.display === 'none' ? 'block' : 'none';
         });

@@ -1,0 +1,63 @@
+<!-- Dashboard -->
+<li>
+    <a class="dropdown-item d-flex align-items-center" href="{% url 'profiles:edit_profile' %}">
+        <span class="menu-icon bg-primary-soft">
+            <i class="fas fa-columns text-primary"></i>
+        </span>
+        <span class="menu-text">Dashboard</span>
+    </a>
+</li>
+
+<!-- Profile -->
+<li>
+    <a class="dropdown-item d-flex align-items-center" href="{% url 'profiles:edit_profile' %}">
+        <span class="menu-icon bg-success-soft">
+            <i class="fas fa-user-edit text-success"></i>
+        </span>
+        <span class="menu-text">Edit Profile</span>
+    </a>
+</li>
+
+<!-- My Learning -->
+<li>
+    <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:my_mentorships' %}">
+        <span class="menu-icon bg-info-soft">
+            <i class="fas fa-graduation-cap text-info"></i>
+        </span>
+        <span class="menu-text">My Learning</span>
+    </a>
+</li>
+
+{% if request.user.profile.is_expert %}
+    <!-- Mentor Dashboard -->
+    <li>
+        <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:expert_dashboard' %}">
+            <span class="menu-icon bg-warning-soft">
+                <i class="fas fa-chalkboard-teacher text-warning"></i>
+            </span>
+            <span class="menu-text">Mentor Dashboard</span>
+        </a>
+    </li>
+{% endif %}
+
+<li><hr class="dropdown-divider"></li>
+
+<!-- Settings -->
+<li>
+    <a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:change_password' %}">
+        <span class="menu-icon bg-secondary-soft">
+            <i class="fas fa-cog text-secondary"></i>
+        </span>
+        <span class="menu-text">Settings</span>
+    </a>
+</li>
+
+<!-- Logout -->
+<li>
+    <a class="dropdown-item d-flex align-items-center text-danger" href="{% url 'accounts:logout' %}">
+        <span class="menu-icon bg-danger-soft">
+            <i class="fas fa-sign-out-alt text-danger"></i>
+        </span>
+        <span class="menu-text">Sign Out</span>
+    </a>
+</li>

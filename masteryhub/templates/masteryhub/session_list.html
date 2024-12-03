@@ -3,62 +3,131 @@
 {% load custom_filters %}
 
 {% block content %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-
-<div class="container mt-5">
+<div class="container mt-5 pt-5">
     <div class="header-content text-center mb-5">
-        <h1 class="display-4 font-weight-bold">Skill-Sharing Sessions</h1>
-        <h2 class="font-weight-light">Connect, Learn, and Grow with Expert-Led 1-on-1 Sessions</h2>
-        <p class="lead">Explore various skill-sharing sessions and register for the ones that interest you.</p>
+        <h1 class="display-4 fw-bold text-primary">Learning Sessions</h1>
+        <h2 class="h3 fw-light text-secondary">Expert-Led Training Sessions</h2>
+        <p class="lead text-muted">Find and join upcoming sessions for your chosen skills.</p>
     </div>
 
-    <div class="row">
-        <div class="col-md-3">
-            <div class="search-section mb-4">
-                <form method="GET" action="{% url 'session_list' %}" class="form-inline">
-                    <input type="text" name="q" class="form-control mr-2" placeholder="Search skill-sharing sessions" value="{{ request.GET.q }}">
-                    <button type="submit" class="btn btn-primary">Search</button>
-                </form>
-            </div>
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <div class="card shadow-sm border-0 rounded-3 sticky-lg-top" style="top: 2rem;">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5 class="card-title mb-3">Search Sessions</h5>
+                        <form method="GET" action="{% url 'masteryhub:session_list' %}">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" name="q" class="form-control border-start-0"
+                                    placeholder="Search sessions..." value="{{ request.GET.q }}">
+                            </div>
+                        </form>
+                    </div>
 
-            <div class="categories-section mb-4">
-                <a href="{% url 'session_list' %}" class="btn btn-outline-secondary btn-block {% if not selected_category %}active{% endif %}">All categories</a>
-                {% for category in categories %}
-                <a href="{% url 'session_list' %}?category={{ category.name|urlencode }}" class="btn btn-outline-secondary btn-block {% if selected_category == category.name %}active{% endif %}">{{ category.name }}</a>
-                {% endfor %}
+                    <h5 class="card-title mb-3">Skill Categories</h5>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'masteryhub:browse_skills' %}"
+                            class="btn btn-outline-primary {% if not selected_category %}active{% endif %}">
+                            <i class="fas fa-th-large me-2"></i>All Categories
+                        </a>
+                        {% for category in categories %}
+                        <a href="{% url 'masteryhub:browse_skills' %}?category={{ category.name|urlencode }}"
+                            class="btn btn-outline-primary {% if selected_category == category.name %}active{% endif %}">
+                            <i class="fas fa-tag me-2"></i>{{ category.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="col-md-9">
-            <div class="row">
+        <div class="col-lg-9">
+            <div class="row g-4">
                 {% for session in sessions %}
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm border-light">
-                        {% if session.image %}
-                        <img class="card-img-top" src="{{ session.image.url }}" 
-                           loading="lazy" alt="{{ session.title }}">
-                        {% else %}
-                        <img class="card-img-top" src="{% static 'images/no-image-available.webp' %}" 
-                             loading="lazy" alt="No Image Available">
-                        {% endif %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm hover-lift border-0 rounded-3">
+                        <div class="position-relative">
+                            <img class="card-img-top"
+                                src="{% if session.skill.image %}{{ session.skill.image.url }}{% else %}{% static 'images/no-image-available.webp' %}{% endif %}"
+                                loading="lazy" alt="{{ session.skill.title }}">
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-primary rounded-pill">
+                                    <i class="fas fa-users me-1"></i>
+                                    {{ session.max_participants|sub:session.participants.count }} spots left
+                                </span>
+                            </div>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title font-weight-bold">{{ session.title }}</h5>
-                            <p class="card-text">{{ session.description|truncatewords:15 }}</p>
-                            <p class="card-text"><small class="text-muted">{{ session.classes_count }} class{{ session.classes_count|pluralize }} ({{ session.total_duration }})</small></p>
-                            <p class="card-text"><small class="text-muted">Available spots: {{ session.max_participants|sub:session.participants.count }}</small></p>
-                            <p class="card-text"><strong class="text-success">${{ session.price }}</strong></p>
-                            <a href="{% url 'view_session' session.id %}" class="btn btn-info btn-block">View Details</a>
-                            <button onclick="addToBag('{{ session.id }}', '{{ session.title }}', '{{ session.price }}')" class="btn btn-primary btn-block mt-2">Add to Bag</button>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary">{{ session.skill.category }}</span>
+                            </div>
+                            <h5 class="card-title fw-bold text-primary">{{ session.title }}</h5>
+                            <p class="card-text text-muted">{{ session.description|truncatewords:15 }}</p>
+
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="{{ session.expert.profile.avatar.url|default:'/static/images/default-avatar.png' }}"
+                                    class="rounded-circle me-2" alt="{{ session.expert.get_full_name }}"
+                                    style="width: 30px; height: 30px; object-fit: cover;">
+                                <div class="small text-muted">
+                                    Expert: {{ session.expert.get_full_name }}
+                                </div>
+                            </div>
+
+                            <div class="session-details mb-3">
+                                <div class="d-flex align-items-center text-muted mb-2">
+                                    <i class="fas fa-clock me-2"></i>
+                                    <span>{{ session.total_duration }}</span>
+                                </div>
+                                <div class="d-flex align-items-center text-muted mb-2">
+                                    <i class="fas fa-calendar me-2"></i>
+                                    <span>Starts {{ session.start_date|date:"M d, Y" }}</span>
+                                </div>
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="fas fa-users me-2"></i>
+                                    <span>{{ session.participants.count }}/{{ session.max_participants }}
+                                        enrolled</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-success fw-bold">${{ session.price }}</span>
+                                <span class="badge bg-{{ session.get_difficulty_badge }}">
+                                    {{ session.get_difficulty_display }}
+                                </span>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'masteryhub:view_session' session_id=session.id %}"
+                                    class="btn btn-outline-primary">
+                                    <i class="fas fa-info-circle me-1"></i>View Details
+                                </a>
+                                {% if user.is_authenticated and not user.is_expert %}
+                                <button
+                                    onclick="addToBag('{{ session.id }}', '{{ session.title }}', '{{ session.price }}')"
+                                    class="btn btn-primary">
+                                    <i class="fas fa-shopping-cart me-1"></i>Add to Bag
+                                </button>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
                 {% empty %}
-                <p class="col-12 text-center">No sessions found.</p>
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>No sessions found matching your criteria.
+                    </div>
+                </div>
                 {% endfor %}
             </div>
         </div>
     </div>
 </div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1050;"></div>
 
 <script>
     function addToBag(sessionId, title, price) {
@@ -74,30 +143,35 @@
                 price: price
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const bagLink = document.querySelector('.nav-link .fa-shopping-bag').closest('a');
-                const totalElement = bagLink.querySelector('p.my-0');
-
-                bagLink.classList.remove('text-black');
-                bagLink.classList.add('text-info', 'font-weight-bold');
-
-                totalElement.textContent = '$' + parseFloat(data.total).toFixed(2);
-               
-                window.location.href = '/checkout/cart/';
-            } else {
-                showToast('Error', 'Error adding session to bag', 'danger');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Error', 'An unexpected error occurred', 'danger');
-        });
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const bagLink = document.querySelector('.nav-link .fa-shopping-bag').closest('a');
+                    const totalElement = bagLink.querySelector('p.my-0');
+                    bagLink.classList.remove('text-black');
+                    bagLink.classList.add('text-info', 'font-weight-bold');
+                    totalElement.textContent = '$' + parseFloat(data.total).toFixed(2);
+                    window.location.href = '/checkout/cart/';
+                } else {
+                    showToast('Error', data.error || 'Error adding session to bag', 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error', 'An unexpected error occurred', 'danger');
+            });
     }
 
     function showToast(title, message, type) {
         const messageContainer = document.querySelector('.toast-container');
+        if (!messageContainer) {
+            console.error('Toast container not found');
+            return;
+        }
+
         const toast = document.createElement('div');
         toast.classList.add('toast', 'custom-toast', 'rounded-0', 'border-top-0');
         toast.setAttribute('role', 'alert');
@@ -105,12 +179,8 @@
         toast.setAttribute('aria-atomic', 'true');
         toast.setAttribute('data-autohide', 'false');
 
-        let bgClass = 'bg-success';
-        let arrowClass = 'arrow-success';
-        if (type === 'danger') {
-            bgClass = 'bg-danger';
-            arrowClass = 'arrow-danger';
-        }
+        const bgClass = type === 'danger' ? 'bg-danger' : 'bg-success';
+        const arrowClass = type === 'danger' ? 'arrow-danger' : 'arrow-success';
 
         toast.innerHTML = `
             <div class="arrow-up ${arrowClass}"></div>

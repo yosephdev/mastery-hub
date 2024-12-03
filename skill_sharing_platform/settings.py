@@ -14,14 +14,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
     (
         "localhost,"
         "127.0.0.1,"
-        "127.0.0.1:8000,"
+        "127.0.0.1:3000,"
         "8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net,"
         ".herokuapp.com"
     ),
@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     "accounts",
     "storages",
     "django_countries",
+    "sslserver",
+    "widget_tweaks",
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
@@ -88,7 +90,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "checkout.context_processors.cart_total",
+                "checkout.context_processors.cart_contents",
             ],
         },
     },
@@ -135,6 +137,10 @@ CSRF_TRUSTED_ORIGINS = [
 
 SITE_ID = 1
 
+# Shopping Cart Settings
+STANDARD_DELIVERY_FEE = 5.99
+FREE_DELIVERY_THRESHOLD = 50.00
+
 # AllAuth settings
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
@@ -152,7 +158,7 @@ ACCOUNT_FORMS = {
 # Login/Logout URLs
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "home:index"
 
 # Social account settings
 SOCIALACCOUNT_PROVIDERS = {
@@ -196,7 +202,8 @@ SOCIALACCOUNT_PROVIDERS = {
 
 SOCIALACCOUNT_GOOGLE_CLIENT_ID = os.getenv("SOCIALACCOUNT_GOOGLE_CLIENT_ID")
 SOCIALACCOUNT_GOOGLE_SECRET = os.getenv("SOCIALACCOUNT_GOOGLE_SECRET")
-SOCIALACCOUNT_FACEBOOK_CLIENT_ID = os.getenv("SOCIALACCOUNT_FACEBOOK_CLIENT_ID")
+SOCIALACCOUNT_FACEBOOK_CLIENT_ID = os.getenv(
+    "SOCIALACCOUNT_FACEBOOK_CLIENT_ID")
 SOCIALACCOUNT_FACEBOOK_SECRET = os.getenv("SOCIALACCOUNT_FACEBOOK_SECRET")
 
 # Email settings (for development)

@@ -1,26 +1,130 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="text-center">Browse Skills</h1>
-    <p class="text-center">Explore a variety of skills offered by our mentors. Click on a skill to learn more or connect with a mentor.</p>
+<div class="container mt-5 pt-5">
+    <div class="header-content text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Explore Skills</h1>
+        <h2 class="font-weight-light text-secondary">Discover skills taught by our expert mentors</h2>
+        <p class="lead">Browse through various skills and find available learning sessions.</p>
+    </div>
 
-    <div class="row">
-        {% for skill in skills %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <div class="card shadow-sm border-0 rounded-3 sticky-lg-top" style="top: 2rem;">
                 <div class="card-body">
-                    <h5 class="card-title">{{ skill.name }}</h5>
-                    <p class="card-text">{{ skill.description }}</p>
-                    <a href="{% url 'search_mentors' %}?q={{ skill.name|urlencode }}" class="btn btn-primary">Find Mentors</a>
+                    <div class="mb-4">
+                        <h5 class="card-title mb-3">Search Skills</h5>
+                        <form method="GET" action="{% url 'masteryhub:browse_skills' %}">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" name="q" class="form-control border-start-0"
+                                    placeholder="Search skills..." value="{{ request.GET.q }}">
+                            </div>
+                        </form>
+                    </div>
+
+                    <h5 class="card-title mb-3">Categories</h5>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'masteryhub:browse_skills' %}"
+                            class="btn btn-outline-primary {% if not selected_category %}active{% endif %}">
+                            <i class="fas fa-th-large me-2"></i>All Categories
+                        </a>
+                        {% for category in categories %}
+                        <a href="{% url 'masteryhub:browse_skills' %}?category={{ category.id }}"
+                            class="btn btn-outline-primary {% if selected_category == category.id|stringformat:'s' %}active{% endif %}">
+                            <i class="fas fa-tag me-2"></i>{{ category.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
-        {% empty %}
-        <div class="col-12">
-            <p class="text-center">No skills available at the moment. Please check back later!</p>
+
+        <div class="col-lg-9">
+            <div class="row g-4">
+                {% for skill in skills %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm hover-lift border-0 rounded-3">
+                        {% if skill.image %}
+                        <img src="{{ skill.image.url }}" class="card-img-top" alt="{{ skill.title }}"
+                            style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span
+                                class="badge {% if skill.available_sessions_count > 0 %}bg-success{% else %}bg-secondary{% endif %} rounded-pill">
+                                <i
+                                    class="fas {% if skill.available_sessions_count > 0 %}fa-check-circle{% else %}fa-clock{% endif %} me-1"></i>
+                                {% if skill.available_sessions_count > 0 %}
+                                {{ skill.available_sessions_count }} Session{{ skill.available_sessions_count|pluralize
+                                }}
+                                {% else %}
+                                No Active Sessions
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-primary">{{ skill.title }}</h5>
+                            <p class="card-text text-muted">{{ skill.description|truncatewords:15 }}</p>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-muted">
+                                    <i class="fas fa-tag me-1"></i>
+                                    {{ skill.category }}
+                                </span>
+                                <span class="text-muted">
+                                    <i class="fas fa-user-tie me-1"></i>
+                                    {{ skill.expert_count }} Expert{{ skill.expert_count|pluralize }}
+                                </span>
+                            </div>
+
+                            <div class="skill-stats mb-3">
+                                <div class="d-flex align-items-center text-muted mb-2">
+                                    <i class="fas fa-users me-2"></i>
+                                    <span>{{ skill.total_students }} Student{{ skill.total_students|pluralize }}</span>
+                                </div>
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="fas fa-star me-2 text-warning"></i>
+                                    <span>{{ skill.average_rating|default:"No ratings yet" }}</span>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                {% if skill.available_sessions_count > 0 %}
+                                <a href="{% url 'masteryhub:session_list' %}?skill={{ skill.id }}"
+                                    class="btn btn-primary">
+                                    <i class="fas fa-calendar-alt me-1"></i>View Available Sessions
+                                </a>
+                                {% else %}
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="fas fa-clock me-1"></i>No Sessions Available
+                                </button>
+                                {% endif %}
+
+                                {% if user.is_expert %}
+                                <a href="{% url 'masteryhub:create_session' skill_id=skill.id %}"
+                                    class="btn btn-outline-primary">
+                                    <i class="fas fa-plus me-1"></i>Create Session
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>No skills found matching your criteria.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
-        {% endfor %}
     </div>
 </div>
+
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1050;"></div>
 {% endblock %}

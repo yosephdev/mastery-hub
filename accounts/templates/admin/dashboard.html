@@ -9,25 +9,27 @@
 {% block content %}
 <div id="content-main">
     <h1 class="h3 mb-4 text-gray-800">{% trans "MasteryHub Administration" %}</h1>
-
     <div class="dashboard-grid">
         <div class="profile-card card text-center">
             <div class="card-body">
-                {% if user.profile.profile_picture %}
-                <img src="{{ user.profile.profile_picture.url }}" loading="lazy" alt="Profile Picture" class="profile-picture">
+                {% if user.profilesprofile.profile_picture %}
+                <img src="{{ user.profilesprofile.profile_picture }}" loading="lazy" alt="Profile Picture"
+                    class="profile-picture">
                 {% else %}
                 <img src="{% static 'images/default_profile.jpg' %}" loading="lazy" alt="Default Profile Picture"
                     class="profile-picture">
                 {% endif %}
+
                 <h3 class="card-title">{{ user.username }}</h3>
-                <p class="text-muted">{{ user.profile.bio|truncatewords:30 }}</p>
+                <p class="text-muted">{{ user.profilesprofile.bio|truncatewords:30|default:"No bio available" }}</p>
+
                 <div class="social-links mt-3">
-                    {% if user.profile.linkedin_profile %}
-                    <a href="{{ user.profile.linkedin_profile }}" target="_blank"
+                    {% if user.profilesprofile.linkedin_profile %}
+                    <a href="{{ user.profilesprofile.linkedin_profile }}" target="_blank"
                         class="btn btn-outline-primary btn-sm">LinkedIn</a>
                     {% endif %}
-                    {% if user.profile.github_profile %}
-                    <a href="{{ user.profile.github_profile }}" target="_blank"
+                    {% if user.profilesprofile.github_profile %}
+                    <a href="{{ user.profilesprofile.github_profile }}" target="_blank"
                         class="btn btn-outline-dark btn-sm">GitHub</a>
                     {% endif %}
                 </div>
@@ -39,11 +41,13 @@
                 <h3>{% trans "Actions" %}</h3>
                 <ul>
                     <li><a href="{% url 'admin:index' %}">{% trans "Django Admin" %}</a></li>
-                    <li><a href="{% url 'admin_dashboard' %}">{% trans "Custom Admin Dashboard" %}</a></li>
-                    <li><a href="{% url 'manage_mentorship_requests' %}">{% trans "Manage Mentorship Requests" %}</a>
-                    </li>
-                    <li><a href="{% url 'view_profile' username=user.username %}">{% trans "View User Profile" %}</a>
-                    </li>
+                    <li><a href="{% url 'admin:admin_dashboard' %}">{% trans "Custom Admin Dashboard" %}</a></li>
+                    {% if user.profilesprofile.is_expert %}
+                    <li><a href="{% url 'masteryhub:manage_mentorship_requests' %}">{% trans "Manage Mentorship
+                            Requests" %}</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'profiles:view_profile' username=user.username %}">{% trans "View User Profile"
+                            %}</a></li>
                     <li><a href="{% url 'account_logout' %}">{% trans "Logout" %}</a></li>
                 </ul>
             </div>

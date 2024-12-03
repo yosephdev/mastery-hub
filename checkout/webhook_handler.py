@@ -2,10 +2,9 @@ from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
-
-from .models import Order, Payment, Session, Profile
-
-import json
+from masteryhub.models import Session
+from checkout.models import Order, Payment
+from profiles.models import Profile
 import time
 import stripe
 
@@ -43,17 +42,16 @@ class StripeWH_Handler:
         """
         intent = event.data.object
         pid = intent.id
-        session_id = intent.metadata.session_id
-        save_info = intent.metadata.save_info
+        session_id = intent.metadata.get('session_id')
+        save_info = intent.metadata.get('save_info', False)
 
         stripe_charge = stripe.Charge.retrieve(intent.latest_charge)
-
         billing_details = stripe_charge.billing_details
         grand_total = round(stripe_charge.amount / 100, 2)
 
         profile = None
-        username = intent.metadata.username
-        if username != "AnonymousUser":
+        username = intent.metadata.get('username')
+        if username and username != "AnonymousUser":
             profile = Profile.objects.get(user__username=username)
             if save_info:
                 profile.default_phone_number = billing_details.phone

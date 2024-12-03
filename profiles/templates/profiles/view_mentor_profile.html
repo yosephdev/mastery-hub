@@ -2,15 +2,15 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 pt-5">
     <div class="row">
         <div class="col-md-4">
             {% if profile.profile_picture %}
-            <img src="{{ profile.profile_picture.url }}" loading="lazy" 
-               alt="{{ profile.user.username }}" class="img-fluid rounded-circle mb-3">
+            <img src="{{ profile.profile_picture.url }}" loading="lazy" alt="{{ profile.user.username }}"
+                class="img-fluid rounded-circle mb-3">
             {% else %}
-            <img src="{% static 'images/default_profile.webp' %}" loading="lazy" 
-                alt="{{ profile.user.username }}" class="img-fluid rounded-circle mb-3">
+            <img src="{% static 'images/default_profile.webp' %}" loading="lazy" alt="{{ profile.user.username }}"
+                class="img-fluid rounded-circle mb-3">
             {% endif %}
         </div>
         <div class="col-md-8">
@@ -44,9 +44,9 @@
             {% endif %}
 
             {% if is_own_profile %}
-            <a href="{% url 'edit_profile' %}" class="btn btn-warning">Edit Profile</a>
+            <a href="{% url 'profiles:edit_profile' %}" class="btn btn-warning">Edit Profile</a>
             {% else %}
-            <a href="{% url 'request_mentorship' mentor_id=profile.id %}" class="btn btn-success">Request Mentorship</a>
+            <a href="{% url 'masteryhub:request_mentorship' mentor_id=profile.id %}" class="btn btn-success">Request Mentorship</a>
             {% endif %}
         </div>
     </div>

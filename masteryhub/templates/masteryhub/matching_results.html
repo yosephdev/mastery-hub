@@ -2,30 +2,121 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="matching-results">
-        <h1>Matching Results</h1>
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Your Mentor Matches</h2>
+                <a href="{% url 'masteryhub:mentor_matching' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-sliders-h me-2"></i>Adjust Preferences
+                </a>
+            </div>
+        </div>
+
         {% if matches %}
-        <div class="row">
-            {% for match in matches %}
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ match.mentor.username }}</h5>
-                        <p>Skill Match: {{ match.skill_match }}</p>
-                        <p>Goal Match: {{ match.goal_match }}</p>
-                        <p>Total Match: {{ match.total_match }}</p>
-                        <a href="{% url 'view_profile' match.mentor.username %}" class="btn btn-primary">View Profile</a>
-                        <a href="{% url 'request_mentorship' match.mentor.id %}" class="btn btn-secondary">Request
-                            Mentorship</a>
+        {% for match in matches %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm hover-lift">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ match.mentor.profile_picture.url|default:'/static/images/default-avatar.png' }}"
+                            alt="{{ match.mentor.user.username }}" class="rounded-circle me-3" width="60" height="60">
+                        <div>
+                            <h5 class="card-title mb-1">{{ match.mentor.user.get_full_name }}</h5>
+                            <div class="text-warning">
+                                {% with ''|center:match.mentor.avg_rating as range %}
+                                {% for _ in range %}
+                                <i class="fas fa-star"></i>
+                                {% endfor %}
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="match-scores mb-3">
+                        <div class="progress mb-2" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                style="width: {{ match.skill_match }}%" aria-valuenow="{{ match.skill_match }}"
+                                aria-valuemin="0" aria-valuemax="100" data-bs-toggle="tooltip"
+                                title="Skill Match: {{ match.skill_match }}%">
+                            </div>
+                        </div>
+                        <div class="progress mb-2" style="height: 10px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ match.style_match }}%"
+                                aria-valuenow="{{ match.style_match }}" aria-valuemin="0" aria-valuemax="100"
+                                data-bs-toggle="tooltip" title="Teaching Style Match: {{ match.style_match }}%">
+                            </div>
+                        </div>
+                        <div class="progress mb-2" style="height: 10px;">
+                            <div class="progress-bar bg-primary" role="progressbar"
+                                style="width: {{ match.availability_match }}%"
+                                aria-valuenow="{{ match.availability_match }}" aria-valuemin="0" aria-valuemax="100"
+                                data-bs-toggle="tooltip" title="Availability Match: {{ match.availability_match }}%">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span>Overall Match:</span>
+                            <span class="fw-bold">{{ match.total_match }}%</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-2">Skills:</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for skill in match.mentor.user.skills.all %}
+                            <span class="badge bg-light text-dark">{{ skill.title }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'masteryhub:view_mentor_profile' match.mentor.user.username %}"
+                            class="btn btn-outline-primary">
+                            <i class="fas fa-user me-2"></i>View Mentor Profile
+                        </a>
+                        <a href="{% url 'request_mentorship' match.mentor.user.username %}" class="btn btn-primary">
+                            <i class="fas fa-handshake me-2"></i>Request Mentorship
+                        </a>
                     </div>
                 </div>
             </div>
-            {% endfor %}
         </div>
+        {% endfor %}
         {% else %}
-        <p>No matches found.</p>
+        <div class="col-12">
+            <div class="text-center py-5">
+                <img src="{% static 'images/no-matches.svg' %}" alt="No matches found" class="img-fluid mb-4"
+                    style="max-width: 250px;">
+                <h4>No Matches Found</h4>
+                <p class="text-muted mb-4">We couldn't find any mentors matching your criteria.</p>
+                <a href="{% url 'masteryhub:mentor_matching' %}" class="btn btn-primary">
+                    <i class="fas fa-redo me-2"></i>Try Different Preferences
+                </a>
+            </div>
+        </div>
         {% endif %}
     </div>
 </div>
+
+{% block extra_css %}
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15) !important;
+    }
+
+    .progress {
+        background-color: #e9ecef;
+        border-radius: 1rem;
+    }
+
+    .progress-bar {
+        border-radius: 1rem;
+    }
+</style>
+{% endblock %}
 {% endblock %}
