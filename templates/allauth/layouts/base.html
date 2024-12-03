@@ -31,10 +31,10 @@
                                 <a href="{{ email_url }}">{% trans "Change Email" %}</a>
                             </li>
                         {% endif %}
-                        {% url 'account_change_password' as change_password_url %}
-                        {% if change_password_url %}
+                        {% url 'accounts:password_change' as password_change_url %}
+                        {% if password_change_url %}
                             <li>
-                                <a href="{{ change_password_url }}">{% trans "Change Password" %}</a>
+                                <a href="{{ password_change_url }}">{% trans "Change Password" %}</a>
                             </li>
                         {% endif %}
                         {% url 'mfa_index' as mfa_url %}
