@@ -14,94 +14,6 @@ def index(request):
     """
     A view to return the index page for the home app
     """
-    return render(request, "home/index.html")
-
-
-def home(request):
-    """A view that handles the home page."""
-    return render(request, "home/index.html")
-
-
-def about(request):
-    """A view that handles the about page."""
-    return render(request, "home/about.html")
-
-
-def contact(request):
-    """A view that handles the contact page."""
-    return render(request, "home/contact.html")
-
-
-def contact_view(request):
-    """A view that handles the contact form submission."""
-    if request.method == "POST":
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data["name"]
-            email = form.cleaned_data["email"]
-            message = form.cleaned_data["message"]
-
-            try:
-                send_mail(
-                    f"Message from {name} via MasteryHub",
-                    message,
-                    email,
-                    [settings.DEFAULT_FROM_EMAIL],
-                    fail_silently=False,
-                )
-            except BadHeaderError:
-                return HttpResponse("Invalid header found.")
-            except Exception as e:
-                return HttpResponse(f"Error sending email: {e}")
-
-            request.session["message_sent"] = True
-            return redirect("home:contact")
-    else:
-        form = ContactForm()
-
-    message_sent = request.session.pop("message_sent", False)
-
-    return render(
-        request,
-        "home/contact.html",
-        {"form": form, "message_sent": message_sent},
-    )
-
-
-def search(request):
-    """A view that handles search functionality."""
-    query = request.GET.get("q", "").strip()
-    profiles = []
-    sessions = []
-    error_message = ""
-
-    if query:
-        try:
-            profiles = Profile.objects.filter(
-                Q(user__username__icontains=query) | Q(skills__icontains=query)
-            )
-            sessions = Session.objects.filter(
-                Q(title__icontains=query) | Q(description__icontains=query)
-            )
-
-            if not profiles and not sessions:
-                error_message = "No results found for your search."
-        except Exception as e:
-            error_message = f"An error occurred during the search: {str(e)}"
-    else:
-        error_message = "Please enter a search term."
-
-    context = {
-        "query": query,
-        "profiles": profiles,
-        "sessions": sessions,
-        "error_message": error_message,
-    }
-    return render(request, "home/search_results.html", context)
-
-
-def home_view(request):
-    """A view that handles the home page content including carousel, mentors, and testimonials."""
     slides = [
         {
             'image': 'https://skill-sharing.s3.amazonaws.com/static/images/hero-bg-1.webp',
@@ -316,4 +228,82 @@ def home_view(request):
         'featured_testimonials': testimonials[:3],
     }
 
-    return render(request, 'home/index.html', context)
+    return render(request, "home/index.html", context)
+
+
+def about(request):
+    """A view that handles the about page."""
+    return render(request, "home/about.html")
+
+
+def contact(request):
+    """A view that handles the contact page."""
+    return render(request, "home/contact.html")
+
+
+def contact_view(request):
+    """A view that handles the contact form submission."""
+    if request.method == "POST":
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data["name"]
+            email = form.cleaned_data["email"]
+            message = form.cleaned_data["message"]
+
+            try:
+                send_mail(
+                    f"Message from {name} via MasteryHub",
+                    message,
+                    email,
+                    [settings.DEFAULT_FROM_EMAIL],
+                    fail_silently=False,
+                )
+            except BadHeaderError:
+                return HttpResponse("Invalid header found.")
+            except Exception as e:
+                return HttpResponse(f"Error sending email: {e}")
+
+            request.session["message_sent"] = True
+            return redirect("home:contact")
+    else:
+        form = ContactForm()
+
+    message_sent = request.session.pop("message_sent", False)
+
+    return render(
+        request,
+        "home/contact.html",
+        {"form": form, "message_sent": message_sent},
+    )
+
+
+def search(request):
+    """A view that handles search functionality."""
+    query = request.GET.get("q", "").strip()
+    profiles = []
+    sessions = []
+    error_message = ""
+
+    if query:
+        try:
+            profiles = Profile.objects.filter(
+                Q(user__username__icontains=query) | Q(skills__icontains=query)
+            )
+            sessions = Session.objects.filter(
+                Q(title__icontains=query) | Q(description__icontains=query)
+            )
+
+            if not profiles and not sessions:
+                error_message = "No results found for your search."
+        except Exception as e:
+            error_message = f"An error occurred during the search: {str(e)}"
+    else:
+        error_message = "Please enter a search term."
+
+    context = {
+        "query": query,
+        "profiles": profiles,
+        "sessions": sessions,
+        "error_message": error_message,
+    }
+    return render(request, "home/search_results.html", context)
