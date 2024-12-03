@@ -38,7 +38,8 @@ def become_mentor(request):
                     action_flag=ADDITION,
                     change_message=areas_of_expertise,
                 )
-            messages.success(request, "Your mentor application has been submitted successfully.")
+            messages.success(
+                request, "Your mentor application has been submitted successfully.")
             return redirect("home:index")
     else:
         form = MentorApplicationForm()
@@ -81,7 +82,7 @@ def search_mentors(request):
     skills = request.GET.getlist('skills')
     rating = request.GET.get('rating')
     available_now = request.GET.get('available_now')
-   
+
     mentors = Mentor.objects.all()
 
     if query:
@@ -89,11 +90,11 @@ def search_mentors(request):
             Q(user__first_name__icontains=query) |
             Q(user__last_name__icontains=query) |
             Q(bio__icontains=query) |
-            Q(user__skills__title__icontains=query)
+            Q(skills__title__icontains=query)
         ).distinct()
 
     if skills:
-        mentors = mentors.filter(user__skills__id__in=skills).distinct()
+        mentors = mentors.filter(skills__id__in=skills).distinct()
 
     if rating:
         mentors = mentors.filter(rating__gte=rating)
@@ -101,7 +102,6 @@ def search_mentors(request):
     if available_now:
         mentors = mentors.filter(is_available=True)
 
-    # Query all skills
     all_skills = Skill.objects.all()
 
     context = {
@@ -120,13 +120,14 @@ def request_mentorship(request, mentor_id):
     mentee_profile = get_object_or_404(Profile, user=request.user)
 
     if not mentor_profile.is_available:
-        messages.error(request, f"{mentor_user.username} is not currently accepting mentorship requests.")
+        messages.error(
+            request, f"{mentor_user.username} is not currently accepting mentorship requests.")
         return redirect("view_mentor_profile", username=mentor_user.username)
 
     if request.method == "POST":
         mentorship, created = Mentorship.objects.get_or_create(
             mentor=mentor_profile, mentee=mentee_profile, status="pending"
-        )    
+        )
         if created:
             message = f"Mentorship request sent to {mentor_user.username}"
         else:
@@ -142,7 +143,8 @@ def request_mentorship(request, mentor_id):
 def manage_mentorship_requests(request):
     """A view that handles the mentorship request management."""
     mentor_profile = get_object_or_404(Profile, user=request.user)
-    pending_requests = Mentorship.objects.filter(mentor=mentor_profile, status="pending")
+    pending_requests = Mentorship.objects.filter(
+        mentor=mentor_profile, status="pending")
     return render(request, "masteryhub/manage_mentorship_requests.html", {"pending_requests": pending_requests})
 
 
@@ -154,7 +156,8 @@ def session_list(request):
     sessions = Session.objects.filter(status="scheduled")
 
     if query:
-        sessions = sessions.filter(Q(title__icontains=query) | Q(description__icontains=query))
+        sessions = sessions.filter(
+            Q(title__icontains=query) | Q(description__icontains=query))
 
     if selected_category:
         sessions = sessions.filter(category__name=selected_category)
@@ -179,7 +182,7 @@ def list_mentors(request):
     areas = request.GET.getlist('areas')
     rating = request.GET.get('rating')
     available_now = request.GET.get('available_now')
-    
+
     mentors = Profile.objects.filter(is_expert=True)
 
     if query:
@@ -216,18 +219,18 @@ def mentor_matching_view(request):
     """A view that handles mentor matching based on multiple criteria."""
     categories = Category.objects.all()
     skills = Skill.objects.all()
-    
-    if request.method == 'POST':        
+
+    if request.method == 'POST':
         learning_goal = request.POST.get('learning_goal')
         experience_level = request.POST.get('experience_level')
         learning_style = request.POST.get('learning_style')
         availability = request.POST.get('availability')
-        budget = request.POST.get('budget')        
-      
+        budget = request.POST.get('budget')
+
         mentors = Profile.objects.filter(is_expert=True).annotate(
             student_count=Count('mentorships_as_mentor')
         )
-       
+
         budget_ranges = {
             'low': (0, 50),
             'medium': (51, 100),
@@ -238,23 +241,25 @@ def mentor_matching_view(request):
             mentors = mentors.filter(
                 user__skills__price__range=(min_price, max_price)
             ).distinct()
-       
+
         if learning_goal:
             mentors = mentors.filter(
                 Q(sessions_hosted__category_id=learning_goal) |
                 Q(user__skills__category=learning_goal)
             ).distinct()
-        
+
         matched_mentors = []
-        for mentor in mentors:          
+        for mentor in mentors:
             mentor_reviews = Review.objects.filter(
                 session__host=mentor
             ).aggregate(avg_rating=Avg('rating'))
             avg_rating = mentor_reviews['avg_rating'] or 0
-           
-            relevant_skills = mentor.user.skills.filter(category=learning_goal).count() if learning_goal else 0
+
+            relevant_skills = mentor.user.skills.filter(
+                category=learning_goal).count() if learning_goal else 0
             total_skills = mentor.user.skills.count()
-            skill_match = (relevant_skills / total_skills * 100) if total_skills > 0 else 0
+            skill_match = (relevant_skills / total_skills *
+                           100) if total_skills > 0 else 0
 
             match_score = {
                 'mentor': mentor,
@@ -262,15 +267,15 @@ def mentor_matching_view(request):
                 'style_match': 80,
                 'availability_match': 90,
                 'rating_score': (avg_rating / 5) * 100
-            }            
-           
+            }
+
             total_match = (
                 match_score['skill_match'] * 0.35 +
                 match_score['style_match'] * 0.25 +
                 match_score['availability_match'] * 0.20 +
                 match_score['rating_score'] * 0.20
             )
-            
+
             matched_mentors.append({
                 'mentor': mentor,
                 'total_match': round(total_match, 1),
@@ -278,14 +283,14 @@ def mentor_matching_view(request):
                 'style_match': match_score['style_match'],
                 'availability_match': match_score['availability_match']
             })
-       
+
         matched_mentors.sort(key=lambda x: x['total_match'], reverse=True)
-        
+
         return render(request, 'masteryhub/matching_results.html', {
-            'matches': matched_mentors[:10], 
+            'matches': matched_mentors[:10],
             'form_submitted': True
-        })    
-   
+        })
+
     context = {
         'categories': categories,
         'skills': skills,
@@ -343,7 +348,8 @@ def create_session(request):
 @login_required
 def edit_session(request, session_id):
     """A view that handles editing an existing session."""
-    session = get_object_or_404(Session, id=session_id, host=request.user.profile)
+    session = get_object_or_404(
+        Session, id=session_id, host=request.user.profile)
     if request.method == "POST":
         form = SessionForm(request.POST, instance=session)
         if form.is_valid():
@@ -358,7 +364,8 @@ def edit_session(request, session_id):
 @login_required
 def delete_session(request, session_id):
     """A view that handles deleting a session."""
-    session = get_object_or_404(Session, id=session_id, host=request.user.profile)
+    session = get_object_or_404(
+        Session, id=session_id, host=request.user.profile)
     if request.method == "POST":
         session.delete()
         messages.success(request, "Session deleted successfully.")
@@ -372,7 +379,8 @@ def create_feedback(request, session_id):
     session = get_object_or_404(Session, id=session_id)
     if request.method == "POST":
         feedback_content = request.POST.get("feedback")
-        Feedback.objects.create(session=session, user=request.user.profile, content=feedback_content)
+        Feedback.objects.create(
+            session=session, user=request.user.profile, content=feedback_content)
         messages.success(request, "Thank you for your feedback!")
         return redirect("masteryhub:view_session", session_id=session_id)
     return render(request, "masteryhub/create_feedback.html", {"session": session})
@@ -476,7 +484,8 @@ def report_concern(request):
         form = ConcernReportForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, "Your concern has been reported. We will review it shortly.")
+            messages.success(
+                request, "Your concern has been reported. We will review it shortly.")
             return redirect("home:index")
     else:
         form = ConcernReportForm()
@@ -492,29 +501,29 @@ def book_session(request, session_id):
         if form.is_valid():
             booking = form.save(commit=False)
             booking.session = session
-            booking.user = request.user  
-            booking.booking_date = timezone.now()  
-            booking.save()           
-            return redirect('booking_success')  
+            booking.user = request.user
+            booking.booking_date = timezone.now()
+            booking.save()
+            return redirect('booking_success')
     else:
         form = BookingForm()
     return render(request, 'masteryhub/book_session.html', {'form': form, 'session': session})
 
 
-def browse_skills_view(request):   
+def browse_skills_view(request):
     """A view that handles browsing skills."""
     query = request.GET.get("q")
     selected_category = request.GET.get("category")
-   
-    skills = Skill.objects.select_related('category').all()    
- 
+
+    skills = Skill.objects.select_related('category').all()
+
     categories = Category.objects.filter(
         skills__isnull=False
     ).distinct().order_by('name')
 
     if query:
         skills = skills.filter(
-            Q(title__icontains=query) | 
+            Q(title__icontains=query) |
             Q(description__icontains=query)
         )
 
@@ -523,14 +532,14 @@ def browse_skills_view(request):
             category_id = int(selected_category)
             skills = skills.filter(category_id=category_id)
         except (ValueError, TypeError):
-            pass  
+            pass
 
     context = {
         "skills": skills,
         "categories": categories,
         "selected_category": selected_category,
     }
-    
+
     return render(request, 'masteryhub/browse_skills.html', context)
 
 
@@ -548,9 +557,9 @@ def create_review(request, session_id):
         if form.is_valid():
             review = form.save(commit=False)
             review.session = session
-            review.reviewer = request.user.profile  
+            review.reviewer = request.user.profile
             review.save()
-            return redirect('review_list') 
+            return redirect('review_list')
     else:
         form = ReviewForm()
     return render(request, 'reviews/create_review.html', {'form': form, 'session': session})
@@ -558,13 +567,14 @@ def create_review(request, session_id):
 
 @login_required
 def expert_dashboard(request):
-    """A view that displays the expert's dashboard with relevant information."""    
+    """A view that displays the expert's dashboard with relevant information."""
     profile = get_object_or_404(Profile, user=request.user)
-  
+
     mentees = Mentorship.objects.filter(mentor=profile)
 
-    upcoming_sessions = Session.objects.filter(host=profile, status="scheduled")
-  
+    upcoming_sessions = Session.objects.filter(
+        host=profile, status="scheduled")
+
     feedbacks = Feedback.objects.filter(session__host=profile)
 
     context = {
@@ -580,7 +590,7 @@ def expert_dashboard(request):
 @login_required
 def mentee_dashboard(request):
     """A view that displays the mentee's dashboard with relevant information."""
-    mentee_profile = request.user.profile  
+    mentee_profile = request.user.profile
     mentorships = Mentorship.objects.filter(mentee=mentee_profile)
     sessions = Session.objects.filter(participants=mentee_profile)
 
@@ -596,36 +606,38 @@ def mentee_dashboard(request):
 def accept_mentorship(request, mentorship_id):
     """A view that allows a mentor to accept a mentorship request."""
     mentorship = get_object_or_404(Mentorship, id=mentorship_id)
-    
+
     if request.user == mentorship.mentor.user:
-        mentorship.status = 'accepted'  
-        mentorship.save()        
+        mentorship.status = 'accepted'
+        mentorship.save()
         messages.success(request, "Mentorship request accepted successfully.")
     else:
-        messages.error(request, "You are not authorized to accept this request.")
+        messages.error(
+            request, "You are not authorized to accept this request.")
 
-    return redirect('manage_mentorship_requests')  
+    return redirect('manage_mentorship_requests')
 
 
 @login_required
 def reject_mentorship(request, mentorship_id):
     """A view that allows a mentor to reject a mentorship request."""
     mentorship = get_object_or_404(Mentorship, id=mentorship_id)
-   
+
     if request.user == mentorship.mentor.user:
-        mentorship.status = 'rejected'  
-        mentorship.save()        
+        mentorship.status = 'rejected'
+        mentorship.save()
         messages.success(request, "Mentorship request rejected successfully.")
     else:
-        messages.error(request, "You are not authorized to reject this request.")
+        messages.error(
+            request, "You are not authorized to reject this request.")
 
-    return redirect('manage_mentorship_requests') 
+    return redirect('manage_mentorship_requests')
 
 
 @login_required
 def my_mentorships(request):
     """A view that displays the current user's mentorships."""
-    mentorships = Mentorship.objects.filter(mentee=request.user.profile)  
+    mentorships = Mentorship.objects.filter(mentee=request.user.profile)
 
     context = {
         'mentorships': mentorships,
