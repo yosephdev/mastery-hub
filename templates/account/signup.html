@@ -44,9 +44,12 @@
                         {% endif %}
 
                         <div class="d-flex justify-content-between align-items-center mt-4">
-                            <a class="btn btn-outline-dark btn-lg" href="{% url 'account_login' %}">{% trans "Back to
-                                Login" %}</a>
-                            <button type="submit" class="btn btn-primary btn-lg">{% trans "Sign Up" %}</button>
+                            <a class="btn btn-outline-dark btn-lg" href="{% url 'accounts:login' %}">
+                                {% trans "Back to Login" %}
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                {% trans "Sign Up" %}
+                            </button>
                         </div>
                     </form>
                 </div>
