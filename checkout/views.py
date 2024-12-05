@@ -12,6 +12,9 @@ import stripe
 from django.http import JsonResponse
 import logging
 import uuid
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.db import transaction
 
 from profiles.models import Profile
 from masteryhub.models import Session
@@ -169,58 +172,59 @@ def pricing(request):
     return render(request, 'checkout/pricing.html', context)
 
 
+@login_required
+@require_POST
 def increase_quantity(request, item_id):
-    """A view that increases the quantity of an item in the cart."""
-    if request.method == 'POST':
-        cart_item = get_object_or_404(
-            CartItem, id=item_id, cart__user=request.user)
+    cart_item = get_object_or_404(
+        CartItem, id=item_id, cart__user=request.user)
+    if not cart_item.session.is_full():
         cart_item.quantity += 1
         cart_item.save()
         messages.success(
-            request, f'Updated quantity of {cart_item.session.title}')
-        return redirect('checkout:view_cart')
+            request, f"Increased quantity for {cart_item.session.title}.")
+    else:
+        messages.error(request, "Cannot add more. The session is full.")
+    return redirect('checkout:view_cart')
 
 
+@login_required
+@require_POST
 def decrease_quantity(request, item_id):
-    """A view that decreases the quantity of an item in the cart."""
-    if request.method == 'POST':
-        cart_item = get_object_or_404(
-            CartItem, id=item_id, cart__user=request.user)
-        if cart_item.quantity > 1:
-            cart_item.quantity -= 1
-            cart_item.save()
-            messages.success(
-                request, f'Updated quantity of {cart_item.session.title}')
-        else:
-            cart_item.delete()
-            messages.success(
-                request, f'Removed {cart_item.session.title} from cart')
-        return redirect('checkout:view_cart')
-
-
-def remove_from_cart(request, item_id):
-    """A view that removes an item from the cart."""
-    if request.method == 'POST':
-        cart_item = get_object_or_404(
-            CartItem, id=item_id, cart__user=request.user)
-        session_title = cart_item.session.title
+    cart_item = get_object_or_404(
+        CartItem, id=item_id, cart__user=request.user)
+    if cart_item.quantity > 1:
+        cart_item.quantity -= 1
+        cart_item.save()
+        messages.success(
+            request, f"Decreased quantity for {cart_item.session.title}.")
+    else:
         cart_item.delete()
-        messages.success(request, f'Removed {session_title} from cart')
-        return redirect('checkout:view_cart')
+        messages.success(
+            request, f"Removed {cart_item.session.title} from your cart.")
+    return redirect('checkout:view_cart')
 
 
+@login_required
+@require_POST
+def remove_from_cart(request, item_id):
+    cart_item = get_object_or_404(
+        CartItem, id=item_id, cart__user=request.user)
+    cart_item.delete()
+    messages.success(
+        request, f"Removed {cart_item.session.title} from your cart.")
+    return redirect('checkout:view_cart')
+
+
+@login_required
 def checkout(request):
     """A view that displays the checkout page."""
     stripe_public_key = settings.STRIPE_PUBLIC_KEY
     stripe_secret_key = settings.STRIPE_SECRET_KEY
+    stripe.api_key = stripe_secret_key
 
     if not stripe_public_key:
         messages.warning(request, 'Stripe public key is missing.')
         return redirect('checkout:view_cart')
-
-    if not request.user.is_authenticated:
-        messages.error(request, 'Please log in to proceed with checkout.')
-        return redirect('account_login')
 
     try:
         cart = Cart.objects.get(user=request.user)
@@ -246,56 +250,57 @@ def checkout(request):
                         order=order,
                         session=cart_item.session,
                         quantity=cart_item.quantity,
-                        price=cart_item.session.price
+                        price=cart_item.get_cost
                     )
                 cart.items.all().delete()
+
+                if 'payment_intent_id' in request.session:
+                    del request.session['payment_intent_id']
+
                 return redirect('checkout_success', order_number=order.order_number)
         else:
             order_form = OrderForm()
 
             try:
-                if grand_total <= 0:
-                    messages.error(request, 'Invalid cart total.')
-                    return redirect('checkout:view_cart')
+                intent = None
+                if 'payment_intent_id' in request.session:
+                    intent = stripe.PaymentIntent.retrieve(
+                        request.session['payment_intent_id']
+                    )
+                    if intent.amount != int(grand_total * 100):
+                        intent = stripe.PaymentIntent.modify(
+                            intent.id,
+                            amount=int(grand_total * 100)
+                        )
 
-                cart_items_string = ", ".join([
-                    f"{item.session.title} (x{item.quantity})"
-                    for item in cart.items.all()
-                ])
-
-                print(f"Creating PaymentIntent for: {grand_total}")
-                print(f"Cart Items: {cart_items_string}")
-
-                intent = stripe.PaymentIntent.create(
-                    amount=int(grand_total * 100),
-                    currency=settings.STRIPE_CURRENCY,
-                    metadata={
-                        'username': request.user.username,
-                        'cart_items': cart_items_string,
-                        'order_total': f"${grand_total:.2f}"
-                    },
-                    automatic_payment_methods={
-                        'enabled': True,
-                    },
-                )
-
-                client_secret = intent.client_secret
-
-                if not client_secret:
-                    raise ValueError("Failed to generate Stripe client secret")
+                if not intent:
+                    intent = stripe.PaymentIntent.create(
+                        amount=int(grand_total * 100),
+                        currency=settings.STRIPE_CURRENCY,
+                        capture_method='automatic',
+                        metadata={
+                            'username': request.user.username,
+                            'cart_items': ", ".join([
+                                f"{item.session.title} (x{item.quantity})"
+                                for item in cart.items.all()
+                            ]),
+                            'order_total': f"${grand_total:.2f}"
+                        },
+                        automatic_payment_methods={
+                            'enabled': True,
+                        },
+                    )
+                    request.session['payment_intent_id'] = intent.id
+                    print("Client Secret:", intent.client_secret)
 
             except stripe.error.StripeError as e:
-                print(f"Stripe Error Details: {e}")
                 messages.error(request, f'Payment processing error: {str(e)}')
-                return redirect('checkout:view_cart')
-            except ValueError as e:
-                messages.error(request, str(e))
                 return redirect('checkout:view_cart')
 
             context = {
                 'order_form': order_form,
-                'stripe_public_key': stripe_public_key.strip('"'),
-                'client_secret': intent.client_secret.strip('"'),
+                'stripe_public_key': stripe_public_key,
+                'client_secret': intent.client_secret,
                 'cart': cart,
                 'total_price': total_price,
                 'grand_total': grand_total,
@@ -310,53 +315,50 @@ def checkout(request):
 def cart_total_view(user):
     """A view that calculates the total price of items in the user's cart."""
     cart = get_object_or_404(Cart, user=user)
-    total = sum(item.session.price *
+    total = sum(item.get_cost *
                 item.quantity for item in cart.items.all())
     return total
 
 
+@login_required
+@require_POST
 def add_to_cart(request, session_id):
-    """A view that adds a session to the cart."""
-    if request.method == 'POST':
-        if not request.user.is_authenticated:
-            return JsonResponse({'success': False, 'error': 'User is not authenticated.'}, status=403)
-        try:
-            session = get_object_or_404(Session, id=session_id)
-            cart, created = Cart.objects.get_or_create(user=request.user)
-            cart_item, item_created = CartItem.objects.get_or_create(
-                cart=cart,
-                session=session,
-                defaults={'quantity': 1}
-            )
-            if not item_created:
-                return JsonResponse({'success': False, 'error': f'{session.title} is already in your cart.'})
-            total = calculate_cart_total(request.user)
-            return JsonResponse({
-                'success': True,
-                'total': total,
-                'cart_count': cart.items.count()
-            })
-        except Exception as e:
-            logger.error(f"Error adding to cart: {e}")
-            return JsonResponse({'success': False, 'error': str(e)}, status=500)
-    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+    try:
+        session = Session.objects.get(id=session_id)
+
+        if session.is_full():
+            return JsonResponse({'success': False, 'error': 'Session is full'}, status=400)
+
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart, session=session)
+
+        if not created:
+            cart_item.quantity += 1
+            cart_item.save()
+
+        total = cart.get_total_price()
+
+        return JsonResponse({'success': True, 'total': float(total)})
+    except Session.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Session not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
+@login_required
 def view_cart(request):
     """View to display the user's cart."""
-    if not request.user.is_authenticated:
-        return redirect('account_login')
-
     cart = get_object_or_404(Cart, user=request.user)
-    cart_items = cart.items.all()
+    cart_items = cart.items.select_related('session').all()
     total_items = cart_items.count()
-    total_price = sum(item.session.price *
-                      item.quantity for item in cart_items)
+    grand_total = cart.get_total_price()
 
     context = {
         'cart': cart,
+        'cart_items': cart_items,
         'total_items': total_items,
-        'grand_total': total_price,
+        'grand_total': grand_total,
     }
     return render(request, 'checkout/cart.html', context)
 
@@ -436,7 +438,7 @@ def cache_checkout_data(request):
 def calculate_cart_total(user):
     """A view that calculates the total price of items in the user's cart."""
     cart = get_object_or_404(Cart, user=user)
-    total = sum(item.session.price *
+    total = sum(item.get_cost *
                 item.quantity for item in cart.items.all())
     return total
 
@@ -479,7 +481,7 @@ def cart_contents_view(request):
         try:
             cart = Cart.objects.get(user=request.user)
             cart_items = cart.items.all()
-            total = sum(item.session.price *
+            total = sum(item.get_cost *
                         item.quantity for item in cart_items)
             item_count = cart_items.count()
         except Cart.DoesNotExist:
@@ -492,3 +494,61 @@ def cart_contents_view(request):
     }
 
     return render(request, 'checkout/cart_contents.html', context)
+
+
+@csrf_exempt
+def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+        )
+        # Handle different event types
+        if event.type == 'payment_intent.succeeded':
+            payment_intent = event.data.object
+            handle_payment_success(payment_intent)
+        
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+@transaction.atomic
+def process_order(order, cart):
+    # Create order
+    order.save()
+    
+    # Create line items
+    for cart_item in cart.items.all():
+        OrderLineItem.objects.create(
+            order=order,
+            session=cart_item.session,
+            quantity=cart_item.quantity,
+            price=cart_item.get_cost
+        )
+    
+    # Clear cart
+    cart.items.all().delete()
+
+
+def check_session_availability(cart):
+    for item in cart.items.all():
+        if item.session.is_full():
+            raise ValidationError(f"Session {item.session.title} is now full")
+
+
+def handle_payment_success(payment_intent):
+    # Get order using payment intent ID
+    order = Order.objects.get(stripe_pid=payment_intent.id)
+    order.payment_status = 'COMPLETED'
+    order.save()
+
+   
+def create_payment_intent(amount, currency='usd'):
+    payment_intent = stripe.PaymentIntent.create(
+        amount=amount,
+        currency=currency,
+    )
+    return payment_intent.client_secret

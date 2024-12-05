@@ -30,7 +30,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ session.title }}</h5>
                     <p>{{ session.description }}</p>
-                    <p><strong>Price:</strong> ${{ session.price }}</p>
+                    <p><strong>Price:</strong> ${{ get_cost }}</p>
                     <p><strong>Duration:</strong> {{ session.duration }} hours</p>
                     <p><strong>Available Spots:</strong> {{ session.available_spots }}</p>
                     <a href="{% url 'masteryhub:book_session' session_id=session.id %}" class="btn btn-primary">Book

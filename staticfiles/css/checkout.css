@@ -1,109 +1,111 @@
-/* Basic styles for Stripe Elements */
+/* Stripe Elements and Input Styles */
 .StripeElement,
 .stripe-style-input {
-  box-sizing: border-box;
-  height: 40px;
-  padding: 10px 12px;
-  border: 1px solid transparent;
-  border-radius: 0px;
-  background-color: white;
-  box-shadow: 0 1px 3px 0 #e6ebf1;
-  -webkit-transition: box-shadow 150ms ease;
-  transition: box-shadow 150ms ease;
+    box-sizing: border-box;
+    height: 40px;
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 150ms ease, border-color 150ms ease;
 }
 
 .StripeElement--focus,
 .stripe-style-input:focus,
 .stripe-style-input:active {
-  box-shadow: 0 1px 3px 0 #cfd7df;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    border-color: #80bdff;
+    outline: none;
 }
 
 .StripeElement--webkit-autofill {
-  background-color: #fefde5 !important;
+    background-color: #fefde5 !important;
 }
 
 .stripe-style-input::placeholder {
-  color: #aab7c4;
+    color: #aab7c4;
 }
 
-/* Fieldset label styling */
-.fieldset-label {
-  position: relative;
-  right: 0.5rem;
-}
-
-/* General form control and card element styles */
-#payment-form .form-control,
-#card-element {
-  color: #000;
-  border: 1px solid #000;
-}
-
-select,
-select option {
-  color: #000000;
-}
-
-select:invalid,
-select option[value=""] {
-  color: #aab7c4 !important;
-}
-
+/* Loading Overlay */
 #loading-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(23, 162, 184, .85);
-  z-index: 9999;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(23, 162, 184, 0.85);
+    z-index: 9999;
 }
 
 .loading-spinner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
 }
 
-/* Cart checkout */
+/* List Group Item */
 .list-group-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: background-color 150ms ease;
 }
 
 .list-group-item.flex-md-row {
-  flex-direction: row;
-  text-align: left;
+    flex-direction: row;
+    text-align: left;
 }
 
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Button Group */
 .btn-group {
-  display: flex;
+    display: flex;
 }
 
 .btn-group form {
-  margin: 0 5px;
+    margin: 0 5px;
 }
 
+/* Card Styles */
 .card {
-  margin-top: 20px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
-.container {
-  margin-top: 50px;
-}
-
-.btn-outline-danger { 
-  color: red;
-  border: 1px solid black !important;
+/* Button Styles */
+.btn-outline-danger {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    transition: background-color 150ms ease, color 150ms ease;
 }
 
 .btn-outline-danger:hover {
-  background-color: red;
-  color: white;
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.btn-outline-dark {
+    color: #343a40;
+    border: 1px solid #343a40;
+    transition: background-color 150ms ease, color 150ms ease;
+}
+
+.btn-outline-dark:hover {
+    background-color: #343a40;
+    color: #fff;
 }

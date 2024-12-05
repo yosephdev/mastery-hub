@@ -1,0 +1,163 @@
+/* Carousel Styles */
+.carousel-item {
+    height: 400px;
+}
+
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.carousel-indicators {
+    z-index: 2;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Sign-up Section */
+.bg-gradient {
+    background: linear-gradient(45deg, #2193b0, #6dd5ed);
+}
+
+.text-white-75 {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+
+
+/* Skill Cards */
+.skill-image-wrapper {
+    position: relative;
+    padding-top: 56.25%;
+    overflow: hidden;
+}
+
+.skill-image-wrapper img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.skill-overlay {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Mentor Cards */
+.mentor-card {
+    transition: transform 0.3s ease;
+    background: white;
+    border: none;
+}
+
+.hover-scale:hover {
+    transform: translateY(-5px);
+}
+
+.mentor-image-wrapper {
+    position: relative;
+    padding-top: 100%;
+    overflow: hidden;
+}
+
+.mentor-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.mentor-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    color: white;
+}
+
+.mentor-stats {
+    font-size: 0.9rem;
+}
+
+.mentor-stats .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Testimonial Cards */
+.testimonial-card {
+    transition: transform 0.3s ease;
+}
+
+.hover-float:hover {
+    transform: translateY(-5px);
+}
+
+.testimonial-avatar {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+}
+
+.testimonial-text {
+    font-style: italic;
+    color: #666;
+}
+
+/* CTA Section */
+.cta-section {
+    background: linear-gradient(45deg, #2193b0, #6dd5ed);
+}
+
+.cta-buttons .btn {
+    transition: all 0.3s ease;
+}
+
+.cta-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.process-card,
+.skill-card,
+.mentor-card,
+.testimonial-card {
+    animation: fadeInUp 0.6s ease backwards;
+}

@@ -4,15 +4,19 @@ from django_countries.fields import CountryField
 from django.db import models
 from masteryhub.models import Session
 from profiles.models import Profile
+from datetime import timedelta
+
 
 class Payment(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True)
-    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True, blank=True)
+    session = models.ForeignKey(
+        Session, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.user.username} - {self.amount} on {self.date}"
+
 
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -24,16 +28,22 @@ class Cart(models.Model):
     def get_total_price(self):
         return sum(item.get_cost() for item in self.items.all())
 
+
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    cart = models.ForeignKey(Cart, related_name='items',
+                             on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
+    class Meta:
+        unique_together = ('cart', 'session')
+
     def __str__(self):
-        return f"{self.quantity} of {self.session.title} in cart"
+        return f"{self.quantity} of {self.session.title}"
 
     def get_cost(self):
-        return self.quantity * self.session.price
+        return self.session.price * self.quantity
+
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -49,7 +59,8 @@ class Order(models.Model):
     country = CountryField(blank_label="Country *", null=False, blank=False)
     phone_number = models.CharField(max_length=20)
     order_total = models.DecimalField(max_digits=10, decimal_places=2)
-    delivery_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    delivery_cost = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0)
     grand_total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def _generate_order_number(self):
@@ -67,7 +78,8 @@ class Order(models.Model):
 
 
 class OrderLineItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='lineitems')
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name='lineitems')
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2)

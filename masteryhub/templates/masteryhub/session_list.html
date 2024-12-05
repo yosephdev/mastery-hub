@@ -93,7 +93,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="text-success fw-bold">${{ session.price }}</span>
+                                <span class="text-success fw-bold">${{ get_cost }}</span>
                                 <span class="badge bg-{{ session.get_difficulty_badge }}">
                                     {{ session.get_difficulty_display }}
                                 </span>
@@ -106,7 +106,7 @@
                                 </a>
                                 {% if user.is_authenticated and not user.is_expert %}
                                 <button
-                                    onclick="addToBag('{{ session.id }}', '{{ session.title }}', '{{ session.price }}')"
+                                    onclick="addToBag('{{ session.id }}', '{{ session.title }}', '{{ get_cost }}')"
                                     class="btn btn-primary">
                                     <i class="fas fa-shopping-cart me-1"></i>Add to Bag
                                 </button>
@@ -143,26 +143,25 @@
                 price: price
             })
         })
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    const bagLink = document.querySelector('.nav-link .fa-shopping-bag').closest('a');
-                    const totalElement = bagLink.querySelector('p.my-0');
-                    bagLink.classList.remove('text-black');
-                    bagLink.classList.add('text-info', 'font-weight-bold');
-                    totalElement.textContent = '$' + parseFloat(data.total).toFixed(2);
-                    window.location.href = '/checkout/cart/';
-                } else {
-                    showToast('Error', data.error || 'Error adding session to bag', 'danger');
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the cart total in the navigation bar
+                const cartTotalElement = document.querySelector('.cart-total');
+                if (cartTotalElement) {
+                    cartTotalElement.textContent = '$' + parseFloat(data.total).toFixed(2);
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('Error', 'An unexpected error occurred', 'danger');
-            });
+
+                // Optionally, show a success toast
+                showToast('Success', 'Session added to your cart!', 'success');
+            } else {
+                showToast('Error', data.error || 'Error adding session to cart', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error', 'An unexpected error occurred', 'danger');
+        });
     }
 
     function showToast(title, message, type) {
@@ -177,7 +176,7 @@
         toast.setAttribute('role', 'alert');
         toast.setAttribute('aria-live', 'assertive');
         toast.setAttribute('aria-atomic', 'true');
-        toast.setAttribute('data-autohide', 'false');
+        toast.setAttribute('data-bs-autohide', 'false');
 
         const bgClass = type === 'danger' ? 'bg-danger' : 'bg-success';
         const arrowClass = type === 'danger' ? 'arrow-danger' : 'arrow-success';
@@ -186,10 +185,8 @@
             <div class="arrow-up ${arrowClass}"></div>
             <div class="w-100 toast-capper ${bgClass}"></div>
             <div class="toast-header bg-white text-dark">
-                <strong class="mr-auto">${title}!</strong>
-                <button type="button" class="ml-2 mb-1 close text-dark" data-dismiss="toast" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <strong class="me-auto">${title}!</strong>
+                <button type="button" class="btn-close text-dark" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body bg-white">
                 ${message}

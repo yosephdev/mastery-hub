@@ -164,14 +164,14 @@ def session_list(request):
 
     categories = Category.objects.all()
 
-    for session in sessions:
-        print(f"Session ID: {session.id}, Price: {session.price}")
+    session_prices = {session.id: session.price for session in sessions}
 
     context = {
         "sessions": sessions,
         "categories": categories,
         "selected_category": selected_category,
         "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
+        "session_prices": session_prices,
     }
 
     return render(request, "masteryhub/session_list.html", context)

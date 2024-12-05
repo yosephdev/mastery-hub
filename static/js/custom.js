@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    setupInfiniteScroll();
     setupDynamicSearch();
     setupLazyLoading();
     setupFormValidation();
@@ -17,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function () {
     setupHeaderScrollEffect();
 });
 
-// Toast Initialization Function
 function initializeToasts() {
     try {
         const toastElList = [].slice.call(document.querySelectorAll('.toast'));
@@ -28,7 +26,6 @@ function initializeToasts() {
     }
 }
 
-// Announcement Carousel Function
 function initializeAnnouncementCarousel() {
     const announcements = [
         "Follow your dream!&nbsp;&nbsp;<i class='fa-solid fa-trophy text-warning'></i>",
