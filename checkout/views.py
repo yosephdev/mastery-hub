@@ -250,7 +250,7 @@ def checkout(request):
                         order=order,
                         session=cart_item.session,
                         quantity=cart_item.quantity,
-                        price=cart_item.get_cost
+                        price=cart_item.get_cost()
                     )
                 cart.items.all().delete()
 
@@ -291,9 +291,11 @@ def checkout(request):
                         },
                     )
                     request.session['payment_intent_id'] = intent.id
-                    print("Client Secret:", intent.client_secret)
+                    logger.info(f"Created payment intent: {intent.id}")
+                    print("Debug - View Client Secret:", intent.client_secret)
 
             except stripe.error.StripeError as e:
+                logger.error(f'Stripe error: {str(e)}')
                 messages.error(request, f'Payment processing error: {str(e)}')
                 return redirect('checkout:view_cart')
 
@@ -305,6 +307,7 @@ def checkout(request):
                 'total_price': total_price,
                 'grand_total': grand_total,
             }
+            print("Debug - View Client Secret:", intent.client_secret)
             return render(request, 'checkout/checkout.html', context)
 
     except Cart.DoesNotExist:
@@ -500,16 +503,15 @@ def cart_contents_view(request):
 def stripe_webhook(request):
     payload = request.body
     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
-    
+
     try:
         event = stripe.Webhook.construct_event(
             payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
         )
-        # Handle different event types
         if event.type == 'payment_intent.succeeded':
             payment_intent = event.data.object
             handle_payment_success(payment_intent)
-        
+
         return JsonResponse({'status': 'success'})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
@@ -517,10 +519,8 @@ def stripe_webhook(request):
 
 @transaction.atomic
 def process_order(order, cart):
-    # Create order
     order.save()
-    
-    # Create line items
+
     for cart_item in cart.items.all():
         OrderLineItem.objects.create(
             order=order,
@@ -528,8 +528,7 @@ def process_order(order, cart):
             quantity=cart_item.quantity,
             price=cart_item.get_cost
         )
-    
-    # Clear cart
+
     cart.items.all().delete()
 
 
@@ -540,12 +539,11 @@ def check_session_availability(cart):
 
 
 def handle_payment_success(payment_intent):
-    # Get order using payment intent ID
     order = Order.objects.get(stripe_pid=payment_intent.id)
     order.payment_status = 'COMPLETED'
     order.save()
 
-   
+
 def create_payment_intent(amount, currency='usd'):
     payment_intent = stripe.PaymentIntent.create(
         amount=amount,
