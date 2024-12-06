@@ -139,4 +139,4 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 
 
 class CustomPasswordResetCompleteView(PasswordResetCompleteView):
-    template_name = 'account/password_reset_from_key_done.html'
+    template_name = 'account/password_reset_complete.html'
