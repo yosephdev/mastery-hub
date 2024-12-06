@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "stripe",
     "crispy_forms",
-    "crispy_bootstrap4",
+    "crispy_bootstrap5",
     "storages",
     "django_countries",
     "sslserver",
@@ -216,3 +216,7 @@ TEMPLATES = [
         },
     },
 ]
+
+# Crispy Forms Settings
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
