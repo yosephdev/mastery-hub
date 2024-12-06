@@ -11,6 +11,8 @@ from masteryhub.models import (
     Session, Category, Mentorship, Review, Forum,
     Feedback, ConcernReport, Skill, Booking, LearningGoal
 )
+from django.contrib.sites.models import Site
+from allauth.socialaccount.models import SocialApp, SocialAccount, SocialToken
 
 # Register your models here.
 
@@ -297,6 +299,33 @@ class CategoryAdmin(admin.ModelAdmin):
     """Category model admin."""
     list_display = ('name', 'description')
     search_fields = ('name', 'description')
+
+
+@admin.register(Site, site=admin_site)
+class SiteAdmin(admin.ModelAdmin):
+    list_display = ['domain', 'name']
+    search_fields = ['domain', 'name']
+
+
+@admin.register(SocialApp, site=admin_site)
+class SocialAppAdmin(admin.ModelAdmin):
+    list_display = ['name', 'provider', 'client_id']
+    search_fields = ['name', 'provider']
+    list_filter = ['provider']
+
+
+@admin.register(SocialAccount, site=admin_site)
+class SocialAccountAdmin(admin.ModelAdmin):
+    list_display = ['user', 'provider', 'uid']
+    search_fields = ['user__username', 'uid']
+    list_filter = ['provider']
+
+
+@admin.register(SocialToken, site=admin_site)
+class SocialTokenAdmin(admin.ModelAdmin):
+    list_display = ['app', 'account', 'expires_at']
+    search_fields = ['account__user__username']
+    list_filter = ['app', 'expires_at']
 
 
 admin.site = admin_site

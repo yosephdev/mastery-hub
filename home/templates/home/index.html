@@ -68,11 +68,14 @@
                     <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg mx-2 mb-3 mb-md-0">
                         <i class="fas fa-user-plus mr-2"></i> Sign Up Free
                     </a>
-                    {% if social_auth_google_enabled %}
-                    <a href="{% provider_login_url 'google' %}" class="btn btn-outline-light btn-lg mx-2">
-                        <i class="fab fa-google mr-2"></i> Continue with Google
-                    </a>
-                    {% endif %}
+                    {% get_providers as socialaccount_providers %}
+                    {% for provider in socialaccount_providers %}
+                        {% if provider.id == 'google' %}
+                            <a href="{% provider_login_url 'google' %}" class="btn btn-outline-light btn-lg mx-2">
+                                <i class="fab fa-google mr-2"></i> Continue with Google
+                            </a>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -308,9 +311,14 @@
                     <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg mr-3 px-4">
                         Get Started Free
                     </a>
-                    <a href="{% provider_login_url 'google' %}" class="btn btn-outline-light btn-lg px-4">
-                        <i class="fab fa-google mr-2"></i> Sign up with Google
-                    </a>
+                    {% get_providers as socialaccount_providers %}
+                    {% for provider in socialaccount_providers %}
+                        {% if provider.id == 'google' %}
+                            <a href="{% provider_login_url 'google' %}" class="btn btn-outline-light btn-lg px-4">
+                                <i class="fab fa-google mr-2"></i> Sign up with Google
+                            </a>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>
