@@ -21,7 +21,7 @@
             {% endblocktrans %}
           </p>
 
-          <form method="post" action="{% url 'accounts:confirm_email' confirmation.key %}" class="text-center">
+          <form method="post" action="{% url 'account_confirm_email' confirmation.key %}" class="text-center">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary">{% trans "Confirm" %}</button>
           </form>

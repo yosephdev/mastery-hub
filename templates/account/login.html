@@ -36,7 +36,7 @@
           <p class="text-center">{% trans "No social login providers are available." %}</p>
           {% endif %}
 
-          <form class="login" method="POST" action="{% url 'accounts:login' %}">
+          <form class="login" method="POST" action="{% url 'account_login' %}">
             {% csrf_token %}
             {{ form|crispy }}
             {% if redirect_field_value %}
@@ -48,9 +48,9 @@
             </div>
           </form>
           <div class="text-center mt-4">
-            <a href="{% url 'accounts:reset_password' %}">{% trans "Forgot Password?" %}</a>
+            <a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
             <p class="text-center mb-4">{% trans "Don't have an account?" %}
-              <a href="{% url 'accounts:signup' %}">{% trans "Sign up" %}</a>
+              <a href="{% url 'account_signup' %}">{% trans "Sign up" %}</a>
             </p>
           </div>
         </div>

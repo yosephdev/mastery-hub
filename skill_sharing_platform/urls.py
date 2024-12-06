@@ -28,7 +28,7 @@ urlpatterns = [
     path('checkout/', include('checkout.urls', namespace='checkout')),
     path('profiles/', include('profiles.urls', namespace='profiles')),
     path('masteryhub/', include('masteryhub.urls', namespace='masteryhub')),
-    path("", include("home.urls", namespace='home')),
+    path('', include(('home.urls', 'home'), namespace='home')),
 ]
 
 if settings.DEBUG:

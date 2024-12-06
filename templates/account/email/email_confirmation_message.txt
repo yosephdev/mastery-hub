@@ -1,7 +1,12 @@
 {% extends "account/email/base_message.txt" %}
-{% load account %}
-{% load i18n %}
+{% load account %}{% user_display user as user_display %}{% load i18n %}{% autoescape off %}{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}Hello from {{ site_name }}!
 
-{% block content %}{% autoescape off %}{% user_display user as user_display %}{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}You're receiving this email because user {{ user_display }} has given your email address to register an account on {{ site_domain }}.
+You're receiving this email because user {{ user_display }} has given this as an email address to connect their account.
 
-To confirm this is correct, go to {{ activate_url }}{% endblocktrans %}{% endautoescape %}{% endblock content %}
+To confirm this is correct, go to:
+{{ activate_url }}
+
+If you did not request this email you can safely ignore it.
+
+Thank you from {{ site_name }}!
+{{ site_domain }}{% endblocktrans %}{% endautoescape %}

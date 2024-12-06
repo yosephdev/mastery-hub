@@ -1,4 +1,4 @@
 {% load i18n %}
 {% autoescape off %}
-{% blocktrans %}Account Already Exists{% endblocktrans %}
+{% blocktrans %}MasteryHub - Account Already Exists{% endblocktrans %}
 {% endautoescape %}

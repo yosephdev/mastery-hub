@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
@@ -146,10 +146,18 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
 ACCOUNT_USERNAME_MIN_LENGTH = 4
+ACCOUNT_EMAIL_SUBJECT_PREFIX = '[MasteryHub] '
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_CONFIRMATION_COOLDOWN = 180
+ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "/"
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "/accounts/login/"
+ACCOUNT_MAX_EMAIL_ADDRESSES = 2
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 
 ACCOUNT_FORMS = {
     "signup": "accounts.forms.CustomSignupForm",
@@ -206,17 +214,24 @@ SOCIALACCOUNT_FACEBOOK_CLIENT_ID = os.getenv(
     "SOCIALACCOUNT_FACEBOOK_CLIENT_ID")
 SOCIALACCOUNT_FACEBOOK_SECRET = os.getenv("SOCIALACCOUNT_FACEBOOK_SECRET")
 
-# Email settings (for development)
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# Email Configuration
+if DEBUG:
+    # Development email settings
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    EMAIL_HOST = "localhost"
+    EMAIL_PORT = 1025
+else:
+    # Production email settings
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = "smtp.gmail.com"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
-# Email settings (for production)
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER")
+# Common email settings
+DEFAULT_FROM_EMAIL = f"MasteryHub <{os.getenv('EMAIL_HOST_USER', 'noreply@masteryhub.com')}>"
+SERVER_EMAIL = os.getenv('EMAIL_HOST_USER', 'server@masteryhub.com')
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -355,3 +370,7 @@ LOGGING = {
         },
     },
 }
+
+# Site settings
+SITE_NAME = 'MasteryHub'
+SITE_DOMAIN = 'localhost:8000' if DEBUG else 'skill-sharing-446c0336ffb5.herokuapp.com'

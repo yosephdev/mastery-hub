@@ -107,8 +107,25 @@ class CustomLogoutView(LogoutView):
 
 class CustomPasswordResetView(PasswordResetView):
     template_name = 'account/password_reset.html'
-    email_template_name = 'account/password_reset_email.html'
-    success_url = reverse_lazy('accounts:reset_password_done')
+    email_template_name = 'account/email/password_reset_key_message.txt'
+    success_url = reverse_lazy('accounts:password_reset_done')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'site_name': 'MasteryHub',
+            'domain': '127.0.0.1:8000' if self.request.is_secure() else '127.0.0.1:8000',
+            'protocol': 'https' if self.request.is_secure() else 'http',
+        })
+        return context
+
+    def form_valid(self, form):
+        self.extra_email_context = {
+            'site_name': 'MasteryHub',
+            'domain': '127.0.0.1:8000' if self.request.is_secure() else '127.0.0.1:8000',
+            'protocol': 'https' if self.request.is_secure() else 'http',
+        }
+        return super().form_valid(form)
 
 
 class CustomPasswordResetDoneView(PasswordResetDoneView):
@@ -117,9 +134,9 @@ class CustomPasswordResetDoneView(PasswordResetDoneView):
 
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
     template_name = 'account/password_reset_from_key.html'
-    success_url = reverse_lazy('accounts:reset_password_complete')
+    success_url = reverse_lazy('accounts:password_reset_complete')
     form_class = CustomSetPasswordForm
 
 
 class CustomPasswordResetCompleteView(PasswordResetCompleteView):
-    template_name = 'account/password_reset_complete.html'
+    template_name = 'account/password_reset_from_key_done.html'

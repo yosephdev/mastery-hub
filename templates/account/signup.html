@@ -13,15 +13,15 @@
                 <div class="card-body p-5">
                     <h2 class="text-center mb-4">Join us for Free</h2>
                     <p class="text-center mb-4">
-                        Already have an account? <a href="{% url 'accounts:login' %}" class="text-success">Log in</a>
+                        Already have an account? <a href="{% url 'account_login' %}" class="text-success">Log in</a>
                     </p>
                     <div class="mb-3">
-                        <a href="/accounts/google/login/?process=signup" class="btn btn-outline-dark w-100 mb-3">
+                        <a href="{% url 'google_login' %}?process=signup" class="btn btn-outline-dark w-100 mb-3">
                             <i class="fab fa-google" aria-hidden="true"></i> Sign up with Google
                         </a>
                     </div>
                     <p class="text-center">or MasteryHub account.</p>
-                    <form class="signup" id="signup_form" method="post" action="{% url 'accounts:signup' %}">
+                    <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
                         {% csrf_token %}
                         {{ form|crispy }}
 
@@ -44,7 +44,7 @@
                         {% endif %}
 
                         <div class="d-flex justify-content-between align-items-center mt-4">
-                            <a class="btn btn-outline-dark btn-lg" href="{% url 'accounts:login' %}">
+                            <a class="btn btn-outline-dark btn-lg" href="{% url 'account_login' %}">
                                 {% trans "Back to Login" %}
                             </a>
                             <button type="submit" class="btn btn-primary btn-lg">

@@ -28,16 +28,16 @@ urlpatterns = [
     # Password Reset
     path("password/reset/",
          CustomPasswordResetView.as_view(),
-         name="reset_password"),
+         name="password_reset"),
     path("password/reset/done/",
          CustomPasswordResetDoneView.as_view(),
-         name="reset_password_done"),
-    path("password/reset/key/<uidb64>/<token>/",
+         name="password_reset_done"),
+    path("password/reset/<uidb64>/<token>/",
          CustomPasswordResetConfirmView.as_view(),
-         name="reset_password_confirm"),
+         name="password_reset_confirm"),
     path("password/reset/complete/",
          CustomPasswordResetCompleteView.as_view(),
-         name="reset_password_complete"),
+         name="password_reset_complete"),
 
     # Admin Dashboard
     path("admin/dashboard/",
