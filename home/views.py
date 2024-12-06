@@ -3,9 +3,10 @@ from django.core.mail import send_mail, BadHeaderError
 from django.conf import settings
 from django.http import HttpResponse
 from django.db.models import Q
-from masteryhub.models import Mentorship, Session
+from masteryhub.models import Session
 from profiles.models import Profile
 from .forms import ContactForm
+from allauth.socialaccount.models import SocialApp
 
 # Create your views here.
 
@@ -14,6 +15,8 @@ def index(request):
     """
     A view to return the index page for the home app
     """
+    social_auth_google_enabled = SocialApp.objects.filter(provider='google').exists()
+    
     slides = [
         {
             'image': 'https://skill-sharing.s3.amazonaws.com/static/images/hero-bg-1.webp',
@@ -226,6 +229,7 @@ def index(request):
         'categories': categories,
         'featured_mentors': mentors[:4],
         'featured_testimonials': testimonials[:3],
+        'social_auth_google_enabled': social_auth_google_enabled,
     }
 
     return render(request, "home/index.html", context)
