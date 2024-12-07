@@ -1,11 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Q
 from .models import Profile
-from .forms import CustomUserChangeForm, ProfileForm 
+from .forms import ProfileForm
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserChangeForm
 
 # Create your views here.
 
@@ -52,29 +50,40 @@ def view_profile(request, username=None):
 @login_required
 def edit_profile(request):
     """Edit the user's profile."""
+    # Get or create profile
+    profile, created = Profile.objects.get_or_create(
+        user=request.user,
+        defaults={
+            'bio': '',
+            'skills': '',
+            'goals': '',
+            'experience': '',
+            'achievements': '',
+            'mentorship_areas': '',
+            'availability': '',
+            'preferred_mentoring_method': '',
+            'is_available': True
+        }
+    )
+
     if request.method == 'POST':
-        user_form = CustomUserChangeForm(request.POST, instance=request.user)
-        profile_form = ProfileForm(
-            request.POST, 
-            request.FILES, 
-            instance=request.user.profile
-        )
-        
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            messages.success(request, 'Your profile was successfully updated!')
-            return redirect('profiles:view_profiles')
-        else:
-            messages.error(request, 'Please correct the errors below.')
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('profile')
     else:
-        user_form = CustomUserChangeForm(instance=request.user)
-        profile_form = ProfileForm(instance=request.user.profile)
+        form = ProfileForm(instance=profile)
 
     context = {
-        'user_form': user_form,
-        'profile_form': profile_form,
+        'form': form,
+        'profile': profile,
+        'created': created
     }
+
+    if created:
+        messages.info(request, 'A new profile has been created for you. Please fill in your details.')
+
     return render(request, 'profiles/edit_profile.html', context)
 
 

@@ -94,8 +94,8 @@ h6 {
     box-shadow: var(--box-shadow);
 }
 
-.card-header {  
-    background: linear-gradient(45deg, #2193b0, #6dd5ed) !important;  
+.card-header {
+    background: linear-gradient(45deg, #2193b0, #6dd5ed) !important;
 }
 
 /* Navigation */
@@ -217,7 +217,6 @@ h6 {
 
 .hover-lift:hover {
     transform: translateY(-5px);
-    box-shadow: var(--box-shadow);
 }
 
 /* Animations */
@@ -604,6 +603,7 @@ h6 {
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -619,6 +619,7 @@ h6 {
         transform: translateX(0);
         opacity: 1;
     }
+
     to {
         transform: translateX(100%);
         opacity: 0;

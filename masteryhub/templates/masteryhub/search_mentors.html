@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_js %}
+<script src="{% static 'js/search.js' %}"></script>
+{% endblock %}
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 
@@ -11,37 +14,47 @@
                 <div class="card-body">
                     <h5 class="card-title mb-3">Filter Mentors</h5>
                     <form method="GET" id="filter-form">
-                        <input type="hidden" name="q" value="{{ request.GET.q }}">
                         <div class="mb-3">
                             <label class="form-label fw-bold">Skills</label>
                             {% for skill in skills %}
                             <div class="form-check">
-                                <input type="checkbox" name="skills" value="{{ skill.id }}" class="form-check-input"
-                                    id="skill-{{ skill.id }}" {% if skill.id|stringformat:"s" in request.GET.skills|default:'' %}checked{% endif %}>
-                                <label class="form-check-label" for="skill-{{ skill.id }}">{{ skill.title }}</label>
+                                <input type="checkbox" 
+                                       name="skills" 
+                                       value="{{ skill.id }}" 
+                                       class="form-check-input" 
+                                       id="skill-{{ skill.id }}"
+                                       {% if skill.id|stringformat:"s" in selected_skills %}checked{% endif %}>
+                                <label class="form-check-label" for="skill-{{ skill.id }}">
+                                    {{ skill.title }}
+                                </label>
                             </div>
                             {% endfor %}
                         </div>
-
+                    
                         <div class="mb-3">
                             <label class="form-label fw-bold">Minimum Rating</label>
                             <select name="rating" class="form-select">
                                 <option value="">Any Rating</option>
-                                <option value="4" {% if request.GET.rating == "4" %}selected{% endif %}>4+ Stars</option>
-                                <option value="3" {% if request.GET.rating == "3" %}selected{% endif %}>3+ Stars</option>
-                                <option value="2" {% if request.GET.rating == "2" %}selected{% endif %}>2+ Stars</option>
+                                <option value="4" {% if selected_rating == "4" %}selected{% endif %}>4+ Stars</option>
+                                <option value="3" {% if selected_rating == "3" %}selected{% endif %}>3+ Stars</option>
+                                <option value="2" {% if selected_rating == "2" %}selected{% endif %}>2+ Stars</option>
                             </select>
                         </div>
-
+                    
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Availability</label>
                             <div class="form-check">
-                                <input type="checkbox" name="available_now" class="form-check-input" id="available-now"
-                                    {% if request.GET.available_now %}checked{% endif %}>
-                                <label class="form-check-label" for="available-now">Available Now</label>
+                                <input type="checkbox" 
+                                       name="available_now" 
+                                       value="true"
+                                       class="form-check-input" 
+                                       id="available-now"
+                                       {% if available_now %}checked{% endif %}>
+                                <label class="form-check-label" for="available-now">
+                                    Available Now
+                                </label>
                             </div>
                         </div>
-
+                    
                         <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
                     </form>
                 </div>
@@ -91,14 +104,18 @@
                     <div class="card h-100 shadow-sm hover-lift" data-aos="fade-up">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
-                                <img src="{{ mentor.user.profile.avatar.url|default:'/static/images/default-avatar.png' }}"
-                                    alt="{{ mentor.user.username }}" class="rounded-circle me-3" width="60" height="60">
+                                <img src="{% static 'images/default-avatar.png' %}"
+                                alt="{{ mentor.user.username }}" 
+                                class="rounded-circle me-3" 
+                                    width="60"
+                                    height="60">
                                 <div>
-                                    <h5 class="card-title mb-1">{{
-                                        mentor.user.get_full_name|default:mentor.user.username }}</h5>
+                                    <h5 class="card-title mb-1"> 
+                                        {{ mentor.user.first_name }} {{ mentor.user.last_name }}
+                                    </h5>
                                     <p class="text-muted mb-0">
                                         <i class="fas fa-star text-warning"></i>
-                                        {{ mentor.rating|default:"New Mentor" }}
+                                        {{ mentor.rating|floatformat:1 }}
                                     </p>
                                 </div>
                             </div>
@@ -106,10 +123,20 @@
                             <div class="mb-3">
                                 <h6 class="text-muted mb-2">Expertise Areas:</h6>
                                 <div class="d-flex flex-wrap gap-2">
-                                    {% for area in mentor.mentorship_areas.all %}
-                                    <span class="badge bg-light text-dark">{{ area }}</span>
+                                    {% for skill in mentor.skills.all %}
+                                    <span class="badge bg-light text-dark">{{ skill.title }}</span>
                                     {% endfor %}
                                 </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-2">Experience Level:</h6>
+                                <span class="badge bg-info">{{ mentor.experience_level|title }}</span>
+                            </div>
+            
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-2">Hourly Rate:</h6>
+                                <span class="text-primary fw-bold">${{ mentor.hourly_rate }}/hour</span>
                             </div>
 
                             <p class="card-text">{{ mentor.bio|truncatewords:30 }}</p>
@@ -120,15 +147,12 @@
                                     {% if mentor.is_available %}
                                     <span class="ms-1">Available Now</span>
                                     {% else %}
-                                    <span class="ms-1">Next available: {{ mentor.next_available_slot|default:"Not
-                                        specified" }}</span>
+                                    <span class="ms-1">Currently Unavailable</span>
                                     {% endif %}
                                 </div>
                                 <div class="btn-group">
-                                    <a href="{% url 'profiles:view_mentor_profile' mentor.user.username %}"
-                                        class="btn btn-outline-primary">View Mentor Profile</a>
                                     <a href="{% url 'masteryhub:request_mentorship' mentor_id=mentor.user.id %}"
-                                        class="btn btn-primary">Request Mentorship</a>
+                                    class="btn btn-primary">Request Mentorship</a>
                                 </div>
                             </div>
                         </div>

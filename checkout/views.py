@@ -197,8 +197,8 @@ def add_to_cart(request, session_id):
         }, status=404)
 
 
-@method_decorator(cache_page(60 * 5))
-@method_decorator(vary_on_cookie)
+@cache_page(60 * 5)
+@vary_on_cookie
 def pricing(request):
     """Cached view for pricing information."""
     pricing_plans = cache.get('pricing_plans')
@@ -239,7 +239,7 @@ def pricing(request):
 
     context = {
         'pricing_plans': pricing_plans,
-        'user_plan': request.user.profile.subscription_plan if request.user.is_authenticated else None
+        'is_authenticated': request.user.is_authenticated
     }
     return render(request, 'checkout/pricing.html', context)
 

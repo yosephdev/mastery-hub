@@ -5,7 +5,15 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.models import User
-from .forms import MentorApplicationForm, ConcernReportForm, BookingForm, ReviewForm, SessionForm, ForumPostForm
+from .forms import (
+    MentorApplicationForm, 
+    ConcernReportForm, 
+    BookingForm, 
+    ReviewForm, 
+    SessionForm, 
+    ForumPostForm,
+    MentorshipRequestForm
+)
 from .models import Feedback, Session, Category, Mentorship, Forum, Review, Skill, Mentor, MentorshipRequest
 from profiles.models import Profile
 import stripe
@@ -86,12 +94,13 @@ def search_mentors(request):
     rating = request.GET.get('rating')
     available_now = request.GET.get('available_now')
 
-    mentors = Mentor.objects.all()
+    mentors = Mentor.objects.select_related('user').prefetch_related('skills', 'categories')
 
     if query:
         mentors = mentors.filter(
             Q(user__first_name__icontains=query) |
             Q(user__last_name__icontains=query) |
+            Q(user__username__icontains=query) |
             Q(bio__icontains=query) |
             Q(skills__title__icontains=query)
         ).distinct()
@@ -100,17 +109,24 @@ def search_mentors(request):
         mentors = mentors.filter(skills__id__in=skills).distinct()
 
     if rating:
-        mentors = mentors.filter(rating__gte=rating)
+        try:
+            rating_value = float(rating)
+            mentors = mentors.filter(rating__gte=rating_value)
+        except (ValueError, TypeError):
+            pass
 
-    if available_now:
+    if available_now == 'true':
         mentors = mentors.filter(is_available=True)
-
-    all_skills = Skill.objects.all()
+    
+    all_skills = Skill.objects.all().order_by('title')
 
     context = {
         'mentors': mentors,
         'skills': all_skills,
         'query': query,
+        'selected_skills': skills,
+        'selected_rating': rating,
+        'available_now': available_now == 'true'
     }
     return render(request, 'masteryhub/search_mentors.html', context)
 
