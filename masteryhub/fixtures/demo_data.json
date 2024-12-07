@@ -1,0 +1,86 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "sarah_tech",
+      "first_name": "Sarah",
+      "last_name": "Johnson",
+      "email": "sarah@example.com",
+      "is_active": true,
+      "password": "pbkdf2_sha256$600000$hashed_password_here"
+    }
+  },
+  {
+    "model": "profiles.profile",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "bio": "Senior Software Engineer with 8 years of experience in full-stack development. Passionate about mentoring new developers and sharing knowledge in web technologies.",
+      "is_expert": true,
+      "expertise_areas": "Python, Django, JavaScript, React",
+      "years_of_experience": 8,
+      "hourly_rate": "75.00",
+      "availability": "Evenings and weekends",
+      "linkedin_url": "https://linkedin.com/in/sarah-tech",
+      "github_url": "https://github.com/sarah-tech",
+      "website_url": "https://sarah-tech.dev"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "username": "mike_data",
+      "first_name": "Michael",
+      "last_name": "Chen",
+      "email": "mike@example.com",
+      "is_active": true,
+      "password": "pbkdf2_sha256$600000$hashed_password_here"
+    }
+  },
+  {
+    "model": "profiles.profile",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "bio": "Data Scientist with expertise in machine learning and AI. Love helping others understand complex data concepts and build practical ML solutions.",
+      "is_expert": true,
+      "expertise_areas": "Python, Machine Learning, Data Analysis, SQL",
+      "years_of_experience": 6,
+      "hourly_rate": "85.00",
+      "availability": "Weekday afternoons",
+      "linkedin_url": "https://linkedin.com/in/mike-data",
+      "github_url": "https://github.com/mike-data",
+      "website_url": "https://mike-data.ai"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "username": "anna_design",
+      "first_name": "Anna",
+      "last_name": "Martinez",
+      "email": "anna@example.com",
+      "is_active": true,
+      "password": "pbkdf2_sha256$600000$hashed_password_here"
+    }
+  },
+  {
+    "model": "profiles.profile",
+    "pk": 3,
+    "fields": {
+      "user": 3,
+      "bio": "UX/UI Designer with a background in psychology. Specialized in creating user-centered designs and teaching design thinking principles.",
+      "is_expert": true,
+      "expertise_areas": "UI/UX Design, Figma, Adobe XD, User Research",
+      "years_of_experience": 5,
+      "hourly_rate": "65.00",
+      "availability": "Flexible schedule",
+      "linkedin_url": "https://linkedin.com/in/anna-design",
+      "github_url": "",
+      "website_url": "https://anna-design.com"
+    }
+  }
+]

@@ -24,7 +24,7 @@
           <div class="d-flex justify-content-center mb-4">
             {% for provider in socialaccount_providers %}
             {% if provider.id == "google" %}
-            <a href="{% provider_login_url provider.id process='login' %}" class="btn btn-outline-dark mx-2">
+            <a href="{% provider_login_url 'google' process='login' %}" class="btn btn-outline-dark mx-2">
               <i class="fab fa-google"></i> {% trans "Sign in with Google" %}
             </a>
             {% endif %}
@@ -36,7 +36,7 @@
           <p class="text-center">{% trans "No social login providers are available." %}</p>
           {% endif %}
 
-          <form class="login" method="POST" action="{% url 'account_login' %}">
+          <form class="login" method="POST" action="{% url 'accounts:login' %}">
             {% csrf_token %}
             {{ form|crispy }}
             {% if redirect_field_value %}
@@ -48,9 +48,9 @@
             </div>
           </form>
           <div class="text-center mt-4">
-            <a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+            <a href="{% url 'accounts:password_reset' %}">{% trans "Forgot Password?" %}</a>
             <p class="text-center mb-4">{% trans "Don't have an account?" %}
-              <a href="{% url 'account_signup' %}">{% trans "Sign up" %}</a>
+              <a href="{% url 'accounts:signup' %}">{% trans "Sign up" %}</a>
             </p>
           </div>
         </div>

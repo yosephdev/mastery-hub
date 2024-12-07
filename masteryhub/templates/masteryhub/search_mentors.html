@@ -125,9 +125,9 @@
                                     {% endif %}
                                 </div>
                                 <div class="btn-group">
-                                    <a href="{% url 'masteryhub:view_mentor_profile' mentor.user.username %}"
+                                    <a href="{% url 'profiles:view_mentor_profile' mentor.user.username %}"
                                         class="btn btn-outline-primary">View Mentor Profile</a>
-                                    <a href="{% url 'masteryhub:request_mentorship' mentor.user.username %}"
+                                    <a href="{% url 'masteryhub:request_mentorship' mentor_id=mentor.user.id %}"
                                         class="btn btn-primary">Request Mentorship</a>
                                 </div>
                             </div>

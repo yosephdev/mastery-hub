@@ -209,3 +209,40 @@ class Mentor(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Mentor Profile"
+
+
+class MentorshipRequest(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+        ('cancelled', 'Cancelled')
+    ]
+
+    mentee = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='mentorship_requests_sent'
+    )
+    mentor = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='mentorship_requests_received'
+    )
+    message = models.TextField(
+        help_text="Explain why you'd like to be mentored by this person"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ['mentee', 'mentor', 'status']
+
+    def __str__(self):
+        return f"Request from {self.mentee.username} to {self.mentor.username} ({self.status})"

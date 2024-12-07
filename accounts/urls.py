@@ -1,5 +1,5 @@
 from django.urls import path
-from allauth.account.views import SignupView, LoginView, LogoutView
+from . import views
 from . import admin_views
 from django.contrib.auth import views as auth_views
 from .views import (
@@ -13,9 +13,9 @@ from .views import (
 app_name = 'accounts'
 
 urlpatterns = [
-    path("signup/", SignupView.as_view(), name="signup"),
-    path("login/", LoginView.as_view(), name="login"),
-    path("logout/", LogoutView.as_view(), name="logout"),
+    path("signup/", views.signup_view, name="signup"),
+    path("login/", views.CustomLoginView.as_view(), name="login"),
+    path("logout/", views.CustomLogoutView.as_view(), name="logout"),
     path("admin/dashboard/", admin_views.admin_dashboard, name="admin_dashboard"),
     path('password/change/',
          auth_views.PasswordChangeView.as_view(

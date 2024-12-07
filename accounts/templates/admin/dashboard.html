@@ -48,7 +48,7 @@
                     {% endif %}
                     <li><a href="{% url 'profiles:view_profile' username=user.username %}">{% trans "View User Profile"
                             %}</a></li>
-                    <li><a href="{% url 'account_logout' %}">{% trans "Logout" %}</a></li>
+                    <li><a href="{% url 'accounts:logout' %}">{% trans "Logout" %}</a></li>
                 </ul>
             </div>
         </div>

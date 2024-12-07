@@ -112,8 +112,12 @@ AUTHENTICATION_BACKENDS = [
     "accounts.backends.EmailOrUsernameModelBackend",
 ]
 
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'home:index'
+LOGOUT_REDIRECT_URL = 'home:index'
+
 # AllAuth Settings
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
@@ -121,11 +125,15 @@ ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_USERNAME_MIN_LENGTH = 4
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
+ACCOUNT_SESSION_REMEMBER = True
 
 # Social Auth Settings
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_REQUIRED = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = "mandatory"
+SOCIALACCOUNT_EMAIL_VERIFICATION = "optional"
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
@@ -220,3 +228,14 @@ TEMPLATES = [
 # Crispy Forms Settings
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+# Social Account Settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': os.environ.get('SOCIALACCOUNT_GOOGLE_CLIENT_ID'),
+            'secret': os.environ.get('SOCIALACCOUNT_GOOGLE_SECRET'),
+            'key': ''
+        }
+    }
+}

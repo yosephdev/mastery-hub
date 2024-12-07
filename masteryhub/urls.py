@@ -42,8 +42,6 @@ urlpatterns = [
     path("become-mentor/", become_mentor, name="become_mentor"),
     path("mentor-help/", mentor_help, name="mentor_help"),
     path("mentor-rules/", mentor_rules, name="mentor_rules"),
-    path('mentor/<str:username>/', views.view_mentor_profile,
-         name='view_mentor_profile'),
     # Mentorship
     path("expert-dashboard/", expert_dashboard, name="expert_dashboard"),
     path("mentee-dashboard/", mentee_dashboard, name="mentee_dashboard"),

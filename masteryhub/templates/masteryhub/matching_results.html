@@ -70,11 +70,11 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <a href="{% url 'masteryhub:view_mentor_profile' match.mentor.user.username %}"
+                        <a href="{% url 'profiles:view_mentor_profile' match.mentor.user.username %}"
                             class="btn btn-outline-primary">
                             <i class="fas fa-user me-2"></i>View Mentor Profile
                         </a>
-                        <a href="{% url 'request_mentorship' match.mentor.user.username %}" class="btn btn-primary">
+                        <a href="{% url 'masteryhub:request_mentorship' mentor_id=match.mentor.user.id %}" class="btn btn-primary">
                             <i class="fas fa-handshake me-2"></i>Request Mentorship
                         </a>
                     </div>

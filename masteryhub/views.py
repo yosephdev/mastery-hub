@@ -6,14 +6,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.models import User
 from .forms import MentorApplicationForm, ConcernReportForm, BookingForm, ReviewForm, SessionForm, ForumPostForm
-from .models import Feedback, Session, Category, Mentorship, Forum, Review, Skill, Mentor
+from .models import Feedback, Session, Category, Mentorship, Forum, Review, Skill, Mentor, MentorshipRequest
 from profiles.models import Profile
 import stripe
 import logging
+from django.contrib.auth import get_user_model
 
 logger = logging.getLogger(__name__)
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
+User = get_user_model()
 
 
 def become_mentor(request):
@@ -114,29 +117,66 @@ def search_mentors(request):
 
 @login_required
 def request_mentorship(request, mentor_id):
-    """A view that handles the mentorship request."""
-    mentor_user = get_object_or_404(User, id=mentor_id)
-    mentor_profile = get_object_or_404(Profile, user=mentor_user)
-    mentee_profile = get_object_or_404(Profile, user=request.user)
-
-    if not mentor_profile.is_available:
-        messages.error(
-            request, f"{mentor_user.username} is not currently accepting mentorship requests.")
-        return redirect("view_mentor_profile", username=mentor_user.username)
-
-    if request.method == "POST":
-        mentorship, created = Mentorship.objects.get_or_create(
-            mentor=mentor_profile, mentee=mentee_profile, status="pending"
-        )
-        if created:
-            message = f"Mentorship request sent to {mentor_user.username}"
+    """Handle mentorship request."""
+    try:
+        mentor = get_object_or_404(User, id=mentor_id)
+        mentor_profile = get_object_or_404(Profile, user=mentor, is_expert=True)
+        
+        if request.user == mentor:
+            messages.error(request, "You cannot request mentorship from yourself.")
+            return redirect('masteryhub:list_mentors')            
+        
+        existing_request = MentorshipRequest.objects.filter(
+            mentee=request.user,
+            mentor=mentor,
+            status='pending'
+        ).exists()
+        
+        if existing_request:
+            messages.warning(
+                request, 
+                "You already have a pending request with this mentor."
+            )
+            return redirect('masteryhub:list_mentors')
+            
+        if request.method == 'POST':
+            form = MentorshipRequestForm(request.POST)
+            if form.is_valid():
+                mentorship_request = form.save(commit=False)
+                mentorship_request.mentee = request.user
+                mentorship_request.mentor = mentor
+                mentorship_request.save()
+                
+                messages.success(
+                    request, 
+                    f"Mentorship request sent to {mentor.username}!"
+                )
+                return redirect('masteryhub:mentee_dashboard')
         else:
-            message = f"You already have a pending request with {mentor_user.username}"
-
-        messages.success(request, message)
-        return redirect("view_mentor_profile", username=mentor_user.username)
-
-    return render(request, "masteryhub/request_mentorship.html", {"mentor": mentor_user})
+            form = MentorshipRequestForm()
+            
+        context = {
+            'form': form,
+            'mentor': mentor,
+            'mentor_profile': mentor_profile
+        }
+        return render(request, 'masteryhub/request_mentorship.html', context)
+        
+    except User.DoesNotExist:
+        messages.error(
+            request, 
+            "The mentor you're trying to reach doesn't exist anymore."
+        )
+        return redirect('masteryhub:list_mentors')
+    except Profile.DoesNotExist:
+        messages.error(
+            request, 
+            "This user is not registered as a mentor."
+        )
+        return redirect('masteryhub:list_mentors')
+    except Exception as e:
+        messages.error(request, f"An error occurred: {str(e)}")
+        return redirect('masteryhub:list_mentors')
 
 
 @login_required

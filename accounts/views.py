@@ -66,17 +66,16 @@ class CustomLoginView(LoginView):
     template_name = "account/login.html"
 
     def form_valid(self, form):
+        # Clear any existing messages first
+        storage = messages.get_messages(self.request)
+        storage.used = True
+        
         user = form.get_user()
         auth_login(self.request, user)
         if not self.request.session.get("message_sent", False):
             messages.success(self.request, f"Welcome back, {user.username}!")
             self.request.session["message_sent"] = True
-        if user.is_superuser:
-            return redirect("admin:index")
-        elif user.profile.is_expert:
-            return redirect("profiles:view_mentor_profile", username=user.username)
-        else:
-            return redirect("profiles:view_profile", username=user.username)
+        return super().form_valid(form)
 
     def form_invalid(self, form):
         messages.error(

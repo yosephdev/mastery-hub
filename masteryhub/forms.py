@@ -3,7 +3,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, ButtonHolder, Submit
 
 from profiles.models import Profile
-from masteryhub.models import Session, Forum, ConcernReport, Booking, Review
+from masteryhub.models import Session, Forum, ConcernReport, Booking, Review, MentorshipRequest
 
 
 class SessionForm(forms.ModelForm):
@@ -164,4 +164,17 @@ class ReviewForm(forms.ModelForm):
         widgets = {
             'rating': forms.Select(attrs={'class': 'form-control'}),
             'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Write your review here...'}),
+        }
+
+
+class MentorshipRequestForm(forms.ModelForm):
+    class Meta:
+        model = MentorshipRequest
+        fields = ['message']
+        widgets = {
+            'message': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Explain why you would like to be mentored by this person...'
+            })
         }

@@ -12,7 +12,7 @@
     {% if session_count > 1 %}
         {% url 'usersessions_list' as action_url %}
     {% else %}
-        {% url 'account_logout' as action_url %}
+        {% url 'accounts:logout' as action_url %}
     {% endif %}
     {% element form action=action_url method="post" tags="sessions" no_visible_fields=True %}
         {% slot body %}
