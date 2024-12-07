@@ -8,6 +8,9 @@ from datetime import timedelta
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from decimal import Decimal
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Payment(models.Model):

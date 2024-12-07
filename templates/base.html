@@ -109,21 +109,58 @@
 
     <!-- Messages -->
     {% if messages %}
-    <div class="message-container">
+    <div class="message-container position-fixed top-0 end-0 p-3" style="z-index: 1050;">
         {% for message in messages %}
-        {% with message.level as level %}
-        {% if level == 40 %}
-        {% include 'includes/toasts/toast_error.html' %}
-        {% elif level == 30 %}
-        {% include 'includes/toasts/toast_warning.html' %}
-        {% elif level == 25 %}
-        {% include 'includes/toasts/toast_success.html' %}
-        {% else %}
-        {% include 'includes/toasts/toast_info.html' %}
-        {% endif %}
-        {% endwith %}
+            {% with message.level as level %}
+                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="5000">
+                    <div class="toast-header {% if level == 25 %}bg-success text-white{% elif level == 40 %}bg-danger text-white{% elif level == 30 %}bg-warning{% else %}bg-info text-white{% endif %}">
+                        <strong class="me-auto">
+                            {% if level == 40 %}
+                                Error!
+                            {% elif level == 30 %}
+                                Warning!
+                            {% elif level == 25 %}
+                                Success!
+                            {% else %}
+                                Info
+                            {% endif %}
+                        </strong>
+                        <button type="button" class="btn-close {% if level != 30 %}btn-close-white{% endif %}" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        {{ message }}
+                    </div>
+                </div>
+            {% endwith %}
         {% endfor %}
     </div>
+
+    <!-- Initialize Toasts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {            
+            const messages = document.querySelectorAll('.toast');
+            const seenMessages = new Set();
+            
+            messages.forEach(message => {
+                const messageText = message.querySelector('.toast-body').textContent.trim();
+                if (seenMessages.has(messageText)) {
+                    message.remove();
+                } else {
+                    seenMessages.add(messageText);
+                }
+            });
+            
+            const toastElList = document.querySelectorAll('.toast');
+            toastElList.forEach(toast => {               
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 500);
+                }, 5000);
+            });
+        });
+    </script>
     {% endif %}
 
 

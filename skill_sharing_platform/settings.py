@@ -178,19 +178,33 @@ if not DEBUG:
 
 # Email Configuration
 if DEBUG:
+    # Development email settings - prints to console
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-    EMAIL_HOST = "localhost"
-    EMAIL_PORT = 1025
+    DEFAULT_FROM_EMAIL = 'masteryhub@example.com'
 else:
+    # Production email settings - uses Gmail SMTP
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_USE_TLS = True
-    EMAIL_PORT = 587
     EMAIL_HOST = 'smtp.gmail.com'
-    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASS')
-    DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER')
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    
+    # Gmail credentials
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'yosephbet@gmail.com')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASS', 'rckzxelycbkkvsas')
+    
+    # Sender email settings
+    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'yosephbet@gmail.com')
+    SERVER_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'yosephbet@gmail.com')
 
-DEFAULT_FROM_EMAIL = 'masteryhub@example.com'
+# Email Subject Prefix
+EMAIL_SUBJECT_PREFIX = '[MasteryHub] '
+
+# Additional Email Settings
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 
 # Stripe Configuration
 STRIPE_CURRENCY = 'usd'
@@ -222,6 +236,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
+                'skill_sharing_platform.context_processors.message_processor',
             ],
         },
     },

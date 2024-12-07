@@ -170,7 +170,7 @@ def add_to_cart(request, session_id):
     try:
         session = Session.objects.get(id=session_id)
         cart, _ = Cart.objects.get_or_create(user=request.user)
-        
+
         cart_item, created = CartItem.objects.get_or_create(
             cart=cart,
             session=session,
@@ -179,7 +179,7 @@ def add_to_cart(request, session_id):
                 'price_at_time_of_adding': session.price
             }
         )
-        
+
         if not created:
             cart_item.quantity += 1
             cart_item.save()
@@ -189,7 +189,7 @@ def add_to_cart(request, session_id):
             'success': True,
             'total': float(total)
         })
-        
+
     except Session.DoesNotExist:
         return JsonResponse({
             'success': False,
@@ -249,20 +249,19 @@ def view_cart(request):
     print("Template path:", request.resolver_match.view_name)
     cart = get_object_or_404(Cart, user=request.user)
     cart_items = cart.items.all()
-    
+
     context = {
         'cart': cart,
         'cart_items': cart_items,
         'total_items': cart_items.count(),
         'grand_total': cart.get_total_price(),
     }
-    
+
     response = render(request, 'checkout/cart.html', context)
-    
-    # Print the actual rendered HTML
+
     print("Rendered HTML:")
     print(response.content.decode())
-    
+
     print("Response status:", response.status_code)
     return response
 
@@ -296,32 +295,77 @@ def checkout(request):
 
         total_price = cart.get_total_price()
         grand_total = total_price
+        stripe_total = int(grand_total * 100)
 
         if request.method == 'POST':
             order_form = OrderForm(request.POST)
             if order_form.is_valid():
                 try:
-                    with transaction.atomic():
-                        order = create_order(
-                            request.user, order_form, cart, grand_total)
-                        process_order(order, cart)
-                        cart.mark_inactive()
+                    intent = stripe.PaymentIntent.create(
+                        amount=stripe_total,
+                        currency=settings.STRIPE_CURRENCY,
+                        metadata={
+                            'user_id': request.user.id,
+                            'username': request.user.username,
+                            'cart_id': cart.id
+                        }
+                    )
 
-                        send_order_confirmation.delay(order.id)
+                    with transaction.atomic():
+                        order = order_form.save(commit=False)
+                        order.user = request.user
+                        order.order_number = uuid.uuid4().hex.upper()
+                        order.order_total = grand_total
+                        order.grand_total = grand_total
+                        order.stripe_pid = intent.id
+                        order.save()
+
+                        for item in cart.items.all():
+                            OrderLineItem.objects.create(
+                                order=order,
+                                session=item.session,
+                                quantity=item.quantity,
+                                price=item.get_cost()
+                            )
+
+                        cart.items.all().delete()
+
+                        try:
+                            send_order_confirmation.delay(order.id)
+                        except Exception as e:
+                            logger.warning(
+                                f"Failed to send confirmation email: {e}")
 
                         messages.success(
                             request, f'Order {order.order_number} processed successfully!')
                         return redirect('checkout:checkout_success', order_number=order.order_number)
+
+                except stripe.error.StripeError as e:
+                    logger.error(f"Stripe error: {str(e)}")
+                    messages.error(
+                        request, f"Payment processing error: {str(e)}")
+                    return redirect('checkout:view_cart')
                 except Exception as e:
                     logger.error(
                         f"Checkout error for user {request.user.id}: {str(e)}")
                     messages.error(
                         request, "There was an error processing your order. Please try again.")
+            else:
+                messages.error(
+                    request, 'There was an error with your form. Please check your information.')
         else:
             order_form = OrderForm(instance=request.user.profile if hasattr(
                 request.user, 'profile') else None)
 
-        intent = handle_payment_intent(request, grand_total)
+            intent = stripe.PaymentIntent.create(
+                amount=stripe_total,
+                currency=settings.STRIPE_CURRENCY,
+                metadata={
+                    'user_id': request.user.id,
+                    'username': request.user.username,
+                    'cart_id': cart.id
+                }
+            )
 
         context = {
             'order_form': order_form,
@@ -331,6 +375,7 @@ def checkout(request):
             'total_price': total_price,
             'grand_total': grand_total,
         }
+
         return render(request, 'checkout/checkout.html', context)
 
     except Cart.DoesNotExist:
@@ -339,16 +384,12 @@ def checkout(request):
     except ValidationError as e:
         messages.error(request, str(e))
         return redirect('checkout:view_cart')
-    except stripe.error.StripeError as e:
-        logger.error(f"Stripe error for user {request.user.id}: {str(e)}")
-        messages.error(request, f"Payment processing error: {str(e)}")
-        return redirect('checkout:view_cart')
 
 
 def cart_total_view(user):
     """A view that calculates the total price of items in the user's cart."""
     cart = get_object_or_404(Cart, user=user)
-    total = sum(item.get_cost *
+    total = sum(item.get_cost() *
                 item.quantity for item in cart.items.all())
     return total
 
@@ -483,7 +524,7 @@ def cart_contents_view(request):
         try:
             cart = Cart.objects.get(user=request.user)
             cart_items = cart.items.all()
-            total = sum(item.get_cost *
+            total = sum(item.get_cost() *
                         item.quantity for item in cart_items)
             item_count = cart_items.count()
         except Cart.DoesNotExist:
@@ -525,7 +566,7 @@ def process_order(order, cart):
             order=order,
             session=cart_item.session,
             quantity=cart_item.quantity,
-            price=cart_item.get_cost
+            price=cart_item.get_cost()
         )
 
     cart.items.all().delete()
@@ -560,8 +601,9 @@ def create_checkout_session(request):
         if not cart.items.exists():
             return JsonResponse({'error': 'Cart is empty'}, status=400)
 
-        domain = "https://skill-sharing-446c0336ffb5.herokuapp.com" if settings.DEBUG else request.build_absolute_uri('/').rstrip('/')
-        
+        domain = "https://skill-sharing-446c0336ffb5.herokuapp.com" if settings.DEBUG else request.build_absolute_uri(
+            '/').rstrip('/')
+
         line_items = [{
             'price_data': {
                 'currency': 'usd',
@@ -586,9 +628,9 @@ def create_checkout_session(request):
                 'cart_id': cart.id,
             }
         )
-        
+
         return JsonResponse({'sessionId': checkout_session.id})
-        
+
     except Exception as e:
         logger.error(f"Error creating checkout session: {str(e)}")
         return JsonResponse({'error': str(e)}, status=400)
@@ -597,11 +639,10 @@ def create_checkout_session(request):
 def handle_payment_intent(request, amount):
     """Create or retrieve Stripe PaymentIntent"""
     stripe.api_key = settings.STRIPE_SECRET_KEY
-    
+
     try:
-        # Ensure amount is a Decimal and convert to cents
         amount_cents = int(Decimal(str(amount)) * 100)
-        
+
         intent = stripe.PaymentIntent.create(
             amount=amount_cents,
             currency=settings.STRIPE_CURRENCY,

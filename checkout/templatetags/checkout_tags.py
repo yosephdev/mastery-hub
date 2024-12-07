@@ -8,3 +8,10 @@ def get_payment_intent_id(client_secret):
     if client_secret:
         return client_secret.split('_secret_')[0]
     return ''
+
+@register.filter
+def multiply(value, arg):
+    try:
+        return float(value) * float(arg)
+    except (ValueError, TypeError):
+        return 0

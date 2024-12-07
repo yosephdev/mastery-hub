@@ -4,9 +4,9 @@
 */
 console.log('Stripe Elements JS Loaded');
 // Get Stripe public key
-const stripePublicKey = document.getElementById('id_stripe_public_key').textContent.trim().slice(1, -1);
+const stripePublicKey = document.getElementById('id_stripe_public_key').value;
 // Get client secret directly from the input field
-const clientSecret = document.getElementById('id_client_secret').value.trim();
+const clientSecret = document.getElementById('id_client_secret').value;
 
 console.log('Debug - JS Public Key:', stripePublicKey);
 console.log('Debug - JS Client Secret:', clientSecret);
@@ -20,30 +20,30 @@ if (!clientSecret) {
 
 // Initialize Stripe
 const stripe = Stripe(stripePublicKey);
+
+// Create card elements
 const elements = stripe.elements();
-
-// Create card element
-const style = {
-    base: {
-        color: '#000',
-        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-        fontSmoothing: 'antialiased',
-        fontSize: '16px',
-        '::placeholder': {
-            color: '#aab7c4'
+const card = elements.create('card', {
+    style: {
+        base: {
+            color: '#000',
+            fontFamily: '"Inter", sans-serif',
+            fontSize: '16px',
+            '::placeholder': {
+                color: '#aab7c4'
+            }
+        },
+        invalid: {
+            color: '#dc3545',
+            iconColor: '#dc3545'
         }
-    },
-    invalid: {
-        color: '#dc3545',
-        iconColor: '#dc3545'
     }
-};
+});
 
-const card = elements.create('card', {style: style});
 card.mount('#card-element');
 
-// Handle realtime validation errors on the card element
-card.addEventListener('change', function (event) {
+// Handle realtime validation errors
+card.addEventListener('change', function(event) {
     const errorDiv = document.getElementById('card-errors');
     if (event.error) {
         const html = `
@@ -60,57 +60,62 @@ card.addEventListener('change', function (event) {
 
 // Handle form submit
 const form = document.getElementById('payment-form');
-
 form.addEventListener('submit', async function(ev) {
     ev.preventDefault();
     
-    try {
-        // Disable form and show loading
-        card.update({ 'disabled': true});
-        $('#submit-button').prop('disabled', true);
-        $('#payment-form').fadeToggle(100);
-        $('#loading-overlay').fadeToggle(100);
+    // Disable form and show loading
+    card.update({ 'disabled': true });
+    document.getElementById('submit-button').disabled = true;
+    document.getElementById('payment-form').style.opacity = '0.5';
+    
+    // Show loading spinner
+    document.getElementById('loading-overlay').style.display = 'block';
 
-        // Get the client secret
-        const clientSecret = document.getElementById('id_client_secret').value.trim();
-        
-        // Confirm the payment
-        const { paymentIntent, error } = await stripe.confirmCardPayment(clientSecret, {
+    try {
+        const result = await stripe.confirmCardPayment(clientSecret, {
             payment_method: {
                 card: card,
                 billing_details: {
-                    name: $.trim(form.full_name.value),
-                    email: $.trim(form.email.value),
-                    phone: $.trim(form.phone_number.value),
+                    name: form.full_name.value,
+                    email: form.email.value,
+                    phone: form.phone_number.value,
                     address: {
-                        line1: $.trim(form.street_address1.value),
-                        line2: $.trim(form.street_address2.value),
-                        city: $.trim(form.town_or_city.value),
-                        state: $.trim(form.county.value),
-                        country: $.trim(form.country.value),
-                        postal_code: $.trim(form.postcode.value),
+                        line1: form.street_address1.value,
+                        line2: form.street_address2.value,
+                        city: form.town_or_city.value,
+                        country: form.country.value,
+                        postal_code: form.postcode.value,
+                        state: form.county.value,
                     }
                 }
             }
         });
 
-        if (error) {
-            throw error;
+        if (result.error) {
+            // Handle payment error
+            const errorDiv = document.getElementById('card-errors');
+            errorDiv.textContent = result.error.message;
+            
+            // Re-enable form
+            card.update({ 'disabled': false });
+            document.getElementById('submit-button').disabled = false;
+            document.getElementById('payment-form').style.opacity = '1';
+            document.getElementById('loading-overlay').style.display = 'none';
+        } else {
+            if (result.paymentIntent.status === 'succeeded') {
+                form.submit();
+            }
         }
-
-        if (paymentIntent.status === 'succeeded') {
-            form.submit();
-        }
-
     } catch (error) {
-        // Handle any errors
+        console.error('Payment error:', error);
+        // Handle any other errors
         const errorDiv = document.getElementById('card-errors');
-        errorDiv.textContent = error.message || 'An error occurred. Please try again.';
+        errorDiv.textContent = 'An error occurred processing your payment. Please try again.';
         
-        // Reset the form state
-        $('#payment-form').fadeToggle(100);
-        $('#loading-overlay').fadeToggle(100);
-        card.update({ 'disabled': false});
-        $('#submit-button').prop('disabled', false);
+        // Re-enable form
+        card.update({ 'disabled': false });
+        document.getElementById('submit-button').disabled = false;
+        document.getElementById('payment-form').style.opacity = '1';
+        document.getElementById('loading-overlay').style.display = 'none';
     }
 });

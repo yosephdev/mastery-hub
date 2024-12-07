@@ -578,3 +578,49 @@ h6 {
     display: flex;
     align-items: center;
 }
+
+.message-container {
+    position: fixed;
+    top: 72px;
+    right: 15px;
+    z-index: 99999;
+    max-width: 300px;
+}
+
+.toast {
+    min-width: 250px;
+    margin-bottom: 10px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    opacity: 1 !important;
+}
+
+.toast.show {
+    opacity: 1;
+    animation: slideIn 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast.hide {
+    animation: slideOut 0.3s ease-in-out;
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}

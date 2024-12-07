@@ -1,4 +1,21 @@
 from .models import Cart
+from django.contrib import messages
+
+
+def message_processor(request):
+    """Clear messages after they're displayed"""
+    storage = messages.get_messages(request)
+    to_return = []
+
+    for message in storage:
+        to_return.append({
+            'message': message.message,
+            'level': message.level,
+            'tags': message.tags,
+        })
+
+    storage.used = True
+    return {'messages': to_return}
 
 
 def cart_contents(request):
