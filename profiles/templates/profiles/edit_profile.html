@@ -13,11 +13,13 @@
                 <div class="card-body p-4">
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        {{ form|crispy }}
+                        {{ user_form|crispy }}
+                        {{ profile_form|crispy }}
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-save me-2"></i>Save Changes
                             </button>
+                            <a href="{% url 'profiles:view_profile' username=user.username %}" class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>
 
