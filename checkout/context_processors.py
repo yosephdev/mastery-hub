@@ -1,7 +1,6 @@
 from .models import Cart
 from django.contrib import messages
 
-
 def message_processor(request):
     """Clear messages after they're displayed"""
     storage = messages.get_messages(request)
@@ -35,4 +34,14 @@ def cart_contents(request):
     return {
         'cart_items': cart_items,
         'total': total,
+    }
+
+
+def project_context(request):
+    """
+    Add project-wide context variables
+    """
+    return {
+        'PROJECT_NAME': 'Mastery Hub',
+        'CURRENT_PATH': request.path
     }
