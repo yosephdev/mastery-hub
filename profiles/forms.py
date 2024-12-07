@@ -1,6 +1,21 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth import get_user_model
 from .models import Profile
+
+User = get_user_model()
+
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)       
+        self.fields.pop('password', None)       
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class': 'form-control'})
 
 
 class ProfileForm(forms.ModelForm):

@@ -3,9 +3,9 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from .models import Profile
-from .forms import ProfileForm
+from .forms import CustomUserChangeForm, ProfileForm 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import CustomUserChangeForm
+from django.contrib.auth.forms import UserChangeForm
 
 # Create your views here.
 
