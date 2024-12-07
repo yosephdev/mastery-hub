@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% load checkout_tags %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
@@ -94,7 +95,11 @@
                     <legend class="fieldset-label small text-black px-2 w-auto">Payment</legend>
                     <div class="mb-3" id="card-element"></div>
                     <div class="mb-3 text-danger" id="card-errors" role="alert"></div>
-                    <input type="hidden" value="{{ client_secret }}" name="client_secret" id="id_client_secret">
+                    <input type="hidden" 
+                           value="{{ client_secret }}" 
+                           name="client_secret" 
+                           id="id_client_secret"
+                           data-payment-intent-id="{{ client_secret|get_payment_intent_id }}">
                 </fieldset>
                 <div class="submit-button text-right mt-5 mb-2">
                     <a href="{% url 'checkout:view_cart' %}" class="btn btn-outline-dark rounded-0">

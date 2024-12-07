@@ -38,7 +38,7 @@
     </div>
     {% endif %}
 
-    {% if cart.items.exists %}
+    {% if cart and cart.items.exists %}
     <div class="card shadow-sm">
         <div class="card-body">
             <ul class="list-group mb-3">
@@ -71,16 +71,22 @@
                 {% endfor %}
             </ul>
             <div class="d-flex justify-content-between align-items-center">
-                <h5>Total Items: {{ total_items }}</h5>
-                <h5>Total: <strong>${{ grand_total|floatformat:2 }}</strong></h5>
+                <h5>Total Items: {{ cart.items.count }}</h5>
+                <h5>Total: <strong>${{ cart.get_total_price|floatformat:2 }}</strong></h5>
             </div>
-            <a href="{% url 'checkout:checkout' %}" class="btn btn-dark btn-block mt-4">Proceed to Checkout</a>
+            <div class="text-center">
+                <a href="{% url 'checkout:checkout' %}" class="btn btn-dark btn-lg mt-4">
+                    Proceed to Checkout
+                </a>
+            </div>
         </div>
     </div>
     {% else %}
-    <p class="text-muted text-center">Your cart is empty.</p>
     <div class="text-center">
-        <a href="{% url 'masteryhub:session_list' %}" class="btn btn-dark">Browse Sessions</a>
+        <p class="text-muted">Your cart is empty.</p>
+        <a href="{% url 'masteryhub:session_list' %}" class="btn btn-dark">
+            Browse Sessions
+        </a>
     </div>
     {% endif %}
 </div>

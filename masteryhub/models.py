@@ -34,6 +34,7 @@ class Session(models.Model):
     max_participants = models.PositiveIntegerField(default=10)
     image = models.ImageField(
         upload_to="session_images/", null=True, blank=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.title

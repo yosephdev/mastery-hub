@@ -72,7 +72,7 @@
                                     class="rounded-circle me-2" alt="{{ session.expert.get_full_name }}"
                                     style="width: 30px; height: 30px; object-fit: cover;">
                                 <div class="small text-muted">
-                                    Expert: {{ session.expert.get_full_name }}
+                                    Expert: {{ session.expert.username }}
                                 </div>
                             </div>
 
@@ -93,7 +93,7 @@
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="text-success fw-bold">${{ get_cost }}</span>
+                                <span class="text-success fw-bold">${{ session.price }}</span>
                                 <span class="badge bg-{{ session.get_difficulty_badge }}">
                                     {{ session.get_difficulty_display }}
                                 </span>
@@ -106,7 +106,7 @@
                                 </a>
                                 {% if user.is_authenticated and not user.is_expert %}
                                 <button
-                                    onclick="addToBag('{{ session.id }}', '{{ session.title }}', '{{ get_cost }}')"
+                                    onclick="addToBag('{{ session.id }}', '{{ session.title }}', '{{ session.price }}')"
                                     class="btn btn-primary">
                                     <i class="fas fa-shopping-cart me-1"></i>Add to Bag
                                 </button>
@@ -145,14 +145,12 @@
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                // Update the cart total in the navigation bar
+            if (data.success) {                
                 const cartTotalElement = document.querySelector('.cart-total');
                 if (cartTotalElement) {
                     cartTotalElement.textContent = '$' + parseFloat(data.total).toFixed(2);
                 }
-
-                // Optionally, show a success toast
+               
                 showToast('Success', 'Session added to your cart!', 'success');
             } else {
                 showToast('Error', data.error || 'Error adding session to cart', 'danger');
