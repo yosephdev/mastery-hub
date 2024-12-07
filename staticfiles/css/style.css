@@ -571,3 +571,10 @@ h6 {
         font-size: 0.8rem;
     }
 }
+
+.account-container {
+    padding-top: 5rem;
+    min-height: calc(100vh - 56px);
+    display: flex;
+    align-items: center;
+}

@@ -2,41 +2,51 @@
 {% load i18n %}
 {% load account %}
 
-{% block head_title %}{% trans "Confirm Email Address" %}{% endblock %}
+{% block head_title %}
+    {% trans "Confirm Email Address" %}
+{% endblock head_title %}
 
 {% block content %}
-<div class="container pt-4 mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h1 class="h4 logo-font text-center mb-4">{% trans "Confirm Email Address" %}</h1>
+<div class="container account-container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h1 class="text-center mb-4">{% trans "Confirm Email Address" %}</h1>
 
-          {% if confirmation %}
-          {% user_display confirmation.email_address.user as user_display %}
-          <p class="text-center">
-            {% blocktrans with confirmation.email_address.email as email %}
-            Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an email address for user {{
-            user_display }}.
-            {% endblocktrans %}
-          </p>
+                    {% if confirmation %}
+                        {% user_display confirmation.email_address.user as user_display %}
+                        <div class="alert alert-info">
+                            <p class="mb-0">
+                                {% blocktrans with confirmation.email_address.email as email %}
+                                Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an email address for user {{ user_display }}.
+                                {% endblocktrans %}
+                            </p>
+                        </div>
 
-          <form method="post" action="{% url 'account_confirm_email' confirmation.key %}" class="text-center">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">{% trans "Confirm" %}</button>
-          </form>
-          {% else %}
-          {% url 'account_email' as email_url %}
-          <p class="text-center">
-            {% blocktrans %}
-            This email confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new email
-              confirmation request</a>.
-            {% endblocktrans %}
-          </p>
-          {% endif %}
+                        <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                            {% csrf_token %}
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">{% trans "Confirm" %}</button>
+                                <a href="{% url 'account_login' %}" class="btn btn-outline-secondary">{% trans "Back to Login" %}</a>
+                            </div>
+                        </form>
+                    {% else %}
+                        {% url 'account_email' as email_url %}
+                        <div class="alert alert-warning">
+                            <p class="mb-0">
+                                {% blocktrans %}
+                                This email confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new email confirmation request</a>.
+                                {% endblocktrans %}
+                            </p>
+                        </div>
+                        <div class="d-grid gap-2 mt-3">
+                            <a href="{% url 'account_login' %}" class="btn btn-primary">{% trans "Back to Login" %}</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
-{% endblock %}
+{% endblock content %}

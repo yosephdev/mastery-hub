@@ -1,14 +1,33 @@
-{% extends "socialaccount/base_entrance.html" %}
+{% extends "socialaccount/base.html" %}
 {% load i18n %}
 {% load allauth %}
-{% block head_title %}
-    {% trans "Third-Party Login Failure" %}
-{% endblock head_title %}
+
+{% block head_title %}{% trans "Third-Party Login Failure" %}{% endblock %}
+
 {% block content %}
-    {% element h1 %}
-        {% trans "Third-Party Login Failure" %}
-    {% endelement %}
-    {% element p %}
-        {% trans "An error occurred while attempting to login via your third-party account." %}
-    {% endelement %}
-{% endblock content %}
+<div class="account-container">
+    <div class="container">
+        <div class="row justify-content-center w-100">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-sm">
+                    <div class="card-body p-5 text-center">
+                        <div class="text-danger mb-4">
+                            <i class="fas fa-exclamation-circle fa-3x"></i>
+                        </div>
+                        {% element h2 class="mb-4" %}
+                            {% trans "Third-Party Login Failure" %}
+                        {% endelement %}
+                        {% element p class="mb-4" %}
+                            {% trans "An error occurred while attempting to login via your third-party account." %}
+                        {% endelement %}
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'accounts:login' %}" class="btn btn-primary btn-lg">{% trans "Try Again" %}</a>
+                            <a href="{% url 'home:index' %}" class="btn btn-outline-dark">{% trans "Back to Home" %}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

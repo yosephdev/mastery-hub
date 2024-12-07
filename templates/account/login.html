@@ -7,51 +7,70 @@
 {% block head_title %}{% trans "Sign In" %}{% endblock %}
 
 {% block content %}
-<div class="container pt-4 mt-5">
-  <div class="row justify-content-center w-100">
-    <div class="col-md-6 col-lg-5">
-      <div class="card shadow-sm">
-        <div class="card-body p-5">
-          <h2 class="text-center mb-4">{% trans "Welcome back!" %}</h2>
+<div class="account-container">
+  <div class="container">
+    <div class="row justify-content-center w-100">
+      <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+          <div class="card-body p-5">
+            <h2 class="text-center mb-4">{% trans "Welcome back!" %}</h2>
 
-          {% get_providers as socialaccount_providers %}
+            {% get_providers as socialaccount_providers %}
 
-          {% if socialaccount_providers %}
-          <p class="text-center mb-4">
-            {% blocktrans %}Sign in with your social account or MasteryHub account.{% endblocktrans %}
-          </p>
+            {% if socialaccount_providers %}
+              <p class="text-center mb-4">
+                {% blocktrans %}Sign in with your social account or MasteryHub account.{% endblocktrans %}
+              </p>
 
-          <div class="d-flex justify-content-center mb-4">
-            {% for provider in socialaccount_providers %}
-            {% if provider.id == "google" %}
-            <a href="{% provider_login_url 'google' process='login' %}" class="btn btn-outline-dark mx-2">
-              <i class="fab fa-google"></i> {% trans "Sign in with Google" %}
-            </a>
+              <div class="d-flex justify-content-center mb-4">
+                {% for provider in socialaccount_providers %}
+                  {% if provider.id == "google" %}
+                    <a href="{% provider_login_url 'google' process='login' %}" class="btn btn-outline-dark mx-2">
+                      <i class="fab fa-google"></i> {% trans "Sign in with Google" %}
+                    </a>
+                  {% endif %}
+                {% endfor %}
+              </div>
             {% endif %}
-            {% empty %}
-            <p class="text-center">{% trans "No social login providers are available." %}</p>
-            {% endfor %}
-          </div>
-          {% else %}
-          <p class="text-center">{% trans "No social login providers are available." %}</p>
-          {% endif %}
 
-          <form class="login" method="POST" action="{% url 'accounts:login' %}">
-            {% csrf_token %}
-            {{ form|crispy }}
-            {% if redirect_field_value %}
-            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-            {% endif %}
-            <div class="d-grid gap-2 mt-4">
-              <button class="btn btn-primary btn-lg btn-block" type="submit">{% trans "Sign In" %}</button>
-              <a class="btn btn-outline-dark btn-block" href="{% url 'home:index' %}">{% trans "Back to Home" %}</a>
+            <form class="login" method="POST" action="{% url 'accounts:login' %}">
+              {% csrf_token %}
+              
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                  {% for error in form.non_field_errors %}
+                    <p class="mb-0">{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              {{ form|crispy }}
+              
+              {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+              {% endif %}
+              
+              <div class="d-grid gap-2 mt-4">
+                <button class="btn btn-primary btn-lg" type="submit">
+                  <i class="fas fa-sign-in-alt me-2"></i>{% trans "Sign In" %}
+                </button>
+                <a class="btn btn-outline-dark" href="{% url 'home:index' %}">
+                  <i class="fas fa-home me-2"></i>{% trans "Back to Home" %}
+                </a>
+              </div>
+            </form>
+
+            <div class="text-center mt-4">
+              <div class="mb-3">
+                <a href="{% url 'accounts:password_reset' %}" class="text-decoration-none">
+                  <i class="fas fa-key me-1"></i>{% trans "Forgot Password?" %}
+                </a>
+              </div>
+              <p class="mb-0">
+                {% trans "Don't have an account?" %}
+                <a href="{% url 'accounts:signup' %}" class="text-decoration-none">{% trans "Sign up" %}</a>
+              </p>
             </div>
-          </form>
-          <div class="text-center mt-4">
-            <a href="{% url 'accounts:password_reset' %}">{% trans "Forgot Password?" %}</a>
-            <p class="text-center mb-4">{% trans "Don't have an account?" %}
-              <a href="{% url 'accounts:signup' %}">{% trans "Sign up" %}</a>
-            </p>
           </div>
         </div>
       </div>
