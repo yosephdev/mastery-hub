@@ -90,44 +90,53 @@ def match_mentor_mentee(mentee):
 def search_mentors(request):
     """A view that handles the mentor searching."""
     query = request.GET.get('q', '')
-    skills = request.GET.getlist('skills')
-    rating = request.GET.get('rating')
-    available_now = request.GET.get('available_now')
-
-    mentors = Mentor.objects.select_related('user').prefetch_related('skills', 'categories')
+    selected_skills = request.GET.getlist('skills', [])
+    selected_rating = request.GET.get('rating', '')
+    available_now = request.GET.get('available_now') == 'true'
+  
+    mentors = Mentor.objects.select_related('user').prefetch_related('skills').all()
+    
+    print("All mentors before filtering:")
+    for mentor in mentors:
+        print(f"- {mentor.user.first_name} {mentor.user.last_name} ({mentor.user.username})")
 
     if query:
+        print(f"\nSearching for: {query}")
         mentors = mentors.filter(
-            Q(user__first_name__icontains=query) |
-            Q(user__last_name__icontains=query) |
+            Q(user__first_name__icontains=query.split()[0]) |
+            Q(user__last_name__icontains=query.split()[-1]) |
             Q(user__username__icontains=query) |
             Q(bio__icontains=query) |
             Q(skills__title__icontains=query)
         ).distinct()
+        
+        print("\nFiltered mentors:")
+        for mentor in mentors:
+            print(f"- {mentor.user.first_name} {mentor.user.last_name}")
 
-    if skills:
-        mentors = mentors.filter(skills__id__in=skills).distinct()
+    if selected_skills:
+        mentors = mentors.filter(skills__id__in=selected_skills).distinct()
 
-    if rating:
-        try:
-            rating_value = float(rating)
-            mentors = mentors.filter(rating__gte=rating_value)
-        except (ValueError, TypeError):
-            pass
-
-    if available_now == 'true':
+    if selected_rating:
+        mentors = mentors.filter(rating__gte=float(selected_rating))
+ 
+    if available_now:
         mentors = mentors.filter(is_available=True)
     
-    all_skills = Skill.objects.all().order_by('title')
+    skills = Skill.objects.all().order_by('title')
+
+    print(f"\nFinal SQL Query: {mentors.query}")
+    print(f"Final Results count: {mentors.count()}")
 
     context = {
         'mentors': mentors,
-        'skills': all_skills,
         'query': query,
-        'selected_skills': skills,
-        'selected_rating': rating,
-        'available_now': available_now == 'true'
+        'skills': skills,
+        'selected_skills': selected_skills,
+        'selected_rating': selected_rating,
+        'available_now': available_now,
     }
+  
     return render(request, 'masteryhub/search_mentors.html', context)
 
 
