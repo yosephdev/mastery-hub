@@ -14,5 +14,5 @@ urlpatterns = [
 
     # View specific profiles
     path('profile/<str:username>/', views.view_profile, name='view_profile'),
-    path('mentor/<str:username>/', views.view_mentor_profile, name='mentor_profile'),
+    path('mentor/<str:username>/', views.view_mentor_profile, name='view_mentor_profile'),
 ]

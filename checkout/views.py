@@ -171,14 +171,15 @@ def cart_action_handler(action_type):
 def add_to_cart(request, session_id):
     try:
         session = Session.objects.get(id=session_id)
-        
+
         if request.user.profile in session.participants.all():
-            messages.error(request, 'You are already enrolled in this session!')
+            messages.error(
+                request, 'You are already enrolled in this session!')
             return JsonResponse({
                 'success': False,
                 'error': 'Already enrolled'
             })
-        
+
         if session.is_full():
             messages.error(request, 'This session is full!')
             return JsonResponse({
@@ -202,9 +203,9 @@ def add_to_cart(request, session_id):
             cart_item.save()
 
         total = cart.get_total_price()
-        
+
         messages.success(
-            request, 
+            request,
             f'Added {session.title} to your cart!'
         )
 

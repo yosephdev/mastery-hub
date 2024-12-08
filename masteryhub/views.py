@@ -156,7 +156,7 @@ def request_mentorship(request, mentor_id):
         if existing_request:
             messages.warning(
                 request, "You already have a pending or active mentorship request with this mentor.")
-            return redirect('profiles:mentor_profile', username=mentor.username)
+            return redirect('profiles:view_mentor_profile', username=mentor.username)
 
         if request.method == 'POST':
             message = request.POST.get('message', '').strip()
@@ -164,7 +164,7 @@ def request_mentorship(request, mentor_id):
             if not message:
                 messages.error(
                     request, "Please provide a message for your mentorship request.")
-                return redirect('profiles:mentor_profile', username=mentor.username)
+                return redirect('profiles:view_mentor_profile', username=mentor.username)
 
             MentorshipRequest.objects.create(
                 mentee=request.user,
@@ -174,7 +174,7 @@ def request_mentorship(request, mentor_id):
 
             messages.success(
                 request, "Your mentorship request has been sent successfully!")
-            return redirect('profiles:mentor_profile', username=mentor.username)
+            return redirect('profiles:view_mentor_profile', username=mentor.username)
 
         return render(request, 'masteryhub/request_mentorship.html', {
             'mentor': mentor

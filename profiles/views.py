@@ -49,7 +49,7 @@ def view_profile(request, username=None):
 
 @login_required
 def edit_profile(request):
-    """Edit the user's profile."""   
+    """Edit the user's profile."""
     profile, created = Profile.objects.get_or_create(
         user=request.user,
         defaults={
@@ -67,12 +67,14 @@ def edit_profile(request):
 
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
-        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
-        
+        profile_form = ProfileForm(
+            request.POST, request.FILES, instance=profile)
+
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            messages.success(request, 'Your profile has been updated successfully!')
+            messages.success(
+                request, 'Your profile has been updated successfully!')
             return redirect('profiles:view_profile', username=request.user.username)
     else:
         user_form = UserForm(instance=request.user)
@@ -125,14 +127,16 @@ def view_mentor_profile(request, username):
 @login_required
 def delete_profile(request, user_id):
     """Delete the user's profile."""
-    if request.method == 'POST':        
+    if request.method == 'POST':
         if request.user.id == user_id:
             user = request.user
             user.delete()
-            messages.success(request, "Your profile has been deleted successfully.")
+            messages.success(
+                request, "Your profile has been deleted successfully.")
             return redirect('home:index')
         else:
-            messages.error(request, "You don't have permission to delete this profile.")
+            messages.error(
+                request, "You don't have permission to delete this profile.")
             return redirect('profiles:view_profiles')
 
     return render(request, 'profiles/delete_confirmation.html')

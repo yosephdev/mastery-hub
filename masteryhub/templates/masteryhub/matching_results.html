@@ -89,8 +89,8 @@
                         </div>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'profiles:mentor_profile' match.mentor.user.username %}"
+                    <div class="d-grid gap-2">                       
+                        <a href="{% url 'profiles:view_mentor_profile' match.mentor.user.username %}"
                             class="btn btn-outline-primary">
                             <i class="fas fa-user me-2"></i>View Profile
                         </a>
