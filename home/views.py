@@ -58,8 +58,7 @@ def index(request):
             'rating': 4.9,
             'students_count': 1234,
             'sessions_count': 89,
-            'description': 'Certified nutritionist with 10+ years of experience',
-            'is_demo': True
+            'description': 'Certified nutritionist with 10+ years of experience'
         },
         {
             'name': 'Sara Taye',
@@ -70,8 +69,7 @@ def index(request):
             'rating': 4.8,
             'students_count': 956,
             'sessions_count': 67,
-            'description': 'MBA, Former CEO with expertise in business growth',
-            'is_demo': True
+            'description': 'MBA, Former CEO with expertise in business growth'
         },
         {
             'name': 'Kidist Shibre',
@@ -82,8 +80,7 @@ def index(request):
             'rating': 4.9,
             'students_count': 1567,
             'sessions_count': 124,
-            'description': 'PhD in Educational Psychology, 15+ years teaching experience',
-            'is_demo': True
+            'description': 'PhD in Educational Psychology, 15+ years teaching experience'
         },
         {
             'name': 'Alex Jacob',
@@ -94,8 +91,7 @@ def index(request):
             'rating': 4.7,
             'students_count': 2341,
             'sessions_count': 156,
-            'description': 'Senior Software Engineer, Full-stack development expert',
-            'is_demo': True
+            'description': 'Senior Software Engineer, Full-stack development expert'
         },
         {
             'name': 'Maria Rodriguez',
