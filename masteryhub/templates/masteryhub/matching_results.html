@@ -1,6 +1,34 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15) !important;
+    }
+
+    .progress {
+        background-color: #e9ecef;
+        border-radius: 1rem;
+    }
+
+    .progress-bar {
+        border-radius: 1rem;
+    }
+
+    .mentor-avatar {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container pt-5">
     <div class="row">
@@ -11,6 +39,9 @@
                     <i class="fas fa-sliders-h me-2"></i>Adjust Preferences
                 </a>
             </div>
+            {% if total_matches %}
+            <p class="text-muted mt-2">Found {{ total_matches }} potential mentors for you</p>
+            {% endif %}
         </div>
 
         {% if matches %}
@@ -19,62 +50,52 @@
             <div class="card h-100 shadow-sm hover-lift">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
-                        <img src="{{ match.mentor.profile_picture.url|default:'/static/images/default-avatar.png' }}"
-                            alt="{{ match.mentor.user.username }}" class="rounded-circle me-3" width="60" height="60">
+                        <img src="{{ match.mentor.avatar.url|default:'/static/images/default-avatar.png' }}"
+                            alt="{{ match.mentor.user.get_full_name }}" class="rounded-circle me-3 mentor-avatar">
                         <div>
                             <h5 class="card-title mb-1">{{ match.mentor.user.get_full_name }}</h5>
-                            <div class="text-warning">
-                                {% with ''|center:match.mentor.avg_rating as range %}
-                                {% for _ in range %}
-                                <i class="fas fa-star"></i>
-                                {% endfor %}
-                                {% endwith %}
-                            </div>
+                            <p class="text-muted small mb-0">{{ match.mentor.title|default:"Mentor" }}</p>
                         </div>
                     </div>
 
                     <div class="match-scores mb-3">
-                        <div class="progress mb-2" style="height: 10px;">
-                            <div class="progress-bar bg-success" role="progressbar"
-                                style="width: {{ match.skill_match }}%" aria-valuenow="{{ match.skill_match }}"
-                                aria-valuemin="0" aria-valuemax="100" data-bs-toggle="tooltip"
-                                title="Skill Match: {{ match.skill_match }}%">
-                            </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="small">Skill Match</span>
+                            <span class="small fw-bold">{{ match.skill_match }}%</span>
                         </div>
-                        <div class="progress mb-2" style="height: 10px;">
-                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ match.style_match }}%"
-                                aria-valuenow="{{ match.style_match }}" aria-valuemin="0" aria-valuemax="100"
-                                data-bs-toggle="tooltip" title="Teaching Style Match: {{ match.style_match }}%">
-                            </div>
+                        <div class="progress mb-2" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: {{ match.skill_match }}%"></div>
                         </div>
-                        <div class="progress mb-2" style="height: 10px;">
-                            <div class="progress-bar bg-primary" role="progressbar"
-                                style="width: {{ match.availability_match }}%"
-                                aria-valuenow="{{ match.availability_match }}" aria-valuemin="0" aria-valuemax="100"
-                                data-bs-toggle="tooltip" title="Availability Match: {{ match.availability_match }}%">
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between text-muted small">
-                            <span>Overall Match:</span>
-                            <span class="fw-bold">{{ match.total_match }}%</span>
-                        </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <h6 class="text-muted mb-2">Skills:</h6>
-                        <div class="d-flex flex-wrap gap-2">
-                            {% for skill in match.mentor.user.skills.all %}
-                            <span class="badge bg-light text-dark">{{ skill.title }}</span>
-                            {% endfor %}
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="small">Teaching Style</span>
+                            <span class="small fw-bold">{{ match.style_match }}%</span>
+                        </div>
+                        <div class="progress mb-2" style="height: 8px;">
+                            <div class="progress-bar bg-info" style="width: {{ match.style_match }}%"></div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="small">Availability</span>
+                            <span class="small fw-bold">{{ match.availability_match }}%</span>
+                        </div>
+                        <div class="progress mb-2" style="height: 8px;">
+                            <div class="progress-bar bg-primary" style="width: {{ match.availability_match }}%"></div>
+                        </div>
+
+                        <div class="d-flex justify-content-between text-muted mt-2">
+                            <span class="fw-bold">Overall Match:</span>
+                            <span class="fw-bold text-primary">{{ match.total_match }}%</span>
                         </div>
                     </div>
 
                     <div class="d-grid gap-2">
-                        <a href="{% url 'profiles:view_mentor_profile' match.mentor.user.username %}"
+                        <a href="{% url 'profiles:mentor_profile' match.mentor.user.username %}"
                             class="btn btn-outline-primary">
-                            <i class="fas fa-user me-2"></i>View Mentor Profile
+                            <i class="fas fa-user me-2"></i>View Profile
                         </a>
-                        <a href="{% url 'masteryhub:request_mentorship' mentor_id=match.mentor.user.id %}" class="btn btn-primary">
+                        <a href="{% url 'masteryhub:request_mentorship' mentor_id=match.mentor.user.id %}"
+                            class="btn btn-primary">
                             <i class="fas fa-handshake me-2"></i>Request Mentorship
                         </a>
                     </div>
@@ -97,26 +118,14 @@
         {% endif %}
     </div>
 </div>
-
-{% block extra_css %}
-<style>
-    .hover-lift {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .hover-lift:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15) !important;
-    }
-
-    .progress {
-        background-color: #e9ecef;
-        border-radius: 1rem;
-    }
-
-    .progress-bar {
-        border-radius: 1rem;
-    }
-</style>
 {% endblock %}
+
+{% block postloadjs %}
+{{ block.super }}
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+</script>
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Count, Avg
+from django.db.models import Q
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -12,14 +12,12 @@ from .forms import (
     ReviewForm,
     SessionForm,
     ForumPostForm,
-    MentorshipRequestForm
 )
 from .models import Feedback, Session, Category, Mentorship, Forum, Review, Skill, Mentor, MentorshipRequest
 from profiles.models import Profile
 import stripe
 import logging
 from django.contrib.auth import get_user_model
-from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)
 
@@ -147,66 +145,47 @@ def search_mentors(request):
 def request_mentorship(request, mentor_id):
     """Handle mentorship request."""
     try:
-        mentor = get_object_or_404(User, id=mentor_id)
-        mentor_profile = get_object_or_404(
-            Profile, user=mentor, is_expert=True)
-
-        if request.user == mentor:
-            messages.error(
-                request, "You cannot request mentorship from yourself.")
-            return redirect('masteryhub:list_mentors')
+        mentor = User.objects.get(id=mentor_id)
 
         existing_request = MentorshipRequest.objects.filter(
             mentee=request.user,
             mentor=mentor,
-            status='pending'
+            status__in=['pending', 'accepted']
         ).exists()
 
         if existing_request:
             messages.warning(
-                request,
-                "You already have a pending request with this mentor."
-            )
-            return redirect('masteryhub:list_mentors')
+                request, "You already have a pending or active mentorship request with this mentor.")
+            return redirect('profiles:mentor_profile', username=mentor.username)
 
         if request.method == 'POST':
-            form = MentorshipRequestForm(request.POST)
-            if form.is_valid():
-                mentorship_request = form.save(commit=False)
-                mentorship_request.mentee = request.user
-                mentorship_request.mentor = mentor
-                mentorship_request.save()
+            message = request.POST.get('message', '').strip()
 
-                messages.success(
-                    request,
-                    f"Mentorship request sent to {mentor.username}!"
-                )
-                return redirect('masteryhub:mentee_dashboard')
-        else:
-            form = MentorshipRequestForm()
+            if not message:
+                messages.error(
+                    request, "Please provide a message for your mentorship request.")
+                return redirect('profiles:mentor_profile', username=mentor.username)
 
-        context = {
-            'form': form,
-            'mentor': mentor,
-            'mentor_profile': mentor_profile
-        }
-        return render(request, 'masteryhub/request_mentorship.html', context)
+            MentorshipRequest.objects.create(
+                mentee=request.user,
+                mentor=mentor,
+                message=message
+            )
+
+            messages.success(
+                request, "Your mentorship request has been sent successfully!")
+            return redirect('profiles:mentor_profile', username=mentor.username)
+
+        return render(request, 'masteryhub/request_mentorship.html', {
+            'mentor': mentor
+        })
 
     except User.DoesNotExist:
-        messages.error(
-            request,
-            "The mentor you're trying to reach doesn't exist anymore."
-        )
-        return redirect('masteryhub:list_mentors')
-    except Profile.DoesNotExist:
-        messages.error(
-            request,
-            "This user is not registered as a mentor."
-        )
-        return redirect('masteryhub:list_mentors')
+        messages.error(request, "Mentor not found.")
+        return redirect('masteryhub:mentor_matching')
     except Exception as e:
         messages.error(request, f"An error occurred: {str(e)}")
-        return redirect('masteryhub:list_mentors')
+        return redirect('masteryhub:mentor_matching')
 
 
 @login_required
@@ -271,6 +250,7 @@ def session_list(request):
 
 
 def list_mentors(request):
+    """A view that lists all mentors."""
     query = request.GET.get('q', '')
     areas = request.GET.getlist('areas')
     rating = request.GET.get('rating')
@@ -309,105 +289,26 @@ def list_mentors(request):
 
 @login_required
 def mentor_matching_view(request):
-    """A view that handles mentor matching based on multiple criteria."""
-    categories = Category.objects.all()
-    skills = Skill.objects.all()
-
+    """A view that handles the mentor matching."""
     if request.method == 'POST':
-        learning_goal = request.POST.get('learning_goal')
-        experience_level = request.POST.get('experience_level')
-        learning_style = request.POST.get('learning_style')
-        availability = request.POST.get('availability')
-        budget = request.POST.get('budget')
-
-        mentors = Profile.objects.filter(is_expert=True).annotate(
-            student_count=Count('mentorships_as_mentor')
-        )
-
-        budget_ranges = {
-            'low': (0, 50),
-            'medium': (51, 100),
-            'high': (101, 1000)
+        request.session['mentor_preferences'] = {
+            'skills': request.POST.getlist('skills'),
+            'experience_level': request.POST.get('experience_level'),
+            'availability': request.POST.get('availability') == 'on'
         }
-        if budget in budget_ranges:
-            min_price, max_price = budget_ranges[budget]
-            mentors = mentors.filter(
-                user__skills__price__range=(min_price, max_price)
-            ).distinct()
+        return redirect('masteryhub:matching_results')
 
-        if learning_goal:
-            mentors = mentors.filter(
-                Q(sessions_hosted__category_id=learning_goal) |
-                Q(user__skills__category=learning_goal)
-            ).distinct()
+    if 'mentor_preferences' in request.session:
+        del request.session['mentor_preferences']
 
-        matched_mentors = []
-        for mentor in mentors:
-            mentor_reviews = Review.objects.filter(
-                session__host=mentor
-            ).aggregate(avg_rating=Avg('rating'))
-            avg_rating = mentor_reviews['avg_rating'] or 0
-
-            relevant_skills = mentor.user.skills.filter(
-                category=learning_goal).count() if learning_goal else 0
-            total_skills = mentor.user.skills.count()
-            skill_match = (relevant_skills / total_skills *
-                           100) if total_skills > 0 else 0
-
-            match_score = {
-                'mentor': mentor,
-                'skill_match': skill_match,
-                'style_match': 80,
-                'availability_match': 90,
-                'rating_score': (avg_rating / 5) * 100
-            }
-
-            total_match = (
-                match_score['skill_match'] * 0.35 +
-                match_score['style_match'] * 0.25 +
-                match_score['availability_match'] * 0.20 +
-                match_score['rating_score'] * 0.20
-            )
-
-            matched_mentors.append({
-                'mentor': mentor,
-                'total_match': round(total_match, 1),
-                'skill_match': round(match_score['skill_match']),
-                'style_match': match_score['style_match'],
-                'availability_match': match_score['availability_match']
-            })
-
-        matched_mentors.sort(key=lambda x: x['total_match'], reverse=True)
-
-        return render(request, 'masteryhub/matching_results.html', {
-            'matches': matched_mentors[:10],
-            'form_submitted': True
-        })
+    skills = Skill.objects.all().order_by('title')
+    experience_levels = Mentor.EXPERIENCE_LEVELS
 
     context = {
-        'categories': categories,
         'skills': skills,
-        'experience_levels': [
-            ('beginner', 'Beginner'),
-            ('intermediate', 'Intermediate'),
-            ('advanced', 'Advanced')
-        ],
-        'learning_styles': [
-            ('hands_on', 'Hands-on Practice'),
-            ('theoretical', 'Theoretical Learning'),
-            ('mixed', 'Mixed Approach')
-        ],
-        'availability_options': [
-            ('weekdays', 'Weekdays'),
-            ('weekends', 'Weekends'),
-            ('flexible', 'Flexible')
-        ],
-        'budget_ranges': [
-            ('low', '$20-50'),
-            ('medium', '$51-100'),
-            ('high', '$101+')
-        ]
+        'experience_levels': experience_levels,
     }
+
     return render(request, 'masteryhub/mentor_matching.html', context)
 
 
@@ -737,11 +638,28 @@ def reject_mentorship(request, mentorship_id):
 
 @login_required
 def my_mentorships(request):
-    """A view that displays the current user's mentorships."""
-    mentorships = Mentorship.objects.filter(mentee=request.user.profile)
+    """A view that displays the user's mentorships."""
+    mentorships_as_mentor = Mentorship.objects.filter(
+        mentor__user=request.user
+    ).select_related('mentee', 'mentor')
+
+    mentorships_as_mentee = Mentorship.objects.filter(
+        mentee__user=request.user
+    ).select_related('mentee', 'mentor')
+
+    requests_sent = MentorshipRequest.objects.filter(
+        mentee=request.user
+    ).select_related('mentor')
+
+    requests_received = MentorshipRequest.objects.filter(
+        mentor=request.user
+    ).select_related('mentee')
 
     context = {
-        'mentorships': mentorships,
+        'mentorships_as_mentor': mentorships_as_mentor,
+        'mentorships_as_mentee': mentorships_as_mentee,
+        'requests_sent': requests_sent,
+        'requests_received': requests_received,
     }
 
     return render(request, 'masteryhub/my_mentorships.html', context)
@@ -751,3 +669,66 @@ def view_mentor_profile(request, username):
     user = get_object_or_404(User, username=username)
     mentor = get_object_or_404(Mentor, user=user)
     return render(request, 'masteryhub/mentor_profile.html', {'mentor': mentor})
+
+
+@login_required
+def matching_results(request):
+    """A view that displays the matching results."""
+    try:
+        preferences = request.session.get('mentor_preferences', {})
+
+        mentors = Mentor.objects.filter(
+            is_available=True,
+            user__profile__is_expert=True
+        ).exclude(
+            user=request.user
+        ).select_related(
+            'user',
+            'user__profile'
+        ).prefetch_related('skills')
+
+        if preferences:
+            if preferences.get('skills'):
+                mentors = mentors.filter(
+                    skills__id__in=preferences['skills']
+                ).distinct()
+
+            if preferences.get('experience_level'):
+                mentors = mentors.filter(
+                    experience_level=preferences['experience_level']
+                )
+
+            if preferences.get('availability'):
+                mentors = mentors.filter(is_available=True)
+
+        matches = []
+        for mentor in mentors:
+            mentor_skills = set(mentor.skills.values_list('id', flat=True))
+            selected_skills = set(map(int, preferences.get('skills', [])))
+
+            if mentor_skills:
+                skill_match = (len(selected_skills.intersection(
+                    mentor_skills)) / len(mentor_skills)) * 100
+
+                matches.append({
+                    'mentor': mentor.user.profile,
+                    'skill_match': round(skill_match, 1),
+                    'style_match': 75,
+                    'availability_match': 80,
+                    'total_match': round((skill_match + 75 + 80) / 3, 1)
+                })
+
+        matches.sort(key=lambda x: x['total_match'], reverse=True)
+
+        return render(request, 'masteryhub/matching_results.html', {
+            'matches': matches[:9],
+            'total_matches': len(matches)
+        })
+
+    except Exception as e:
+        messages.error(
+            request, f"An error occurred while finding matches: {str(e)}")
+        return render(request, 'masteryhub/matching_results.html', {
+            'matches': [],
+            'total_matches': 0
+        })

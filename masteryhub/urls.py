@@ -45,8 +45,8 @@ urlpatterns = [
     # Mentorship
     path("expert-dashboard/", expert_dashboard, name="expert_dashboard"),
     path("mentee-dashboard/", mentee_dashboard, name="mentee_dashboard"),
-    path("mentor-matching/", mentor_matching_view, name="mentor_matching"),
-    path('matching-results/', mentor_matching_view, name='matching_results'),
+    path("mentor-matching/", views.mentor_matching_view, name="mentor_matching"),
+    path('matching-results/', views.matching_results, name='matching_results'),
     path("request-mentorship/<int:mentor_id>/",
          request_mentorship, name="request_mentorship"),
     path("manage-mentorship-requests/", manage_mentorship_requests,

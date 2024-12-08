@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-
 {% block content %}
 <div class="container pt-5">
     <h2 class="display-4 fw-bold text-center mb-5">My Mentorships</h2>
@@ -13,13 +12,43 @@
                     <h3 class="h4 mb-0">As Mentor</h3>
                 </div>
                 <div class="card-body">
+                    <!-- Received Requests Section -->
+                    {% if requests_received %}
+                    <h5 class="mb-3">Pending Requests</h5>
+                    {% for request in requests_received %}
+                    <div class="mentorship-card mb-3 p-3 border rounded">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-user-graduate me-2"></i>
+                                <strong>{{ request.mentee.username }}</strong>
+                            </div>
+                            <p class="mb-2 text-muted small">{{ request.message }}</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-warning">Pending</span>
+                                <span class="badge bg-secondary">
+                                    <i class="far fa-clock me-1"></i>
+                                    {{ request.created_at|date:"M d, Y" }}
+                                </span>
+                            </div>
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-success">Accept</button>
+                                <button class="btn btn-sm btn-danger">Decline</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <hr class="my-4">
+                    {% endif %}
+
+                    <!-- Active Mentorships -->
+                    <h5 class="mb-3">Active Mentorships</h5>
                     {% for mentorship in mentorships_as_mentor %}
                     <div
                         class="mentorship-card mb-3 p-3 border rounded {% if mentorship.status == 'active' %}border-success{% endif %}">
                         <div class="d-flex flex-column">
                             <div class="d-flex align-items-center mb-2">
                                 <i class="fas fa-user-graduate me-2"></i>
-                                <strong>{{ mentorship.mentee.username }}</strong>
+                                <strong>{{ mentorship.mentee.user.username }}</strong>
                             </div>
                             <div class="d-flex flex-wrap gap-2">
                                 <span
@@ -36,10 +65,12 @@
                         </div>
                     </div>
                     {% empty %}
+                    {% if not requests_received %}
                     <div class="text-center text-muted py-4">
                         <i class="fas fa-user-friends fa-3x mb-3"></i>
                         <p>You are not mentoring anyone at the moment.</p>
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -51,13 +82,39 @@
                     <h3 class="h4 mb-0">As Mentee</h3>
                 </div>
                 <div class="card-body">
+                    <!-- Sent Requests Section -->
+                    {% if requests_sent %}
+                    <h5 class="mb-3">Sent Requests</h5>
+                    {% for request in requests_sent %}
+                    <div class="mentorship-card mb-3 p-3 border rounded">
+                        <div class="d-flex flex-column">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-chalkboard-teacher me-2"></i>
+                                <strong>{{ request.mentor.username }}</strong>
+                            </div>
+                            <p class="mb-2 text-muted small">{{ request.message }}</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-warning">Pending</span>
+                                <span class="badge bg-secondary">
+                                    <i class="far fa-clock me-1"></i>
+                                    {{ request.created_at|date:"M d, Y" }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <hr class="my-4">
+                    {% endif %}
+
+                    <!-- Active Mentorships -->
+                    <h5 class="mb-3">Active Mentorships</h5>
                     {% for mentorship in mentorships_as_mentee %}
                     <div
                         class="mentorship-card mb-3 p-3 border rounded {% if mentorship.status == 'active' %}border-success{% endif %}">
                         <div class="d-flex flex-column">
                             <div class="d-flex align-items-center mb-2">
                                 <i class="fas fa-chalkboard-teacher me-2"></i>
-                                <strong>{{ mentorship.mentor.username }}</strong>
+                                <strong>{{ mentorship.mentor.user.username }}</strong>
                             </div>
                             <div class="d-flex flex-wrap gap-2">
                                 <span
@@ -74,10 +131,12 @@
                         </div>
                     </div>
                     {% empty %}
+                    {% if not requests_sent %}
                     <div class="text-center text-muted py-4">
                         <i class="fas fa-user-friends fa-3x mb-3"></i>
                         <p>You are not being mentored at the moment.</p>
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
