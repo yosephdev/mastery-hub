@@ -14,7 +14,10 @@ class Session(models.Model):
     duration = models.DurationField(default=timedelta(hours=1))
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     host = models.ForeignKey(
-        Profile, on_delete=models.CASCADE, related_name="sessions_hosted"
+        'profiles.Profile',
+        on_delete=models.CASCADE,
+        related_name="sessions_hosted",
+        db_constraint=False
     )
     participants = models.ManyToManyField(
         Profile, related_name="sessions_participated", blank=True
@@ -219,13 +222,13 @@ class MentorshipRequest(models.Model):
     ]
 
     mentee = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
+        User,
+        on_delete=models.CASCADE,
         related_name='mentorship_requests_sent'
     )
     mentor = models.ForeignKey(
-        User, 
-        on_delete=models.CASCADE, 
+        User,
+        on_delete=models.CASCADE,
         related_name='mentorship_requests_received'
     )
     message = models.TextField(

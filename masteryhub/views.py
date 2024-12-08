@@ -218,14 +218,28 @@ def manage_mentorship_requests(request):
 
 
 def session_list(request):
-    """A view that renders the list of sessions with optional filtering."""
+    """A view that renders the list of sessions."""
     query = request.GET.get("q")
     selected_category = request.GET.get("category")
-    
+
     sessions = Session.objects.filter(
+        is_active=True,
         status="scheduled",
-        date__gte=timezone.now()
-    ).select_related('host', 'category')
+    ).select_related(
+        'host',
+        'category',
+        'host__user'
+    ).prefetch_related('participants')
+
+    print(f"Total sessions found: {sessions.count()}")
+    for session in sessions:
+        print(f"""
+        Session: {session.title}
+        Host: {session.host.user.username}
+        Category: {session.category}
+        Price: {session.price}
+        Participants: {session.participants.count()}/{session.max_participants}
+        """)
 
     if query:
         sessions = sessions.filter(
@@ -235,26 +249,20 @@ def session_list(request):
         )
 
     if selected_category:
-        sessions = sessions.filter(category__id=selected_category)
+        sessions = sessions.filter(category__name=selected_category)
 
     categories = Category.objects.all()
 
     user_sessions = []
     if request.user.is_authenticated:
-        try:
-            user_profile = request.user.profile
-            user_sessions = Session.objects.filter(participants=user_profile)
-        except AttributeError:
-            user_sessions = []
-
-    session_prices = {session.id: session.price for session in sessions}
+        user_sessions = Session.objects.filter(
+            participants=request.user.profile)
 
     context = {
         "sessions": sessions,
         "categories": categories,
         "selected_category": selected_category,
         "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
-        "session_prices": session_prices,
         "user_sessions": user_sessions,
     }
 
@@ -600,20 +608,20 @@ def browse_skills(request):
     selected_category = request.GET.get("category")
 
     skills = Skill.objects.all()
-  
+
     if query:
         skills = skills.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query)
         )
-    
+
     if selected_category:
-        try:           
+        try:
             category_id = int(selected_category)
             skills = skills.filter(category_id=category_id)
-        except (ValueError, TypeError):          
+        except (ValueError, TypeError):
             skills = skills.filter(category__name=selected_category)
-  
+
     categories = Category.objects.all()
 
     skill_sessions = {}
