@@ -34,7 +34,7 @@ urlpatterns = [
     path('reviews/', review_list, name='review_list'),
     path('reviews/create/<int:session_id>/',
          create_review, name='create_review'),
-    path('browse-skills/', views.browse_skills_view, name='browse_skills'),
+    path('browse-skills/', views.browse_skills, name='browse_skills'),
     path('checkout/', include('checkout.urls')),
     # Mentors
     path('mentors/', views.list_mentors, name='list_mentors'),

@@ -221,15 +221,21 @@ def session_list(request):
     """A view that renders the list of sessions with optional filtering."""
     query = request.GET.get("q")
     selected_category = request.GET.get("category")
-
-    sessions = Session.objects.filter(status="scheduled")
+    
+    sessions = Session.objects.filter(
+        status="scheduled",
+        date__gte=timezone.now()
+    ).select_related('host', 'category')
 
     if query:
         sessions = sessions.filter(
-            Q(title__icontains=query) | Q(description__icontains=query))
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(category__name__icontains=query)
+        )
 
     if selected_category:
-        sessions = sessions.filter(category__name=selected_category)
+        sessions = sessions.filter(category__id=selected_category)
 
     categories = Category.objects.all()
 
@@ -588,37 +594,45 @@ def book_session(request, session_id):
     return render(request, 'masteryhub/book_session.html', {'form': form, 'session': session})
 
 
-def browse_skills_view(request):
-    """A view that handles browsing skills."""
+def browse_skills(request):
+    """A view to display all skills with optional category filtering."""
     query = request.GET.get("q")
     selected_category = request.GET.get("category")
 
-    skills = Skill.objects.select_related('category').all()
-
-    categories = Category.objects.filter(
-        skills__isnull=False
-    ).distinct().order_by('name')
-
+    skills = Skill.objects.all()
+  
     if query:
         skills = skills.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query)
         )
-
+    
     if selected_category:
-        try:
+        try:           
             category_id = int(selected_category)
             skills = skills.filter(category_id=category_id)
-        except (ValueError, TypeError):
-            pass
+        except (ValueError, TypeError):          
+            skills = skills.filter(category__name=selected_category)
+  
+    categories = Category.objects.all()
+
+    skill_sessions = {}
+    for skill in skills:
+        active_sessions = Session.objects.filter(
+            category=skill.category,
+            status="scheduled",
+            date__gte=timezone.now()
+        ).count()
+        skill_sessions[skill.id] = active_sessions
 
     context = {
         "skills": skills,
         "categories": categories,
         "selected_category": selected_category,
+        "skill_sessions": skill_sessions,
     }
 
-    return render(request, 'masteryhub/browse_skills.html', context)
+    return render(request, "masteryhub/browse_skills.html", context)
 
 
 def review_list(request):
@@ -728,19 +742,3 @@ def view_mentor_profile(request, username):
     user = get_object_or_404(User, username=username)
     mentor = get_object_or_404(Mentor, user=user)
     return render(request, 'masteryhub/mentor_profile.html', {'mentor': mentor})
-
-
-def browse_skills(request):
-    categories = Category.objects.all()
-    selected_category = request.GET.get('category')
-    skills = Skill.objects.all()
-
-    if selected_category:
-        skills = skills.filter(category__id=selected_category)
-
-    context = {
-        'categories': categories,
-        'selected_category': selected_category,
-        'skills': skills,
-    }
-    return render(request, 'masteryhub/browse_skills.html', context)
