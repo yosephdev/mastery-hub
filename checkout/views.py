@@ -28,6 +28,7 @@ from masteryhub.models import Session
 from .models import Order, CartItem, Cart, OrderLineItem
 from .tasks import send_order_confirmation
 from .decorators import cart_action_handler
+from profiles.forms import ProfileForm
 
 User = get_user_model()
 
@@ -469,19 +470,35 @@ def remove_from_cart(request, item_id):
 def checkout_success(request, order_number):
     """Handle successful checkouts"""
     order = get_object_or_404(Order, order_number=order_number)
+    save_info = request.session.get('save_info', False)
 
     if request.user.is_authenticated:
         profile = Profile.objects.get(user=request.user)
         order.user_profile = profile
         order.save()
 
-    messages.success(request, f'Order successfully processed! \
-        Your order number is {order_number}. A confirmation \
-        email will be sent to {order.email}.')
+        if save_info:
+            profile_data = {
+                'default_phone_number': order.phone_number,
+                'default_country': order.country,
+                'default_postcode': order.postcode,
+                'default_town_or_city': order.town_or_city,
+                'default_street_address1': order.street_address1,
+                'default_street_address2': order.street_address2,
+                'default_county': order.county,
+            }
+            profile_form = ProfileForm(profile_data, instance=profile)
+            if profile_form.is_valid():
+                profile_form.save()
+
+    # Clear the cart
+    if 'cart' in request.session:
+        del request.session['cart']
 
     template = 'checkout/checkout_success.html'
     context = {
         'order': order,
+        'from_profile': False,
     }
 
     return render(request, template, context)
