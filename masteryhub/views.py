@@ -13,8 +13,7 @@ from .forms import (
     SessionForm,
     ForumPostForm,
 )
-from .models import Feedback, Session, Category, Mentorship, Forum, Review, Skill, Mentor, MentorshipRequest, Activity
-from profiles.models import Profile
+from .models import Feedback, Session, Category, Mentorship, Forum, Review, Skill, Mentor, MentorshipRequest, Activity, Profile
 import stripe
 import logging
 from django.contrib.auth import get_user_model
@@ -591,25 +590,32 @@ def expert_dashboard(request):
 
 @login_required
 def mentee_dashboard(request):
+    """A view that displays the mentee's dashboard with relevant information."""
+    try:
+        user_profile = request.user.profile
+    except Profile.DoesNotExist:
+        user_profile = None
+
     context = {
         'upcoming_sessions': Session.objects.filter(
-            participants=request.user,
+            participants=user_profile,
             date__gte=timezone.now()
-        ).order_by('date')[:5],
-         'booked_sessions': Session.objects.filter(
-            participants=request.user
-        ).order_by('-date'),
-        
+        ).order_by('date')[:5] if user_profile else [],
+
+        'booked_sessions': Session.objects.filter(
+            participants=user_profile
+        ).order_by('-date') if user_profile else [],
+
         'recent_activities': [],
-    }    
-    
+    }
+
     try:
         context['recent_activities'] = Activity.objects.filter(
             user=request.user
         ).order_by('-timestamp')[:5]
     except:
         pass
-        
+
     return render(request, 'masteryhub/mentee_dashboard.html', context)
 
 
@@ -675,6 +681,7 @@ def my_mentorships(request):
 
 
 def view_mentor_profile(request, username):
+    """A view that displays the mentor's profile."""
     user = get_object_or_404(User, username=username)
     mentor = get_object_or_404(Mentor, user=user)
     return render(request, 'masteryhub/mentor_profile.html', {'mentor': mentor})
@@ -744,4 +751,5 @@ def matching_results(request):
 
 
 def booking_success(request):
+    """A view that displays the booking success page."""
     return render(request, 'masteryhub/booking_success.html')
