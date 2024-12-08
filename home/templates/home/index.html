@@ -27,9 +27,11 @@
 <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-indicators">
         {% for slide in slides %}
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ forloop.counter0 }}" 
-            {% if forloop.first %}class="active"{% endif %} 
-            aria-label="Slide {{ forloop.counter }}">
+        <button type="button" 
+        data-bs-target="#heroCarousel" 
+        data-bs-slide-to="{{ forloop.counter0 }}" 
+        {% if forloop.first %}class="active"{% endif %} 
+        aria-label="Slide {{ forloop.counter }}">
         </button>
         {% endfor %}
     </div>
@@ -71,11 +73,11 @@
                     </a>
                     {% get_providers as socialaccount_providers %}
                     {% for provider in socialaccount_providers %}
-                        {% if provider.id == 'google' %}
-                            <a href="{% provider_login_url 'google' %}" class="btn btn-outline-light btn-lg mx-2">
-                                <i class="fab fa-google mr-2"></i> Continue with Google
-                            </a>
-                        {% endif %}
+                    {% if provider.id == 'google' %}
+                    <a href="{% provider_login_url 'google' %}" class="btn btn-outline-light btn-lg mx-2">
+                        <i class="fab fa-google mr-2"></i> Continue with Google
+                    </a>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -159,10 +161,15 @@
                             <span><i class="fas fa-users text-primary"></i> 1.2k+ Students</span>
                             <span><i class="fas fa-star text-warning"></i> 4.8/5</span>
                         </div>
-                        <a href="{% url 'masteryhub:view_session' session_id=2 %}"
-                            class="btn btn-outline-primary btn-block">
-                            Explore Course
-                        </a>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'masteryhub:mentor_matching' %}?skill=web-development"
+                                class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Find Mentors
+                            </a>
+                            <a href="{% url 'masteryhub:view_session' session_id=20 %}" class="btn btn-outline-primary">
+                                <i class="fas fa-book-open me-2"></i>View Sessions
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -182,10 +189,15 @@
                             <span><i class="fas fa-users text-primary"></i> 956 Students</span>
                             <span><i class="fas fa-star text-warning"></i> 4.7/5</span>
                         </div>
-                        <a href="{% url 'masteryhub:view_session' session_id=3 %}"
-                            class="btn btn-outline-primary btn-block">
-                            Explore Course
-                        </a>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'masteryhub:mentor_matching' %}?skill=digital-marketing"
+                                class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Find Mentors
+                            </a>
+                            <a href="{% url 'masteryhub:view_session' session_id=17 %}" class="btn btn-outline-primary">
+                                <i class="fas fa-book-open me-2"></i>View Sessions
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -205,10 +217,14 @@
                             <span><i class="fas fa-users text-primary"></i> 845 Students</span>
                             <span><i class="fas fa-star text-warning"></i> 4.9/5</span>
                         </div>
-                        <a href="{% url 'masteryhub:view_session' session_id=4 %}"
-                            class="btn btn-outline-primary btn-block">
-                            Explore Course
-                        </a>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'masteryhub:mentor_matching' %}?skill=data-science" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>Find Mentors
+                            </a>
+                            <a href="{% url 'masteryhub:view_session' session_id=19 %}" class="btn btn-outline-primary">
+                                <i class="fas fa-book-open me-2"></i>View Sessions
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -314,11 +330,11 @@
                     </a>
                     {% get_providers as socialaccount_providers %}
                     {% for provider in socialaccount_providers %}
-                        {% if provider.id == 'google' %}
-                            <a href="{% provider_login_url 'google' %}" class="btn btn-outline-light btn-lg px-4">
-                                <i class="fab fa-google mr-2"></i> Sign up with Google
-                            </a>
-                        {% endif %}
+                    {% if provider.id == 'google' %}
+                    <a href="{% provider_login_url 'google' %}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fab fa-google mr-2"></i> Sign up with Google
+                    </a>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -359,4 +375,4 @@
         animation-delay: 0.4s;
     }
 </style>
-{% endblock %}
+{% endblock content %}

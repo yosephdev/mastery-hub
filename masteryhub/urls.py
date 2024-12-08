@@ -58,7 +58,7 @@ urlpatterns = [
     path("my-mentorships/", my_mentorships, name="my_mentorships"),
     path("report-concern/", report_concern, name="report_concern"),
     # Sessions
-    path("sessions/<int:session_id>/", view_session, name="view_session"),
+    path("session/<int:session_id>/", view_session, name="view_session"),
     path("sessions/", session_list, name="session_list"),
     path("sessions/create/", create_session, name="create_session"),
     path("sessions/<int:session_id>/edit/", edit_session, name="edit_session"),
