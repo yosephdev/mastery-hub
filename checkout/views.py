@@ -27,6 +27,7 @@ from profiles.models import Profile
 from masteryhub.models import Session
 from .models import Order, CartItem, Cart, OrderLineItem
 from .tasks import send_order_confirmation
+from .decorators import cart_action_handler
 
 User = get_user_model()
 
@@ -169,6 +170,21 @@ def cart_action_handler(action_type):
 def add_to_cart(request, session_id):
     try:
         session = Session.objects.get(id=session_id)
+        
+        if request.user.profile in session.participants.all():
+            messages.error(request, 'You are already enrolled in this session!')
+            return JsonResponse({
+                'success': False,
+                'error': 'Already enrolled'
+            })
+        
+        if session.is_full():
+            messages.error(request, 'This session is full!')
+            return JsonResponse({
+                'success': False,
+                'error': 'Session is full'
+            })
+
         cart, _ = Cart.objects.get_or_create(user=request.user)
 
         cart_item, created = CartItem.objects.get_or_create(
@@ -185,16 +201,29 @@ def add_to_cart(request, session_id):
             cart_item.save()
 
         total = cart.get_total_price()
+        
+        messages.success(
+            request, 
+            f'Added {session.title} to your cart!'
+        )
+
         return JsonResponse({
             'success': True,
             'total': float(total)
         })
 
     except Session.DoesNotExist:
+        messages.error(request, 'Session not found!')
         return JsonResponse({
             'success': False,
             'error': 'Session not found'
         }, status=404)
+    except Exception as e:
+        messages.error(request, f'Error adding session to cart: {str(e)}')
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
 
 
 @cache_page(60 * 5)

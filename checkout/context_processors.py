@@ -1,3 +1,4 @@
+from decimal import Decimal
 from .models import Cart
 from django.contrib import messages
 
@@ -19,21 +20,23 @@ def message_processor(request):
 
 def cart_contents(request):
     """
-    Context processor for making cart contents available across all templates.
+    Context processor to make cart contents available across all templates
     """
-    cart_items = []
-    total = 0
+    cart_total = Decimal('0.00')
+    cart_items_count = 0
+
     if request.user.is_authenticated:
         try:
-            cart = Cart.objects.get(user=request.user)
-            cart_items = cart.items.select_related('session').all()
-            total = cart.get_total_price()
+            cart = Cart.objects.prefetch_related('items').get(user=request.user)
+            cart_total = cart.get_total_price()
+            cart_items_count = cart.items.count()
         except Cart.DoesNotExist:
             pass
 
     return {
-        'cart_items': cart_items,
-        'total': total,
+        'cart_total': cart_total,
+        'cart_items_count': cart_items_count,
+        'cart': cart if request.user.is_authenticated and 'cart' in locals() else None
     }
 
 

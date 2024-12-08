@@ -19,6 +19,7 @@ from profiles.models import Profile
 import stripe
 import logging
 from django.contrib.auth import get_user_model
+from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)
 
