@@ -1,147 +1,148 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="container pt-5">
+<div class="container-fluid py-4">
     <div class="row">
-        <div class="col-md-3 pt-3">
-            <div class="list-group">
-                <a href="#dashboard" class="list-group-item list-group-item-action active">Dashboard</a>
-                <a href="#assessment" class="list-group-item list-group-item-action">My Assessment</a>
-                <a href="#goals" class="list-group-item list-group-item-action">My Goals</a>
-                <a href="#feedback" class="list-group-item list-group-item-action">Feedback</a>
-                <a href="#analytics" class="list-group-item list-group-item-action">Analytics</a>
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        {% if request.user.profile.image %}
+                            <img src="{{ request.user.profile.image.url }}" class="rounded-circle me-3" width="60" height="60" alt="Profile">
+                        {% else %}
+                            <img src="{% static 'images/default-profile.png' %}" class="rounded-circle me-3" width="60" height="60" alt="Profile">
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-0">{{ request.user.get_full_name }}</h5>
+                            <small class="text-muted">Mentee</small>
+                        </div>
+                    </div>
+                    <div class="list-group">
+                        <a href="#overview" class="list-group-item list-group-item-action active" data-bs-toggle="list">
+                            <i class="fas fa-home me-2"></i> Overview
+                        </a>
+                        <a href="#sessions" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                            <i class="fas fa-calendar-check me-2"></i> My Sessions
+                        </a>
+                        <a href="#mentors" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                            <i class="fas fa-users me-2"></i> My Mentors
+                        </a>
+                        <a href="#progress" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                            <i class="fas fa-chart-line me-2"></i> Progress
+                        </a>
+                        <a href="#goals" class="list-group-item list-group-item-action" data-bs-toggle="list">
+                            <i class="fas fa-bullseye me-2"></i> Goals
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- Main Content -->
         <div class="col-md-9">
-            <div id="dashboard" class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Skill Assessment and Tracking</h5>
-                    <p>Welcome, {{ request.user.get_full_name }}. Here is an overview of your skills, goals, and
-                        feedback.</p>
-                </div>
-            </div>
-
-            {% if sessions %}
-            <h5>Available Sessions</h5>
-            {% for session in sessions %}
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">{{ session.title }}</h5>
-                    <p>{{ session.description }}</p>
-                    <p><strong>Price:</strong> ${{ get_cost }}</p>
-                    <p><strong>Duration:</strong> {{ session.duration }} hours</p>
-                    <p><strong>Available Spots:</strong> {{ session.available_spots }}</p>
-                    <a href="{% url 'masteryhub:book_session' session_id=session.id %}" class="btn btn-primary">Book
-                        Session</a>
-                </div>
-            </div>
-            {% empty %}
-            <p>No sessions available</p>
-            {% endfor %}
-            {% else %}
-            <p>No sessions available</p>
-            {% endif %}
-
-            <div id="assessment" class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Skill Assessment</h5>
-                    <ul class="list-unstyled">
-                        {% for skill in skills %}
-                        <li><i class="fas fa-chalkboard-teacher"></i> {{ skill.title }}: {{ skill.description }}</li>
-                        {% empty %}
-                        <li>No skills listed</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-
-            <div id="goals" class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Goal Setting</h5>
-                    <ul class="list-unstyled">
-                        {% for goal in goals %}
-                        <li><i class="fas fa-calendar-alt"></i> {{ goal.name }}: {{ goal.description }}</li>
-                        {% empty %}
-                        <li>No goals listed</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-
-            <div id="feedback" class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Expert Feedback</h5>
-                    {% for feedback in feedbacks %}
-                    <div class="mb-2">
-                        <p><strong>"{{ feedback.comment }}"</strong> - {{ feedback.mentor.user.get_full_name }}</p>
-                    </div>
-                    {% empty %}
-                    <p>No feedback available</p>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <div id="progress" class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Progress Tracking</h5>
+            <div class="tab-content">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade show active" id="overview">
                     <div class="row">
-                        {% for progress in mentee_profile.progress_set.all %}
-                        <div class="col-md-6 mb-3">
-                            <div class="progress-card p-3 border rounded">
-                                <h6>{{ progress.name }}</h6>
-                                <p>{{ progress.description }}</p>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Upcoming Sessions</h5>
+                                    {% if upcoming_sessions %}
+                                        {% for session in upcoming_sessions %}
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="session-icon me-3">
+                                                    <i class="fas fa-chalkboard-teacher fa-2x text-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0">{{ session.title }}</h6>
+                                                    <small class="text-muted">
+                                                        {{ session.scheduled_time|date:"F j, Y, g:i a" }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p class="text-muted">No upcoming sessions</p>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
-                        {% empty %}
-                        <p>No progress records found</p>
-                        {% endfor %}
+
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Recent Activity</h5>
+                                    {% if recent_activities %}
+                                        {% for activity in recent_activities %}
+                                            <div class="activity-item mb-3">
+                                                <small class="text-muted">{{ activity.timestamp|date:"F j, Y" }}</small>
+                                                <p class="mb-0">{{ activity.description }}</p>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p class="text-muted">No recent activity</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="analytics" class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Performance Insights</h5>
-                    <canvas id="performance-graph" width="400" height="200"></canvas>
-                    <script>
-                        var ctx = document.getElementById('performance-graph').getContext('2d');
-                        var chart = new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                                datasets: [{
-                                    label: 'Performance',
-                                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                                    borderColor: 'rgba(0, 123, 255, 1)',
-                                    data: [10, 20, 30, 40, 50, 60, 70]
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                scales: {
-                                    x: {
-                                        display: true,
-                                        title: {
-                                            display: true,
-                                            text: 'Month'
-                                        }
-                                    },
-                                    y: {
-                                        display: true,
-                                        title: {
-                                            display: true,
-                                            text: 'Performance'
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    </script>
+                <!-- Sessions Tab -->
+                <div class="tab-pane fade" id="sessions">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">My Learning Sessions</h5>
+                            {% if booked_sessions %}
+                                {% for session in booked_sessions %}
+                                    <div class="session-card mb-3 p-3 border rounded">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">{{ session.title }}</h6>
+                                                <p class="mb-0 text-muted">
+                                                    <small>
+                                                        <i class="fas fa-clock me-1"></i>
+                                                        {{ session.scheduled_time|date:"F j, Y, g:i a" }}
+                                                    </small>
+                                                </p>
+                                            </div>
+                                            <div class="session-actions">
+                                                <a href="{% url 'masteryhub:view_session' session_id=session.id %}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <p class="text-muted mb-3">You haven't booked any sessions yet</p>
+                                    <a href="{% url 'masteryhub:browse_skills' %}" class="btn btn-primary">
+                                        Browse Available Sessions
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Continue with other tabs... -->
             </div>
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/dashboard.js' %}"></script>
 {% endblock %}
+
+{% endblock content %}

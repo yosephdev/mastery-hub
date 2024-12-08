@@ -13,7 +13,7 @@ from .forms import (
     SessionForm,
     ForumPostForm,
 )
-from .models import Feedback, Session, Category, Mentorship, Forum, Review, Skill, Mentor, MentorshipRequest
+from .models import Feedback, Session, Category, Mentorship, Forum, Review, Skill, Mentor, MentorshipRequest, Activity
 from profiles.models import Profile
 import stripe
 import logging
@@ -591,16 +591,18 @@ def expert_dashboard(request):
 
 @login_required
 def mentee_dashboard(request):
-    """A view that displays the mentee's dashboard with relevant information."""
-    mentee_profile = request.user.profile
-    mentorships = Mentorship.objects.filter(mentee=mentee_profile)
-    sessions = Session.objects.filter(participants=mentee_profile)
-
     context = {
-        'mentorships': mentorships,
-        'sessions': sessions,
+        'upcoming_sessions': Session.objects.filter(
+            participants=request.user,
+            date__gte=timezone.now()
+        ).order_by('date')[:5],
+        'booked_sessions': Session.objects.filter(
+            participants=request.user
+        ).order_by('-date'),
+        'recent_activities': Activity.objects.filter(
+            user=request.user
+        ).order_by('-timestamp')[:5] if hasattr(request.user, 'activity_set') else [],
     }
-
     return render(request, 'masteryhub/mentee_dashboard.html', context)
 
 
