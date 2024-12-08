@@ -1,16 +1,20 @@
 # MasteryHub: Skill-Sharing Platform for Professionals
 
-![Alt text](docs/readme_images/Macbook.png)
-![Alt text](docs/readme_images/iPad.png)
-![Alt text](docs/readme_images/iPhone.png)
+![MasteryHub Preview](docs/readme_images/responsive-preview.png)
 
 Welcome to MasteryHub, your go-to platform for mentorship and skill development. This application connects mentees with experienced mentors across various fields, offering personalized guidance and support.
 
-Some features on the site are available exclusively to registered users, including accessing the dashboard, booking mentorship sessions, and tracking progress.
-
-Users can search for mentors, view mentor profiles, request mentorship, and schedule sessions. There is also a resources section, privacy policy, and a section for providing feedback.
-
 [Live link to MasteryHub](https://skill-sharing-446c0336ffb5.herokuapp.com/)
+
+## Key Features
+- Personalized mentorship sessions
+- Expert-led skill development
+- Real-time session booking
+- Secure payment processing
+- User profiles and progress tracking
+- Interactive learning resources
+
+Some features are available exclusively to registered users, including accessing the dashboard, booking mentorship sessions, and tracking progress.
 
 <br>
 
