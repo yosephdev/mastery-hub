@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="mb-4">Booking Successful!</h1>
+            <p class="lead">Your session has been successfully booked.</p>
+            <a href="{% url 'masteryhub:mentee_dashboard' %}" class="btn btn-primary">
+                Go to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

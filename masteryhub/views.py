@@ -498,7 +498,7 @@ def book_session(request, session_id):
             booking.user = request.user
             booking.booking_date = timezone.now()
             booking.save()
-            return redirect('booking_success')
+            return redirect('masteryhub:booking_success')
     else:
         form = BookingForm()
     return render(request, 'masteryhub/book_session.html', {'form': form, 'session': session})
@@ -732,3 +732,7 @@ def matching_results(request):
             'matches': [],
             'total_matches': 0
         })
+
+
+def booking_success(request):
+    return render(request, 'masteryhub/booking_success.html')

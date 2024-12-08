@@ -25,6 +25,7 @@ from .views import (
     delete_session,
     review_list,
     create_review,
+    booking_success,
 )
 
 app_name = 'masteryhub'
@@ -71,4 +72,5 @@ urlpatterns = [
     path("forums/<int:post_id>/", view_forum_post, name="view_forum_post"),
     path("forums/<int:post_id>/reply/",
          reply_forum_post, name="reply_forum_post"),
+    path('booking/success/', views.booking_success, name='booking_success'),
 ]
