@@ -128,37 +128,35 @@
                         <button type="button" class="btn-close {% if level != 30 %}btn-close-white{% endif %}" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
                     <div class="toast-body">
-                        {{ message }}
+                        {{ message.message|safe }}
                     </div>
                 </div>
             {% endwith %}
         {% endfor %}
     </div>
 
-    <!-- Initialize Toasts -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {            
-            const messages = document.querySelectorAll('.toast');
-            const seenMessages = new Set();
-            
-            messages.forEach(message => {
-                const messageText = message.querySelector('.toast-body').textContent.trim();
-                if (seenMessages.has(messageText)) {
-                    message.remove();
-                } else {
-                    seenMessages.add(messageText);
-                }
-            });
-            
-            const toastElList = document.querySelectorAll('.toast');
-            toastElList.forEach(toast => {               
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => {
-                        toast.remove();
-                    }, 500);
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof bootstrap !== 'undefined') {
+                var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+                var toastList = toastElList.map(function(toastEl) {
+                    return new bootstrap.Toast(toastEl, {
+                        autohide: true,
+                        delay: 5000
+                    });
+                });            
+                
+                setTimeout(function() {
+                    toastList.forEach(function(toast) {
+                        toast.hide();
+                    });
                 }, 5000);
-            });
+            } else {
+                console.warn('Bootstrap is not loaded');                
+                setTimeout(function() {
+                    document.querySelector('.message-container').remove();
+                }, 5000);
+            }
         });
     </script>
     {% endif %}
