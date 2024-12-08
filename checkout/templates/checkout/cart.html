@@ -19,25 +19,6 @@
 <div class="container pt-4 mt-5">
     <h2 class="logo-font mb-4 text-center">Your Cart</h2>
 
-    
-    {% if messages %}
-    <div class="message-container">
-        {% for message in messages %}
-        {% with message.level as level %}
-        {% if level == 40 %}
-        {% include 'includes/toasts/toast_error.html' %}
-        {% elif level == 30 %}
-        {% include 'includes/toasts/toast_warning.html' %}
-        {% elif level == 25 %}
-        {% include 'includes/toasts/toast_success.html' %}
-        {% else %}
-        {% include 'includes/toasts/toast_info.html' %}
-        {% endif %}
-        {% endwith %}
-        {% endfor %}
-    </div>
-    {% endif %}
-
     {% if cart and cart.items.exists %}
     <div class="card shadow-sm">
         <div class="card-body">
