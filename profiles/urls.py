@@ -9,7 +9,7 @@ urlpatterns = [
     
     # View/edit/delete own profile
     path('profile/edit/', views.edit_profile, name='edit_profile'),
-    path('profile/delete/', views.delete_profile, name='delete_profile'),
+    path('profile/delete/<int:user_id>/', views.delete_profile, name='delete_profile'),
     
     # View specific profiles
     path('profile/<str:username>/', views.view_profile, name='view_profile'),
