@@ -15,8 +15,9 @@ def index(request):
     """
     A view to return the index page for the home app
     """
-    social_auth_google_enabled = SocialApp.objects.filter(provider='google').exists()
-    
+    social_auth_google_enabled = SocialApp.objects.filter(
+        provider='google').exists()
+
     slides = [
         {
             'image': 'https://skill-sharing.s3.amazonaws.com/static/images/hero-bg-1.webp',
@@ -41,7 +42,7 @@ def index(request):
             'alt': 'Slide 3',
             'heading': 'Upskill Today',
             'caption': 'Enhance your career with new skills.',
-            'button_url': '/accounts/signup/', 
+            'button_url': '/accounts/signup/',
             'button_text': 'Get Started',
             'button_class': 'btn-success'
         },
@@ -53,88 +54,96 @@ def index(request):
             'username': 'Anna',
             'field': 'Health & Wellness',
             'specialty': 'Nutrition Expert',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/anna-carolina.webp'},
+            'image': {'url': f'https://avatar.iran.liara.run/public/girl?username=Anna_Carolina'},
             'rating': 4.9,
             'students_count': 1234,
             'sessions_count': 89,
-            'description': 'Certified nutritionist with 10+ years of experience'
+            'description': 'Certified nutritionist with 10+ years of experience',
+            'is_demo': True
         },
         {
             'name': 'Sara Taye',
             'username': 'Sara',
             'field': 'Business',
             'specialty': 'Business Strategy',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/sara-taye.webp'},
+            'image': {'url': f'https://eu.ui-avatars.com/api/?name=Sara+Taye&size=250&background=random'},
             'rating': 4.8,
             'students_count': 956,
             'sessions_count': 67,
-            'description': 'MBA, Former CEO with expertise in business growth'
+            'description': 'MBA, Former CEO with expertise in business growth',
+            'is_demo': True
         },
         {
             'name': 'Kidist Shibre',
             'username': 'Kidist',
             'field': 'Education',
             'specialty': 'Educational Psychology',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/kidist-shibre.webp'},
+            'image': {'url': f'https://robohash.org/Kidist_Shibre'},
             'rating': 4.9,
             'students_count': 1567,
             'sessions_count': 124,
-            'description': 'PhD in Educational Psychology, 15+ years teaching experience'
+            'description': 'PhD in Educational Psychology, 15+ years teaching experience',
+            'is_demo': True
         },
         {
             'name': 'Alex Jacob',
             'username': 'Alex',
             'field': 'Technology',
             'specialty': 'Software Development',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/alex-jacob.webp'},
+            'image': {'url': f'https://avatar.iran.liara.run/public/boy?username=Alex_Jacob'},
             'rating': 4.7,
             'students_count': 2341,
             'sessions_count': 156,
-            'description': 'Senior Software Engineer, Full-stack development expert'
+            'description': 'Senior Software Engineer, Full-stack development expert',
+            'is_demo': True
         },
         {
             'name': 'Maria Rodriguez',
             'username': 'Maria',
             'field': 'Design',
             'specialty': 'UX/UI Design',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/maria-rodriguez.webp'},
+            'image': {'url': f'https://eu.ui-avatars.com/api/?name=Maria+Rodriguez&size=250'},
             'rating': 4.8,
             'students_count': 1789,
             'sessions_count': 98,
-            'description': 'Lead Designer at top tech company, 8+ years experience'
+            'description': 'Lead Designer at top tech company, 8+ years experience',
+            'is_demo': True
         },
         {
             'name': 'John Smith',
             'username': 'John',
             'field': 'Marketing',
             'specialty': 'Digital Marketing',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/john-smith.webp'},
+            'image': {'url': f'https://avatar.iran.liara.run/public/boy?username=John'},
             'rating': 4.6,
             'students_count': 2156,
             'sessions_count': 134,
-            'description': 'Digital Marketing Strategist, Google certified expert'
+            'description': 'Digital Marketing Strategist, Google certified expert',
+            'is_demo': True
         },
         {
             'name': 'Lisa Chen',
             'username': 'Lisa',
             'field': 'Finance',
             'specialty': 'Investment Banking',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/lisa-chen.webp'},
+            'image': {'url': f'https://robohash.org/Lisa_Chen'},
             'rating': 4.9,
             'students_count': 876,
             'sessions_count': 45,
-            'description': 'Former Investment Banker, CFA charterholder'
+            'description': 'Former Investment Banker, CFA charterholder',
+            'is_demo': True
         },
         {
             'name': 'David Kumar',
             'username': 'David',
             'field': 'Data Science',
             'specialty': 'Machine Learning',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/david-kumar.webp'},
+            'image': {'url': f'https://eu.ui-avatars.com/api/?name=David+Kumar&size=250&background=random'},
             'rating': 4.8,
             'students_count': 1654,
             'sessions_count': 87,
-            'description': 'AI Researcher, PhD in Machine Learning'
+            'description': 'AI Researcher, PhD in Machine Learning',
+            'is_demo': True
         }
     ]
 
@@ -142,42 +151,42 @@ def index(request):
         {
             'name': 'Emily Rodriguez',
             'role': 'UX Designer',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/testimonial1.webp'},
+            'image': {'url': f'https://eu.ui-avatars.com/api/?name=Emily+Rodriguez&size=250&background=random'},
             'text': 'MasteryHub has transformed my career! The mentors are incredibly knowledgeable and supportive. I went from a junior designer to leading my own team in just 8 months.',
             'rating': 5
         },
         {
             'name': 'Michael Thompson',
             'role': 'Software Developer',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/testimonial2.webp'},
+            'image': {'url': f'https://avatar.iran.liara.run/public/boy?username=Michael'},
             'text': "I've learned so much in such a short time. The platform is easy to use and the sessions are very engaging. The practical projects helped me build a strong portfolio.",
             'rating': 5
         },
         {
             'name': 'Sarah Johnson',
             'role': 'Marketing Manager',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/testimonial3.webp'},
+            'image': {'url': f'https://robohash.org/Sarah_Johnson'},
             'text': 'The personalized mentorship program exceeded my expectations. My mentor provided invaluable insights that helped me secure a promotion at work.',
             'rating': 5
         },
         {
             'name': 'James Wilson',
             'role': 'Business Analyst',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/testimonial4.webp'},
+            'image': {'url': f'https://eu.ui-avatars.com/api/?name=James+Wilson&size=250&background=random'},
             'text': 'Outstanding platform for professional development. The mentors are industry experts who provide practical, real-world advice and guidance.',
             'rating': 5
         },
         {
             'name': 'Anna Martinez',
             'role': 'Data Scientist',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/testimonial5.webp'},
+            'image': {'url': f'https://avatar.iran.liara.run/public/girl?username=Anna'},
             'text': 'The quality of instruction is exceptional. I particularly appreciated the hands-on projects and personalized feedback from my mentor.',
             'rating': 5
         },
         {
             'name': 'Robert Chen',
             'role': 'Product Manager',
-            'image': {'url': 'https://skill-sharing.s3.amazonaws.com/static/images/testimonial6.webp'},
+            'image': {'url': f'https://robohash.org/Robert_Chen'},
             'text': 'MasteryHub helped me transition into product management seamlessly. The structured learning path and expert guidance were invaluable.',
             'rating': 5
         }

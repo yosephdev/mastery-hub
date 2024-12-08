@@ -270,10 +270,14 @@
                                 <span>{{ mentor.sessions_count }}</span>
                             </div>
                         </div>
-                        <a href="{% url 'profiles:view_mentor_profile' username=mentor.username %}"
-                            class="btn btn-outline-primary btn-block">
-                            View Profile
-                        </a>
+                        {% if not mentor.is_demo %}
+                            <a href="{% url 'profiles:view_mentor_profile' username=mentor.username %}"
+                                class="btn btn-outline-primary btn-block">
+                                View Profile
+                            </a>
+                        {% else %}
+                            <button class="btn btn-secondary" disabled>Demo Profile</button>
+                        {% endif %}
                     </div>
                 </div>
             </div>
