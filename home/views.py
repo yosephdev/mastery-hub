@@ -23,7 +23,7 @@ def index(request):
             'alt': 'Slide 1',
             'heading': 'Welcome to Skill Sharing',
             'caption': 'Learn new skills from experts.',
-            'button_url': '/learn-more/',
+            'button_url': '/about/',
             'button_text': 'Learn More',
             'button_class': 'btn-primary'
         },
@@ -32,7 +32,7 @@ def index(request):
             'alt': 'Slide 2',
             'heading': 'Join Our Community',
             'caption': 'Connect with mentors and peers.',
-            'button_url': '/join/',
+            'button_url': '/accounts/signup/',
             'button_text': 'Join Now',
             'button_class': 'btn-warning'
         },
@@ -41,7 +41,7 @@ def index(request):
             'alt': 'Slide 3',
             'heading': 'Upskill Today',
             'caption': 'Enhance your career with new skills.',
-            'button_url': '/upskill/',
+            'button_url': '/accounts/signup/', 
             'button_text': 'Get Started',
             'button_class': 'btn-success'
         },

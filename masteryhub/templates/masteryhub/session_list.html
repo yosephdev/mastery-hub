@@ -98,18 +98,35 @@
                                     {{ session.get_difficulty_display }}
                                 </span>
                             </div>
-
+                          
                             <div class="d-grid gap-2">
                                 <a href="{% url 'masteryhub:view_session' session_id=session.id %}"
                                     class="btn btn-outline-primary">
                                     <i class="fas fa-info-circle me-1"></i>View Details
                                 </a>
-                                {% if user.is_authenticated and not user.is_expert %}
-                                <button
-                                    onclick="addToBag('{{ session.id }}', '{{ session.title }}', '{{ session.price }}')"
-                                    class="btn btn-primary">
-                                    <i class="fas fa-shopping-cart me-1"></i>Add to Bag
-                                </button>
+                                
+                                {% if user.is_authenticated %}
+                                    {% if not user.is_expert %}
+                                        {% if session in user_sessions %}
+                                            <button class="btn btn-success disabled">
+                                                <i class="fas fa-check-circle me-1"></i>Already Enrolled
+                                            </button>
+                                        {% else %}
+                                            <button
+                                                onclick="addToBag('{{ session.id }}', '{{ session.title }}', '{{ session.price }}')"
+                                                class="btn btn-primary">
+                                                <i class="fas fa-shopping-cart me-1"></i>Add to Bag
+                                            </button>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="alert alert-info small mb-0">
+                                            <i class="fas fa-info-circle me-1"></i>Experts cannot enroll in sessions
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-primary">
+                                        <i class="fas fa-sign-in-alt me-1"></i>Login to Enroll
+                                    </a>
                                 {% endif %}
                             </div>
                         </div>
@@ -143,23 +160,23 @@
                 price: price
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {                
-                const cartTotalElement = document.querySelector('.cart-total');
-                if (cartTotalElement) {
-                    cartTotalElement.textContent = '$' + parseFloat(data.total).toFixed(2);
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const cartTotalElement = document.querySelector('.cart-total');
+                    if (cartTotalElement) {
+                        cartTotalElement.textContent = '$' + parseFloat(data.total).toFixed(2);
+                    }
+
+                    showToast('Success', 'Session added to your cart!', 'success');
+                } else {
+                    showToast('Error', data.error || 'Error adding session to cart', 'danger');
                 }
-               
-                showToast('Success', 'Session added to your cart!', 'success');
-            } else {
-                showToast('Error', data.error || 'Error adding session to cart', 'danger');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Error', 'An unexpected error occurred', 'danger');
-        });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error', 'An unexpected error occurred', 'danger');
+            });
     }
 
     function showToast(title, message, type) {

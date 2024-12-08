@@ -6,11 +6,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.models import User
 from .forms import (
-    MentorApplicationForm, 
-    ConcernReportForm, 
-    BookingForm, 
-    ReviewForm, 
-    SessionForm, 
+    MentorApplicationForm,
+    ConcernReportForm,
+    BookingForm,
+    ReviewForm,
+    SessionForm,
     ForumPostForm,
     MentorshipRequestForm
 )
@@ -93,12 +93,14 @@ def search_mentors(request):
     selected_skills = request.GET.getlist('skills', [])
     selected_rating = request.GET.get('rating', '')
     available_now = request.GET.get('available_now') == 'true'
-  
-    mentors = Mentor.objects.select_related('user').prefetch_related('skills').all()
-    
+
+    mentors = Mentor.objects.select_related(
+        'user').prefetch_related('skills').all()
+
     print("All mentors before filtering:")
     for mentor in mentors:
-        print(f"- {mentor.user.first_name} {mentor.user.last_name} ({mentor.user.username})")
+        print(
+            f"- {mentor.user.first_name} {mentor.user.last_name} ({mentor.user.username})")
 
     if query:
         print(f"\nSearching for: {query}")
@@ -109,7 +111,7 @@ def search_mentors(request):
             Q(bio__icontains=query) |
             Q(skills__title__icontains=query)
         ).distinct()
-        
+
         print("\nFiltered mentors:")
         for mentor in mentors:
             print(f"- {mentor.user.first_name} {mentor.user.last_name}")
@@ -119,10 +121,10 @@ def search_mentors(request):
 
     if selected_rating:
         mentors = mentors.filter(rating__gte=float(selected_rating))
- 
+
     if available_now:
         mentors = mentors.filter(is_available=True)
-    
+
     skills = Skill.objects.all().order_by('title')
 
     print(f"\nFinal SQL Query: {mentors.query}")
@@ -136,7 +138,7 @@ def search_mentors(request):
         'selected_rating': selected_rating,
         'available_now': available_now,
     }
-  
+
     return render(request, 'masteryhub/search_mentors.html', context)
 
 
@@ -145,25 +147,27 @@ def request_mentorship(request, mentor_id):
     """Handle mentorship request."""
     try:
         mentor = get_object_or_404(User, id=mentor_id)
-        mentor_profile = get_object_or_404(Profile, user=mentor, is_expert=True)
-        
+        mentor_profile = get_object_or_404(
+            Profile, user=mentor, is_expert=True)
+
         if request.user == mentor:
-            messages.error(request, "You cannot request mentorship from yourself.")
-            return redirect('masteryhub:list_mentors')            
-        
+            messages.error(
+                request, "You cannot request mentorship from yourself.")
+            return redirect('masteryhub:list_mentors')
+
         existing_request = MentorshipRequest.objects.filter(
             mentee=request.user,
             mentor=mentor,
             status='pending'
         ).exists()
-        
+
         if existing_request:
             messages.warning(
-                request, 
+                request,
                 "You already have a pending request with this mentor."
             )
             return redirect('masteryhub:list_mentors')
-            
+
         if request.method == 'POST':
             form = MentorshipRequestForm(request.POST)
             if form.is_valid():
@@ -171,31 +175,31 @@ def request_mentorship(request, mentor_id):
                 mentorship_request.mentee = request.user
                 mentorship_request.mentor = mentor
                 mentorship_request.save()
-                
+
                 messages.success(
-                    request, 
+                    request,
                     f"Mentorship request sent to {mentor.username}!"
                 )
                 return redirect('masteryhub:mentee_dashboard')
         else:
             form = MentorshipRequestForm()
-            
+
         context = {
             'form': form,
             'mentor': mentor,
             'mentor_profile': mentor_profile
         }
         return render(request, 'masteryhub/request_mentorship.html', context)
-        
+
     except User.DoesNotExist:
         messages.error(
-            request, 
+            request,
             "The mentor you're trying to reach doesn't exist anymore."
         )
         return redirect('masteryhub:list_mentors')
     except Profile.DoesNotExist:
         messages.error(
-            request, 
+            request,
             "This user is not registered as a mentor."
         )
         return redirect('masteryhub:list_mentors')
@@ -229,6 +233,14 @@ def session_list(request):
 
     categories = Category.objects.all()
 
+    user_sessions = []
+    if request.user.is_authenticated:
+        try:
+            user_profile = request.user.profile
+            user_sessions = Session.objects.filter(participants=user_profile)
+        except AttributeError:
+            user_sessions = []
+
     session_prices = {session.id: session.price for session in sessions}
 
     context = {
@@ -237,6 +249,7 @@ def session_list(request):
         "selected_category": selected_category,
         "stripe_public_key": settings.STRIPE_PUBLIC_KEY,
         "session_prices": session_prices,
+        "user_sessions": user_sessions,
     }
 
     return render(request, "masteryhub/session_list.html", context)
