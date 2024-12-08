@@ -596,13 +596,20 @@ def mentee_dashboard(request):
             participants=request.user,
             date__gte=timezone.now()
         ).order_by('date')[:5],
-        'booked_sessions': Session.objects.filter(
+         'booked_sessions': Session.objects.filter(
             participants=request.user
         ).order_by('-date'),
-        'recent_activities': Activity.objects.filter(
+        
+        'recent_activities': [],
+    }    
+    
+    try:
+        context['recent_activities'] = Activity.objects.filter(
             user=request.user
-        ).order_by('-timestamp')[:5] if hasattr(request.user, 'activity_set') else [],
-    }
+        ).order_by('-timestamp')[:5]
+    except:
+        pass
+        
     return render(request, 'masteryhub/mentee_dashboard.html', context)
 
 

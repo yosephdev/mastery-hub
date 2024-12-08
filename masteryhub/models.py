@@ -248,3 +248,25 @@ class MentorshipRequest(models.Model):
 
     def __str__(self):
         return f"Request from {self.mentee.username} to {self.mentor.username} ({self.status})"
+
+
+class Activity(models.Model):
+    ACTIVITY_TYPES = [
+        ('SESSION_BOOKED', 'Session Booked'),
+        ('SESSION_COMPLETED', 'Session Completed'),
+        ('REVIEW_ADDED', 'Review Added'),
+        ('GOAL_ACHIEVED', 'Goal Achieved'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    activity_type = models.CharField(max_length=20, choices=ACTIVITY_TYPES)
+    description = models.TextField()
+    timestamp = models.DateTimeField(default=timezone.now)
+    related_session = models.ForeignKey('Session', on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        verbose_name_plural = 'Activities'
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.activity_type} - {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
