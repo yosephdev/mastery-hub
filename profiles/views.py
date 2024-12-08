@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Profile
-from .forms import ProfileForm
+from .forms import ProfileForm, UserForm
 from django.contrib.auth import get_user_model
 
 # Create your views here.
@@ -49,8 +49,7 @@ def view_profile(request, username=None):
 
 @login_required
 def edit_profile(request):
-    """Edit the user's profile."""
-    # Get or create profile
+    """Edit the user's profile."""   
     profile, created = Profile.objects.get_or_create(
         user=request.user,
         defaults={
@@ -67,22 +66,23 @@ def edit_profile(request):
     )
 
     if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('profile')
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+        
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Your profile has been updated successfully!')
+            return redirect('profiles:view_profile', username=request.user.username)
     else:
-        form = ProfileForm(instance=profile)
+        user_form = UserForm(instance=request.user)
+        profile_form = ProfileForm(instance=profile)
 
     context = {
-        'form': form,
-        'profile': profile,
-        'created': created
+        'user_form': user_form,
+        'profile_form': profile_form,
+        'profile': profile
     }
-
-    if created:
-        messages.info(request, 'A new profile has been created for you. Please fill in your details.')
 
     return render(request, 'profiles/edit_profile.html', context)
 

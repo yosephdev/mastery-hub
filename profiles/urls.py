@@ -5,7 +5,7 @@ app_name = 'profiles'
 
 urlpatterns = [
     # List all profiles
-    path('', views.view_profiles, name='view_profiles'),
+    path('profiles/', views.view_profiles, name='view_profiles'),
     
     # View/edit/delete own profile
     path('profile/edit/', views.edit_profile, name='edit_profile'),
