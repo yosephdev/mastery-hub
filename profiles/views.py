@@ -123,13 +123,16 @@ def view_mentor_profile(request, username):
 
 
 @login_required
-def delete_profile(request):
-    """Delete the current user's profile."""
-    if request.method == 'POST':
-        user = request.user
-        user.delete()
-        messages.success(
-            request, "Your profile has been deleted successfully.")
-        return redirect('home:index')
+def delete_profile(request, user_id):
+    """Delete the user's profile."""
+    if request.method == 'POST':        
+        if request.user.id == user_id:
+            user = request.user
+            user.delete()
+            messages.success(request, "Your profile has been deleted successfully.")
+            return redirect('home:index')
+        else:
+            messages.error(request, "You don't have permission to delete this profile.")
+            return redirect('profiles:view_profiles')
 
     return render(request, 'profiles/delete_confirmation.html')
