@@ -648,20 +648,41 @@ def create_checkout_session(request):
         if not cart.items.exists():
             return JsonResponse({'error': 'Cart is empty'}, status=400)
 
-        domain = "https://skill-sharing-446c0336ffb5.herokuapp.com" if settings.DEBUG else request.build_absolute_uri(
-            '/').rstrip('/')
+        domain = "https://skill-sharing-446c0336ffb5.herokuapp.com"
 
-        line_items = [{
-            'price_data': {
-                'currency': 'usd',
-                'unit_amount': int(item.session.price * 100),
-                'product_data': {
-                    'name': item.session.title,
-                    'description': item.session.description[:255],
+        for item in cart.items.all():
+            if item.session.is_full():
+                return JsonResponse({
+                    'error': f'Session "{item.session.title}" is now full'
+                }, status=400)
+
+            if not item.session.is_active:
+                return JsonResponse({
+                    'error': f'Session "{item.session.title}" is no longer available'
+                }, status=400)
+
+        line_items = []
+        total_amount = 0
+
+        for item in cart.items.all():
+            price = int(item.session.price * 100)
+            if price <= 0:
+                return JsonResponse({
+                    'error': f'Invalid price for session "{item.session.title}"'
+                }, status=400)
+
+            line_items.append({
+                'price_data': {
+                    'currency': 'usd',
+                    'unit_amount': price,
+                    'product_data': {
+                        'name': item.session.title,
+                        'description': item.session.description[:255],
+                    },
                 },
-            },
-            'quantity': item.quantity,
-        } for item in cart.items.all()]
+                'quantity': item.quantity,
+            })
+            total_amount += price * item.quantity
 
         checkout_session = stripe.checkout.Session.create(
             customer_email=request.user.email,
@@ -673,14 +694,20 @@ def create_checkout_session(request):
             metadata={
                 'user_id': request.user.id,
                 'cart_id': cart.id,
+                'total_amount': total_amount,
             }
         )
 
         return JsonResponse({'sessionId': checkout_session.id})
 
+    except Cart.DoesNotExist:
+        return JsonResponse({'error': 'Cart not found'}, status=404)
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error: {str(e)}")
+        return JsonResponse({'error': 'Payment processing error'}, status=400)
     except Exception as e:
-        logger.error(f"Error creating checkout session: {str(e)}")
-        return JsonResponse({'error': str(e)}, status=400)
+        logger.error(f"Checkout error: {str(e)}")
+        return JsonResponse({'error': 'An unexpected error occurred'}, status=500)
 
 
 def handle_payment_intent(request, amount):
