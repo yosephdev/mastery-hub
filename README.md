@@ -7,6 +7,7 @@ Welcome to MasteryHub, your go-to platform for mentorship and skill development.
 [Live link to MasteryHub](https://skill-sharing-446c0336ffb5.herokuapp.com/)
 
 ## Key Features
+
 - Personalized mentorship sessions
 - Expert-led skill development
 - Real-time session booking
@@ -21,68 +22,68 @@ Some features are available exclusively to registered users, including accessing
 ## Table of Contents
 
 - [MasteryHub: Skill-Sharing Platform for Professionals](#masteryhub--skill-sharing-platform-for-professionals)
-  * [Table of Contents](#table-of-contents)
+  - [Table of Contents](#table-of-contents)
 - [UX](#ux)
-  * [The Strategy Plane](#the-strategy-plane)
-    + [Targeted Users](#targeted-users)
-    + [Site Goals](#site-goals)
-    + [Project Goals](#project-goals)
-  * [**Agile Planning**](#--agile-planning--)
-  * [User Stories](#user-stories)
-  * [Fundamental Structure](#fundamental-structure)
-    + [Wireframes](#wireframes)
-    + [Database Scheme](#database-scheme)
-    + [ERD Diagram](#erd-diagram)
-  * [Main plan](#main-plan)
-  * [Structure Plane](#structure-plane)
+  - [The Strategy Plane](#the-strategy-plane)
+    - [Targeted Users](#targeted-users)
+    - [Site Goals](#site-goals)
+    - [Project Goals](#project-goals)
+  - [**Agile Planning**](#--agile-planning--)
+  - [User Stories](#user-stories)
+  - [Fundamental Structure](#fundamental-structure)
+    - [Wireframes](#wireframes)
+    - [Database Scheme](#database-scheme)
+    - [ERD Diagram](#erd-diagram)
+  - [Main plan](#main-plan)
+  - [Structure Plane](#structure-plane)
 - [Features](#features)
-  * [Existing Features](#existing-features)
-    + [Home Page Preview](#home-page-preview)
-    + [Skill-Sharing Sessions Section](#skill-sharing-sessions-section)
-    + [Features:](#features-)
-    + [Dropdown Options:](#dropdown-options-)
-    + [Editing Options:](#editing-options-)
-    + [Unauthorized Users:](#unauthorized-users-)
-    + [Footer](#footer)
-    + [Contact Page](#contact-page)
-    + [Main Nav Menu](#main-nav-menu)
-    + [Restricted Pages](#restricted-pages)
-    + [Search Bar](#search-bar)
-    + [Session Details Page](#session-details-page)
-  * [My Account Dropdown](#my-account-dropdown)
-  * [User Sign Up Page](#user-sign-up-page)
-  * [User Sign In Page](#user-sign-in-page)
-  * [User Sign Out Page](#user-sign-out-page)
-  * [User Profile Page](#user-profile-page)
-  * [Dropdown Menu Content](#dropdown-menu-content)
-  * [Basket Page](#basket-page)
-  * [Checkout Page](#checkout-page)
-  * [Models](#models)
-    + [Error Page](#error-page)
-  * [Future Features](#future-features)
-  * [Design](#design)
-    + [Color Scheme](#color-scheme)
-    + [Typography](#typography)
-    + [Images](#images)
-  * [**Business Model**](#business-model)
-  * [**Marketing Strategy**](#marketing-strategy)
-    + [**Social Media Marketing**](#social-media-marketing)
-    + [**Newsletter Marketing**](#newsletter-marketing)
-  * [**Search Engine Optimization (SEO)**](#search-engine-optimization--seo)
-    + [**Keywords**](#keywords)
-    - [Keyword Research Process](#keyword-research-process)
-      * [Brainstorm General Topics](#brainstorm-general-topics)
-      * [Brain Dump Potential Keywords](#brain-dump-potential-keywords)
-      * [Research Keywords in Google](#research-keywords-in-google)
-      * [Ensure Mix of Head Terms and Long-Tail](#ensure-mix-of-head-terms-and-long-tail)
-      * [Assess Keyword Relevance and Search Volume](#assess-keyword-relevance-and-search-volume)
-      * [Final List of Keywords](#final-list-of-keywords)
-    + [**Sitemap.xml**](#--sitemapxml--)
-    + [**Robots.txt**](#--robotstxt--)
-  * [Main Technologies](#main-technologies)
-  * [Frameworks Used](#frameworks-used)
-  * [Libraries And Installed Packages](#libraries-and-installed-packages)
-  * [Tools And Resources](#tools-and-resources)
+  - [Existing Features](#existing-features)
+    - [Home Page Preview](#home-page-preview)
+    - [Skill-Sharing Sessions Section](#skill-sharing-sessions-section)
+    - [Features:](#features-)
+    - [Dropdown Options:](#dropdown-options-)
+    - [Editing Options:](#editing-options-)
+    - [Unauthorized Users:](#unauthorized-users-)
+    - [Footer](#footer)
+    - [Contact Page](#contact-page)
+    - [Main Nav Menu](#main-nav-menu)
+    - [Restricted Pages](#restricted-pages)
+    - [Search Bar](#search-bar)
+    - [Session Details Page](#session-details-page)
+  - [My Account Dropdown](#my-account-dropdown)
+  - [User Sign Up Page](#user-sign-up-page)
+  - [User Sign In Page](#user-sign-in-page)
+  - [User Sign Out Page](#user-sign-out-page)
+  - [User Profile Page](#user-profile-page)
+  - [Dropdown Menu Content](#dropdown-menu-content)
+  - [Basket Page](#basket-page)
+  - [Checkout Page](#checkout-page)
+  - [Models](#models)
+    - [Error Page](#error-page)
+  - [Future Features](#future-features)
+  - [Design](#design)
+    - [Color Scheme](#color-scheme)
+    - [Typography](#typography)
+    - [Images](#images)
+  - [**Business Model**](#business-model)
+  - [**Marketing Strategy**](#marketing-strategy)
+    - [**Social Media Marketing**](#social-media-marketing)
+    - [**Newsletter Marketing**](#newsletter-marketing)
+  - [**Search Engine Optimization (SEO)**](#search-engine-optimization--seo)
+    - [**Keywords**](#keywords)
+    * [Keyword Research Process](#keyword-research-process)
+      - [Brainstorm General Topics](#brainstorm-general-topics)
+      - [Brain Dump Potential Keywords](#brain-dump-potential-keywords)
+      - [Research Keywords in Google](#research-keywords-in-google)
+      - [Ensure Mix of Head Terms and Long-Tail](#ensure-mix-of-head-terms-and-long-tail)
+      - [Assess Keyword Relevance and Search Volume](#assess-keyword-relevance-and-search-volume)
+      - [Final List of Keywords](#final-list-of-keywords)
+    - [**Sitemap.xml**](#--sitemapxml--)
+    - [**Robots.txt**](#--robotstxt--)
+  - [Main Technologies](#main-technologies)
+  - [Frameworks Used](#frameworks-used)
+  - [Libraries And Installed Packages](#libraries-and-installed-packages)
+  - [Tools And Resources](#tools-and-resources)
 - [Testing](#testing)
 - [Bugs](#bugs)
 - [Credits](#credits)
@@ -139,8 +140,8 @@ The Project board [here](https://github.com/users/yosephdev/projects/7).
 
 ## User Stories
 
-* Based on the collected and studied user stories, a project implementation plan was developed.
-You can read user stories [here](https://github.com/MasteryHub/issues?q=is%3Aissue+is%3Aclosed).
+- Based on the collected and studied user stories, a project implementation plan was developed.
+  You can read user stories [here](https://github.com/MasteryHub/issues?q=is%3Aissue+is%3Aclosed).
 
 ![Alt text](docs/readme_images/image-2.png)
 
@@ -198,11 +199,12 @@ Note: Mobile wireframes will be developed in a future iteration of the project, 
 
 ## Structure Plane
 
-# Features 
+# Features
 
 ## Existing Features
 
 ### Home Page Preview
+
 ![Home Page Preview](docs/readme_images/homepage-preview-image.png)
 
 The Home page of this online resource is an attractive and informative landing page, designed to capture users' attention.
@@ -214,6 +216,7 @@ The Home page of this online resource is an attractive and informative landing p
 <br>
 
 ### Skill-Sharing Sessions Section
+
 ![Skill-Sharing Sessions Section Image](docs/readme_images/image-3.png)
 
 The Skill-Sharing Sessions page allows users to explore and register for various sessions. Prompts to log in or register if not authorized.
@@ -225,7 +228,9 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 <br>
 
 ### Footer
+
 ![Footer Image](docs/readme_images/image-4.png)
+
 - The footer is consistently present on every page, featuring links to Contact, Returns, Privacy Policies, and an email address.
 - Additionally, the footer incorporates our newsletter signup, powered by MailChimp. This ensures its visibility on every page, maximizing the likelihood of visitors subscribing.
 
@@ -238,7 +243,9 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 <br>
 
 ### Contact Page
+
 ![Contact Page Image](docs/readme_images/image-6.png)
+
 - On the contact page, concise information is presented using small icons for quick and easy comprehension, including a phone number, address, and email.
 - Additionally, the page includes a contact form enabling users to reach out to the business. The information submitted through this form is stored in the Admin panel, ensuring easy access for staff to review.
 
@@ -249,15 +256,14 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 <br>
 
 ### Main Nav Menu
-![Alt text](docs/readme_images/image-7.png)
-![Alt text](docs/readme_images/image-8.png)
-![Alt text](docs/readme_images/image-9.png)
 
-- At the very top, there is an information board in which information about the terms of return, delivery, and the minimum order amount for free delivery is updated every three seconds (to encourage the user to buy more products), as well as a motivational phrase as a call to action.
+![Alt text](docs/readme_images/image-7.png)
+
+- At the very top, there is an information board in which a motivational phrase is used as a call to action which is updated every three seconds. It also has a user login option.
 
 ![Main Nav Menu Image](docs/readme_images/image-10.png)
 
-- Throughout the site, the user has access to the main navigation menu. Features include a search bar, account/profile access, cart link and subtotal if the user has added items to their carts, as well as links to filter products by gender, brand, and sale page. Once logged in, users have access to the wishlist page.
+- Throughout the site, the user has access to the main navigation menu. Features include a search bar, account/profile access, cart link and subtotal if the user has added items to their carts. Once logged in, users have access to the dashboard page.
 
 <br>
 
@@ -266,6 +272,7 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 <br>
 
 ### Restricted Pages
+
 ![Logged in and out Nav Image](docs/readme_images/image-11.png)
 ![Logged in and out Nav Image](docs/readme_images/image-17.png)
 
@@ -278,11 +285,13 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 <br>
 
 ### Search Bar
+
 ![Search Bar Image](docs/readme_images/image-12.png)
 
 ## Dropdown Menu Content
 
 - **Authenticated Users**:
+
   - **Admin Dashboard**: Link visible to superusers.
   - **Mentee Dashboard**: Visible to non-expert users.
   - **Mentor Matching**: Link to mentor matching page.
@@ -292,7 +301,7 @@ The Skill-Sharing Sessions page allows users to explore and register for various
   - **Manage Mentorship Requests**: Link to manage mentorship requests.
 
   ![User Dropdown Menu](docs/readme_images/image-21.png)
-  ![Admin Options](docs/readme_images/image-22.png) 
+  ![Admin Options](docs/readme_images/image-22.png)
 
 - **Unauthenticated Users**:
   - **Login**: Link to login page.
@@ -320,17 +329,18 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 ## Checkout Page
 
 - **Checkout Process**: Includes a form for payment information, and a summary of the order. Logged-in users can save shipping details for future orders.
-  ![Checkout Form](docs/readme_images/image-43.png)
-
-- **Payment Information**: Users must enter payment details, processed through Stripe.
-  ![Payment Details](docs/readme_images/image-44.png)
-
 - **Order Summary**: Shows cart items, quantities, and total cost.
 
+- **Payment Information**: Users must enter payment details, processed through Stripe.
+
+  ![Checkout Form](docs/readme_images/image-43.png)
+
 - **Completion**: Displays buttons for setting up a cart or placing an order, and the total amount to be charged.
+
   ![Order Summary](docs/readme_images/image-45.png)
 
 - **Confirmation Email**: After completing the order, users receive a confirmation email with the order number and receipt.
+
   ![Order Confirmation Email](docs/readme_images/image-47.png)
 
 [Back to Top](#table-of-contents)
@@ -338,11 +348,8 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 ## Models
 
 - **Payment**: Stores payment information including user, amount, date, and associated session.
-  
 - **Cart**: Represents the user's cart.
-  
 - **CartItem**: Links products to a cart with a quantity.
-  
 - **Order**: Stores order details including user, address, and total amounts.
 
 <br>
@@ -350,22 +357,20 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 [Back to Top](#table-of-contents)
 
 ### Error Page
+
 ![Error Page Image](docs/readme_images/image-49.png)
+
 - If a user lands on a page that either doesn't exist or that they shouldn't be on (a regular user using links on an admin page or trying to edit/delete something from a link), they will be shown an error message and button to return to sessions or home.
 
 <br>
 
 [Back to Top](#table-of-contents)
 
-<br>
-
 ## Future Features
 
 - If I had extra time, I would implement several new features on the site. Currently, session ratings are simply random numbers entered when adding a session through the settings file. However, I want users to also be able to give a session rating, calculated as an average.
 
 - There are also plans to implement functionality that allows you to display the number of sessions held and their popularity in the administrative panel, as well as provide information about the availability of sessions by skill.
-
-- Additionally, to attract more visitors, I would introduce a blog with information about the latest trends and tips in skill development and mentoring.
 
 <br>
 
@@ -386,16 +391,16 @@ The Skill-Sharing Sessions page allows users to explore and register for various
 - Background-color (#FFFFFF)
 
 ### Typography
+
 - The site chose the GT Walsheim Pro font due to its excellent readability, modern design, and versatility.
 
 ### Images
+
 - All images used as educational material were taken from these sites [Freepik](https://www.freepik.com/), [Adobe](https://www.adobe.com/), [Craiyon](https://www.craiyon.com/).
 
 <br>
 
 [Back to Top](#table-of-contents)
-
-<br>
 
 ## **Business Model**
 
@@ -406,11 +411,13 @@ This online resource follows a Business-to-Consumer (B2C) model, offering sessio
 ## **Marketing Strategy**
 
 ### **Social Media Marketing**
+
 This Facebook page primarily aims to inform followers about new sessions, notify subscribers about offers and promotions, and place targeted advertisements.
 
 ![Facebook 1](docs/readme_images/image-50.png)
 
 ### **Newsletter Marketing**
+
 In the footer of the website is a [Mailchimp](https://mailchimp.com/?currency=EUR) newsletter in the footer which is used to send emails to subscribers about the latest products, promotions, and discounts.
 
 ![Newsletter Email](docs/readme_images/image-51.png)
@@ -420,6 +427,7 @@ In the footer of the website is a [Mailchimp](https://mailchimp.com/?currency=EU
 ## **Search Engine Optimization (SEO)**
 
 ### **Keywords**
+
 Keywords were analyzed and added to the description of the online platform on the main page of the site.
 
 ![Keywords](docs/readme_images/image-52.png)
@@ -471,11 +479,13 @@ This resulted in the final list of 10-15 keywords spanning general topics as wel
 <br>
 
 ### **Sitemap.xml**
+
 I created a sitemap using [XML-Sitemaps](https://www.xml-sitemaps.com) on my live website [https://skill-sharing-446c0336ffb5.herokuapp.com/](https://skill-sharing-446c0336ffb5.herokuapp.com/)
 
 The XML that was created is in the root directory of the website.
 
 ### **Robots.txt**
+
 The robots.txt file was created using this guide [https://www.conductor.com/academy/robotstxt/](https://www.conductor.com/academy/robotstxt/).
 
 ![Robots](docs/readme_images/image-53.png)
@@ -486,30 +496,30 @@ The robots.txt file was created using this guide [https://www.conductor.com/acad
 
 ## Main Technologies
 
-* [HTML5](https://en.wikipedia.org/wiki/HTML5)
-* [CSS3](https://en.wikipedia.org/wiki/Cascading_Style_Sheets)
-* [Javascript](https://en.wikipedia.org/wiki/JavaScript)
-* [Python](https://en.wikipedia.org/wiki/Python_(programming_language))
+- [HTML5](https://en.wikipedia.org/wiki/HTML5)
+- [CSS3](https://en.wikipedia.org/wiki/Cascading_Style_Sheets)
+- [Javascript](https://en.wikipedia.org/wiki/JavaScript)
+- [Python](<https://en.wikipedia.org/wiki/Python_(programming_language)>)
 
 ## Frameworks Used
 
-* [Django](https://www.djangoproject.com/)
-* [Bootstrap](https://blog.getbootstrap.com/) 
+- [Django](https://www.djangoproject.com/)
+- [Bootstrap](https://blog.getbootstrap.com/)
 
 ## Libraries And Installed Packages
 
-* [coverage](https://pypi.org/project/django-coverage/) - Used for running automated tests.
-* [crispy-bootstrap4](https://pypi.org/project/crispy-bootstrap4/) - Template pack used for django-crispy-forms.
-* [django-crispy-forms](https://pypi.org/project/crispy-bootstrap4/) - Used to render forms throughout the project.
-* [dj-database-url](https://pypi.org/project/dj-database-url/) - A package used to utilize DATABASE_URL environment variable. 
-* [django-allauth](https://django-allauth.readthedocs.io/en/latest/) - Allows authentication, registration, and account management in Django.
-* [django-countries, v7.2.1](https://pypi.org/project/django-countries/7.2.1/) - Django application used to provide country choices for use with forms, and a country field for models.
-* [gunicorn](https://gunicorn.org/) - A Python WSGI HTTP Server for UNIX.
-* [psycopg2](https://pypi.org/project/psycopg2/) - A PostgreSQL database adapter.
-* [boto3](https://pypi.org/project/boto3/) - An Amazon Web Services (AWS) software development kit (SDK) used to connect to the S3 bucket.
-* [Black](https://pypi.org/project/black/) - A Python code formatter.
-* [django storages](https://django-storages.readthedocs.io/en/latest/) - Collection of custom storage backends for Django.
-* [stripe](https://pypi.org/project/stripe/) - A Python library for Stripe’s API.
+- [coverage](https://pypi.org/project/django-coverage/) - Used for running automated tests.
+- [crispy-bootstrap4](https://pypi.org/project/crispy-bootstrap4/) - Template pack used for django-crispy-forms.
+- [django-crispy-forms](https://pypi.org/project/crispy-bootstrap4/) - Used to render forms throughout the project.
+- [dj-database-url](https://pypi.org/project/dj-database-url/) - A package used to utilize DATABASE_URL environment variable.
+- [django-allauth](https://django-allauth.readthedocs.io/en/latest/) - Allows authentication, registration, and account management in Django.
+- [django-countries, v7.2.1](https://pypi.org/project/django-countries/7.2.1/) - Django application used to provide country choices for use with forms, and a country field for models.
+- [gunicorn](https://gunicorn.org/) - A Python WSGI HTTP Server for UNIX.
+- [psycopg2](https://pypi.org/project/psycopg2/) - A PostgreSQL database adapter.
+- [boto3](https://pypi.org/project/boto3/) - An Amazon Web Services (AWS) software development kit (SDK) used to connect to the S3 bucket.
+- [Black](https://pypi.org/project/black/) - A Python code formatter.
+- [django storages](https://django-storages.readthedocs.io/en/latest/) - Collection of custom storage backends for Django.
+- [stripe](https://pypi.org/project/stripe/) - A Python library for Stripe’s API.
 
 <br>
 
@@ -518,21 +528,20 @@ The robots.txt file was created using this guide [https://www.conductor.com/acad
 <br>
 
 ## Tools And Resources
-* [GitPod](https://www.gitpod.io/)
-* [GitHub](https://github.com/)
-* [Heroku](https://heroku.com)
-* [ElephantSQL](https://www.elephantsql.com/)
-* [AWS](https://aws.amazon.com)
-* [Coolors](https://coolors.co/)
-* [Responsive Viewer](https://responsiveviewer.org/)
+
+- [GitPod](https://www.gitpod.io/)
+- [GitHub](https://github.com/)
+- [Heroku](https://heroku.com)
+- [ElephantSQL](https://www.elephantsql.com/)
+- [AWS](https://aws.amazon.com)
+- [Coolors](https://coolors.co/)
+- [Responsive Viewer](https://responsiveviewer.org/)
 
 <br>
 
 [Back to Top](#table-of-contents)
 
-<br>
-
-# Testing
+## Testing
 
 For all testing, please refer to the [TESTING.md](TESTING.md) file.
 
@@ -542,17 +551,15 @@ For all testing, please refer to the [TESTING.md](TESTING.md) file.
 
 <br>
 
-# Bugs
-
-<br>
+## Bugs
 
 [Back to Top](#table-of-contents)
 
 <br>
 
-# Credits 
+## Credits
 
-## Below is a list of sources of information that helped me and inspired me with their ideas:
+### Below is a list of sources of information that helped me and inspired me with their ideas:
 
 - [Boutique Ado Walkthrough Project](https://learn.codeinstitute.net/courses/course-v1:CodeInstitute+EA101+2021_T1/courseware/eb05f06e62c64ac89823cc956fcd8191/3adff2bf4a78469db72c5330b1afa836/)
 - [I Think Therefore I Blog Walkthrough Project](https://learn.codeinstitute.net/courses/course-v1:CodeInstitute+FSD101_WTS+2023_Q3/courseware/56a2da0940b4411d8a38c2b093a22c60/4565659a34d648b8b8edd063c3182180/)
@@ -563,8 +570,6 @@ For all testing, please refer to the [TESTING.md](TESTING.md) file.
 
 [Back to Top](#table-of-contents)
 
-<br>
-
 ### Deployment
 
 The live deployed application can be found deployed on [Heroku](https://skill-sharing-446c0336ffb5.herokuapp.com/).
@@ -574,6 +579,7 @@ The live deployed application can be found deployed on [Heroku](https://skill-sh
 This project uses [ElephantSQL](https://www.elephantsql.com) for the PostgreSQL Database.
 
 To obtain your own Postgres Database, sign-up with your GitHub account, then follow these steps:
+
 - Click **Create New Instance** to start a new database.
 - Provide a name.
 - Select the **Tiny Turtle (Free)** plan.
@@ -597,56 +603,58 @@ Make sure you're on the **AWS Management Console** page.
 - From the **Properties** tab, turn on static website hosting, and type `index.html` and `error.html` in their respective fields, then click **Save**.
 - From the **Permissions** tab, paste in the following CORS configuration:
 
-	```shell
-	[
-		{
-			"AllowedHeaders": [
-				"Authorization"
-			],
-			"AllowedMethods": [
-				"GET"
-			],
-			"AllowedOrigins": [
-				"*"
-			],
-			"ExposeHeaders": []
-		}
-	]
-	```
+  ```shell
+  [
+  	{
+  		"AllowedHeaders": [
+  			"Authorization"
+  		],
+  		"AllowedMethods": [
+  			"GET"
+  		],
+  		"AllowedOrigins": [
+  			"*"
+  		],
+  		"ExposeHeaders": []
+  	}
+  ]
+  ```
 
 - Copy your **ARN** string.
 - From the **Bucket Policy** tab, select the **Policy Generator** link, and use the following steps:
-	- Policy Type: **S3 Bucket Policy**
-	- Effect: **Allow**
-	- Principal: `*`
-	- Actions: **GetObject**
-	- Amazon Resource Name (ARN): **paste-your-ARN-here**
-	- Click **Add Statement**
-	- Click **Generate Policy**
-	- Copy the entire Policy, and paste it into the **Bucket Policy Editor**
 
-		```shell
-		{
-			"Id": "Policy1234567890",
-			"Version": "2012-10-17",
-			"Statement": [
-				{
-					"Sid": "Stmt1234567890",
-					"Action": [
-						"s3:GetObject"
-					],
-					"Effect": "Allow",
-					"Resource": "arn:aws:s3:::your-bucket-name/*"
-					"Principal": "*",
-				}
-			]
-		}
-		```
+  - Policy Type: **S3 Bucket Policy**
+  - Effect: **Allow**
+  - Principal: `*`
+  - Actions: **GetObject**
+  - Amazon Resource Name (ARN): **paste-your-ARN-here**
+  - Click **Add Statement**
+  - Click **Generate Policy**
+  - Copy the entire Policy, and paste it into the **Bucket Policy Editor**
 
-	- Before you click "Save", add `/*` to the end of the Resource key in the Bucket Policy Editor (like above).
-	- Click **Save**.
+    ```shell
+    {
+    	"Id": "Policy1234567890",
+    	"Version": "2012-10-17",
+    	"Statement": [
+    		{
+    			"Sid": "Stmt1234567890",
+    			"Action": [
+    				"s3:GetObject"
+    			],
+    			"Effect": "Allow",
+    			"Resource": "arn:aws:s3:::your-bucket-name/*"
+    			"Principal": "*",
+    		}
+    	]
+    }
+    ```
+
+  - Before you click "Save", add `/*` to the end of the Resource key in the Bucket Policy Editor (like above).
+  - Click **Save**.
+
 - From the **Access Control List (ACL)** section, click "Edit" and enable **List** for **Everyone (public access)**, and accept the warning box.
-	- If the edit button is disabled, you need to change the **Object Ownership** section above to **ACLs enabled** (mentioned above).
+  - If the edit button is disabled, you need to change the **Object Ownership** section above to **ACLs enabled** (mentioned above).
 
 #### IAM
 
@@ -654,50 +662,52 @@ Back on the AWS Services Menu, search for and open **IAM** (Identity and Access 
 Once on the IAM page, follow these steps:
 
 - From **User Groups**, click **Create New Group**.
-	- Suggested Name: `group-skill-sharing` (group + the project name)
+  - Suggested Name: `group-skill-sharing` (group + the project name)
 - Tags are optional, but you must click it to get to the **review policy** page.
 - From **User Groups**, select your newly created group, and go to the **Permissions** tab.
 - Open the **Add Permissions** dropdown, and click **Attach Policies**.
 - Select the policy, then click **Add Permissions** at the bottom when finished.
 - From the **JSON** tab, select the **Import Managed Policy** link.
-	- Search for **S3**, select the `AmazonS3FullAccess` policy, and then **Import**.
-	- You'll need your ARN from the S3 Bucket copied again, which is pasted into "Resources" key on the Policy.
 
-		```shell
-		{
-			"Version": "2012-10-17",
-			"Statement": [
-				{
-					"Effect": "Allow",
-					"Action": "s3:*",
-					"Resource": [
-						"arn:aws:s3:::your-bucket-name",
-						"arn:aws:s3:::your-bucket-name/*"
-					]
-				}
-			]
-		}
-		```
-	
-	- Click **Review Policy**.
-	- Suggested Name: `policy-skill-sharing` (policy + the project name)
-	- Provide a description:
-		- "Access to S3 Bucket for skill-sharing static files."
-	- Click **Create Policy**.
+  - Search for **S3**, select the `AmazonS3FullAccess` policy, and then **Import**.
+  - You'll need your ARN from the S3 Bucket copied again, which is pasted into "Resources" key on the Policy.
+
+    ```shell
+    {
+    	"Version": "2012-10-17",
+    	"Statement": [
+    		{
+    			"Effect": "Allow",
+    			"Action": "s3:*",
+    			"Resource": [
+    				"arn:aws:s3:::your-bucket-name",
+    				"arn:aws:s3:::your-bucket-name/*"
+    			]
+    		}
+    	]
+    }
+    ```
+
+  - Click **Review Policy**.
+  - Suggested Name: `policy-skill-sharing` (policy + the project name)
+  - Provide a description:
+    - "Access to S3 Bucket for skill-sharing static files."
+  - Click **Create Policy**.
+
 - From **User Groups**, click your "group-skill-sharing".
 - Click **Attach Policy**.
 - Search for the policy you've just created ("policy-skill-sharing") and select it, then **Attach Policy**.
 - From **User Groups**, click **Add User**.
-	- Suggested Name: `user-skill-sharing` (user + the project name)
+  - Suggested Name: `user-skill-sharing` (user + the project name)
 - For "Select AWS Access Type", select **Programmatic Access**.
 - Select the group to add your new user to: `group-skill-sharing`
 - Tags are optional, but you must click it to get to the **review user** page.
 - Click **Create User** once done.
 - You should see a button to **Download .csv**, so click it to save a copy on your system.
-	- **IMPORTANT**: once you pass this page, you cannot come back to download it again, so do it immediately!
-	- This contains the user's **Access key ID** and **Secret access key**.
-	- `AWS_ACCESS_KEY_ID` = **Access key ID**
-	- `AWS_SECRET_ACCESS_KEY` = **Secret access key**
+  - **IMPORTANT**: once you pass this page, you cannot come back to download it again, so do it immediately!
+  - This contains the user's **Access key ID** and **Secret access key**.
+  - `AWS_ACCESS_KEY_ID` = **Access key ID**
+  - `AWS_SECRET_ACCESS_KEY` = **Secret access key**
 
 #### Final AWS Setup
 
@@ -715,18 +725,18 @@ Once you've created a Stripe account and logged in, follow these series of steps
 
 - From your Stripe dashboard, click to expand the "Get your test API keys".
 - You'll have two keys here:
-	- `STRIPE_PUBLIC_KEY` = Publishable Key (starts with **pk**)
-	- `STRIPE_SECRET_KEY` = Secret Key (starts with **sk**)
+  - `STRIPE_PUBLIC_KEY` = Publishable Key (starts with **pk**)
+  - `STRIPE_SECRET_KEY` = Secret Key (starts with **sk**)
 
 As a backup, in case users prematurely close the purchase-order page during payment, we can include Stripe Webhooks.
 
 - From your Stripe dashboard, click **Developers**, and select **Webhooks**.
 - From there, click **Add Endpoint**.
-	- `https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/wh/`
+  - `https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/wh/`
 - Click **receive all events**.
 - Click **Add Endpoint** to complete the process.
 - You'll have a new key here:
-	- `STRIPE_WH_SECRET` = Signing Secret (Wehbook) Key (starts with **wh**)
+  - `STRIPE_WH_SECRET` = Signing Secret (Wehbook) Key (starts with **wh**)
 
 ### Gmail API
 
@@ -744,11 +754,11 @@ Once you've created a Gmail (Google) account and logged in, follow these series 
 - This might prompt you once again to confirm your password and account.
 - Select **Mail** for the app type.
 - Select **Other (Custom name)** for the device type.
-	- Any custom name, such as "Django"
+  - Any custom name, such as "Django"
 - You'll be provided with a 16-character password (API key).
-	- Save this somewhere locally, as you cannot access this key again later!
-	- `EMAIL_HOST_PASS` = user's 16-character API key
-	- `EMAIL_HOST_USER` = user's own personal Gmail email address
+  - Save this somewhere locally, as you cannot access this key again later!
+  - `EMAIL_HOST_PASS` = user's 16-character API key
+  - `EMAIL_HOST_USER` = user's own personal Gmail email address
 
 ### Heroku Deployment
 
@@ -760,44 +770,50 @@ Deployment steps are as follows, after account setup:
 - Your app name must be unique, and then choose a region closest to you (EU or USA), and finally, select **Create App**.
 - From the new app **Settings**, click **Reveal Config Vars**, and set your environment variables.
 
-| Key | Value |
-| --- | --- |
-| `AWS_ACCESS_KEY_ID` | user's own value |
-| `AWS_SECRET_ACCESS_KEY` | user's own value |
-| `DATABASE_URL` | user's own value |
-| `DISABLE_COLLECTSTATIC` | 1 (*this is temporary, and can be removed for the final deployment*) |
-| `EMAIL_HOST_PASS` | user's own value |
-| `EMAIL_HOST_USER` | user's own value |
-| `SECRET_KEY` | user's own value |
-| `STRIPE_PUBLIC_KEY` | user's own value |
-| `STRIPE_SECRET_KEY` | user's own value |
-| `STRIPE_WH_SECRET` | user's own value |
-| `USE_AWS` | True |
+| Key                     | Value                                                                |
+| ----------------------- | -------------------------------------------------------------------- |
+| `AWS_ACCESS_KEY_ID`     | user's own value                                                     |
+| `AWS_SECRET_ACCESS_KEY` | user's own value                                                     |
+| `DATABASE_URL`          | user's own value                                                     |
+| `DISABLE_COLLECTSTATIC` | 1 (_this is temporary, and can be removed for the final deployment_) |
+| `EMAIL_HOST_PASS`       | user's own value                                                     |
+| `EMAIL_HOST_USER`       | user's own value                                                     |
+| `SECRET_KEY`            | user's own value                                                     |
+| `STRIPE_PUBLIC_KEY`     | user's own value                                                     |
+| `STRIPE_SECRET_KEY`     | user's own value                                                     |
+| `STRIPE_WH_SECRET`      | user's own value                                                     |
+| `USE_AWS`               | True                                                                 |
 
 Heroku needs two additional files in order to deploy properly.
+
 - requirements.txt
 - Procfile
 
 You can install this project's **requirements** (where applicable) using:
+
 - `pip3 install -r requirements.txt`
 
 If you have your own packages that have been installed, then the requirements file needs updated using:
+
 - `pip3 freeze --local > requirements.txt`
 
 The **Procfile** can be created with the following command:
+
 - `echo web: gunicorn app_name.wsgi > Procfile`
-- *replace **app_name** with the name of your primary Django app name; the folder where settings.py is located*
+- _replace **app_name** with the name of your primary Django app name; the folder where settings.py is located_
 
 For Heroku deployment, follow these steps to connect your own GitHub repository to the newly created app:
 
 Either:
+
 - Select **Automatic Deployment** from the Heroku app.
 
 Or:
+
 - In the Terminal/CLI, connect to Heroku using this command: `heroku login -i`
-- Set the remote for Heroku: `heroku git:remote -a app_name` (replace *app_name* with your app name)
+- Set the remote for Heroku: `heroku git:remote -a app_name` (replace _app_name_ with your app name)
 - After performing the standard Git `add`, `commit`, and `push` to GitHub, you can now type:
-	- `git push heroku main`
+  - `git push heroku main`
 
 The project should now be connected and deployed to Heroku!
 
@@ -805,7 +821,8 @@ The project should now be connected and deployed to Heroku!
 
 This project can be cloned or forked in order to make a local copy on your own system.
 
-For either method, you will need to install any applicable packages found within the *requirements.txt* file.
+For either method, you will need to install any applicable packages found within the _requirements.txt_ file.
+
 - `pip3 install -r requirements.txt`.
 
 You will need to create a new file called `env.py` at the root-level,
@@ -830,6 +847,7 @@ os.environ.setdefault("DEBUG", "True")
 ```
 
 Once the project is cloned or forked, in order to run it locally, you'll need to follow these steps:
+
 - Start the Django app: `python3 manage.py runserver`
 - Stop the app once it's loaded: `CTRL+C` or `⌘+C` (Mac)
 - Make any necessary migrations: `python3 manage.py makemigrations`
@@ -839,15 +857,16 @@ Once the project is cloned or forked, in order to run it locally, you'll need to
 - Everything should be ready now, so run the Django app again: `python3 manage.py runserver`
 
 If you'd like to backup your database models, use the following command for each model you'd like to create a fixture for:
+
 - `python3 manage.py dumpdata your-model > your-model.json`
-- *repeat this action for each model you wish to backup*
+- _repeat this action for each model you wish to backup_
 
 #### Cloning
 
 You can clone the repository by following these steps:
 
-1. Go to the [GitHub repository](https://github.com/yosephdev/mastery-hub) 
-2. Locate the Code button above the list of files and click it 
+1. Go to the [GitHub repository](https://github.com/yosephdev/mastery-hub)
+2. Locate the Code button above the list of files and click it
 3. Select if you prefer to clone using HTTPS, SSH, or GitHub CLI and click the copy button to copy the URL to your clipboard
 4. Open Git Bash or Terminal
 5. Change the current working directory to the one where you want the cloned directory
