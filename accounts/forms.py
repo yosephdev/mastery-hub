@@ -8,6 +8,7 @@ from crispy_forms.layout import Layout, Field, ButtonHolder, Submit, Div
 from django.utils.translation import gettext_lazy as _
 from allauth.account.forms import SignupForm as AllAuthSignupForm
 from django.utils import timezone
+import re
 
 from profiles.models import Profile
 from masteryhub.models import Session, ConcernReport
@@ -27,10 +28,10 @@ class CustomSignupForm(AllAuthSignupForm):
     password1 = forms.CharField(
         widget=forms.PasswordInput,
         help_text=(
-            "Your password can’t be too similar to your personal information. "
+            "Your password can't be too similar to your personal information. "
             "Your password must contain at least 8 characters. "
-            "Your password can’t be a commonly used password. "
-            "Your password can’t be entirely numeric."
+            "Your password can't be a commonly used password. "
+            "Your password can't be entirely numeric."
         ),
     )
     password2 = forms.CharField(
@@ -38,7 +39,10 @@ class CustomSignupForm(AllAuthSignupForm):
         help_text="Enter the same password as before, for verification.",
     )
     is_expert = forms.BooleanField(required=False)
-    terms = forms.BooleanField(required=True)
+    terms = forms.BooleanField(
+        required=True,
+        error_messages={'required': 'You must accept the terms and conditions'}
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -59,14 +63,18 @@ class CustomSignupForm(AllAuthSignupForm):
             ),
             Div(
                 Submit("submit", "Sign Up", css_class="btn btn-primary"),
-                css_class=(
-                    "d-flex justify-content-between "
-                    "align-items-center mt-4"
-                ),
+                css_class="d-flex justify-content-between align-items-center mt-4",
             ),
         )
         for field_name, field in self.fields.items():
             field.help_text = field.help_text.replace("<br>", " ")
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Passwords don't match")
+        return password2
 
 
 class CustomUserChangeForm(UserChangeForm):
@@ -113,9 +121,15 @@ class SessionForm(forms.ModelForm):
             ),
         }
 
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if price <= 0:
+            raise forms.ValidationError("Price must be greater than zero")
+        return price
+
     def clean_mentor_since(self):
         mentor_since = self.cleaned_data.get('mentor_since')
-        if mentor_since > timezone.now().date():
+        if mentor_since and mentor_since > timezone.now().date():
             raise forms.ValidationError("The date cannot be in the future.")
         return mentor_since
 
@@ -174,7 +188,8 @@ class ConcernReportForm(forms.ModelForm):
         fields = ["category", "description"]
         widgets = {
             "description": forms.Textarea(attrs={
-                "rows": 5, "class": "form-control"
+                "rows": 5,
+                "class": "form-control"
             }),
             "category": forms.Select(attrs={"class": "form-control"}),
         }
@@ -199,6 +214,22 @@ class OrderForm(forms.Form):
     )
     phone_number = forms.CharField(
         max_length=20, required=True, label="Phone Number")
+
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data.get('phone_number')
+        if not re.match(r'^\+?1?\d{9,15}$', phone_number):
+            raise forms.ValidationError(
+                'Please enter a valid phone number (9-15 digits)'
+            )
+        return phone_number
+
+    def clean_postcode(self):
+        postcode = self.cleaned_data.get('postcode')
+        if not re.match(r'^\d{5}(?:[-\s]\d{4})?$', postcode):
+            raise forms.ValidationError(
+                'Please enter a valid postal code (e.g., 12345 or 12345-6789)'
+            )
+        return postcode
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
