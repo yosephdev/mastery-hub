@@ -1,11 +1,11 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Field, ButtonHolder, Submit
 from django.core.exceptions import ValidationError
-import re
 from django.utils import timezone
+from django_countries.fields import CountryField
+from django_countries.widgets import CountrySelectWidget
+import re
 
 from profiles.models import Profile
 from masteryhub.models import Session
@@ -14,24 +14,71 @@ from .models import Order
 User = get_user_model()
 
 
-def validate_phone(value):
-    if not re.match(r'^\+?1?\d{9,15}$', value):
-        raise ValidationError(
-            'Phone number must be in the format: "+999999999". Up to 15 digits allowed.'
+class OrderForm(forms.ModelForm):
+    """Form for handling order information during checkout."""
+
+    country = CountryField(blank_label="Country *").formfield(
+        widget=CountrySelectWidget(attrs={
+            "class": "border-black rounded-0 profile-form-input"
+        })
+    )
+
+    class Meta:
+        model = Order
+        fields = (
+            "full_name",
+            "email",
+            "phone_number",
+            "street_address1",
+            "street_address2",
+            "town_or_city",
+            "postcode",
+            "country",
+            "county",
         )
 
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data.get('phone_number')
+        if not re.match(r'^\+?1?\d{9,15}$', phone_number):
+            raise ValidationError(
+                'Please enter a valid phone number (9-15 digits)'
+            )
+        return phone_number
 
-def validate_postal_code(value):
-    if not re.match(r'^\d{5}(?:[-\s]\d{4})?$', value):
-        raise ValidationError(
-            'Postal code must be in the format: "12345" or "12345-6789".'
-        )
+    def clean_postcode(self):
+        postcode = self.cleaned_data.get('postcode')
+        if not re.match(r'^\d{5}(?:[-\s]\d{4})?$', postcode):
+            raise ValidationError(
+                'Please enter a valid postal code (e.g., 12345 or 12345-6789)'
+            )
+        return postcode
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        placeholders = {
+            "full_name": "Full Name",
+            "email": "Email Address",
+            "phone_number": "Phone Number (e.g., +1234567890)",
+            "postcode": "Postal Code (e.g., 12345)",
+            "town_or_city": "Town or City",
+            "street_address1": "Street Address 1",
+            "street_address2": "Street Address 2",
+            "county": "County, State or Locality",
+        }
+
+        self.fields["full_name"].widget.attrs["autofocus"] = True
+        for field in self.fields:
+            if field != "country":
+                placeholder = placeholders.get(field, field)
+                if self.fields[field].required:
+                    placeholder += " *"
+                self.fields[field].widget.attrs["placeholder"] = placeholder
+            self.fields[field].widget.attrs["class"] = "stripe-style-input"
+            self.fields[field].label = False
 
 
 class SessionForm(forms.ModelForm):
-    """
-    Form class for handling session information in the checkout process.
-    """
+    """Form for creating and editing sessions."""
 
     class Meta:
         model = Session
@@ -51,67 +98,39 @@ class SessionForm(forms.ModelForm):
                 attrs={"type": "time", "class": "form-control"}
             ),
             "price": forms.NumberInput(attrs={"class": "form-control"}),
-            "description": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+            "description": forms.Textarea(
+                attrs={"class": "form-control", "rows": 4}
+            ),
         }
 
-
-class OrderForm(forms.ModelForm):
-    """
-    Form class for handling order information in the checkout process.
-    """
-
-    class Meta:
-        model = Order
-        fields = (
-            "full_name",
-            "email",
-            "phone_number",
-            "street_address1",
-            "street_address2",
-            "town_or_city",
-            "postcode",
-            "country",
-            "county",
-        )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        placeholders = {
-            "full_name": "Full Name",
-            "email": "Email Address",
-            "phone_number": "Phone Number",
-            "postcode": "Postal Code",
-            "town_or_city": "Town or City",
-            "street_address1": "Street Address 1",
-            "street_address2": "Street Address 2",
-            "county": "County, State or Locality",
-        }
-
-        self.fields["full_name"].widget.attrs["autofocus"] = True
-        for field in self.fields:
-            if field != "country":
-                placeholder = placeholders.get(field, field)
-                if self.fields[field].required:
-                    placeholder += " *"
-                self.fields[field].widget.attrs["placeholder"] = placeholder
-            self.fields[field].widget.attrs["class"] = "border-black rounded-0 profile-form-input"
-            self.fields[field].label = False
-
-        self.fields['phone_number'].validators.append(validate_phone)
-        self.fields['postcode'].validators.append(validate_postal_code)
-
-
-class CheckoutForm(forms.Form):
-    phone_number = forms.CharField(validators=[validate_phone])
-    postal_code = forms.CharField(validators=[validate_postal_code])
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if price <= 0:
+            raise ValidationError("Price must be greater than zero")
+        return price
 
 
 class ProfileForm(forms.ModelForm):
-    mentor_since = forms.DateField(widget=forms.SelectDateWidget())
+    """Form for user profile information."""
+
+    mentor_since = forms.DateField(
+        widget=forms.SelectDateWidget(),
+        required=False
+    )
+
+    class Meta:
+        model = Profile
+        fields = [
+            'bio',
+            'skills',
+            'mentor_since',
+            'mentorship_areas',
+            'availability',
+            'is_available'
+        ]
 
     def clean_mentor_since(self):
         mentor_since = self.cleaned_data.get('mentor_since')
         if mentor_since and mentor_since > timezone.now().date():
-            raise ValidationError("The 'Mentor Since' date cannot be in the future.")
+            raise ValidationError("Mentor since date cannot be in the future")
         return mentor_since
-
