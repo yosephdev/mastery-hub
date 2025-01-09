@@ -17,6 +17,7 @@ from .models import Feedback, Session, Category, Mentorship, Forum, Review, Skil
 import stripe
 import logging
 from django.contrib.auth import get_user_model
+from django.db import transaction
 
 logger = logging.getLogger(__name__)
 
@@ -144,7 +145,16 @@ def search_mentors(request):
 def request_mentorship(request, mentor_id):
     """Handle mentorship request."""
     try:
-        mentor = User.objects.get(id=mentor_id)
+        mentor = get_object_or_404(User, id=mentor_id)
+
+        if mentor == request.user:
+            messages.error(
+                request, "You cannot request mentorship from yourself.")
+            return redirect('masteryhub:mentor_matching')
+
+        if not hasattr(mentor, 'profile') or not mentor.profile.is_expert:
+            messages.error(request, "This user is not registered as a mentor.")
+            return redirect('masteryhub:mentor_matching')
 
         existing_request = MentorshipRequest.objects.filter(
             mentee=request.user,
@@ -154,26 +164,35 @@ def request_mentorship(request, mentor_id):
 
         if existing_request:
             messages.warning(
-                request, "You already have a pending or active mentorship request with this mentor.")
+                request,
+                "You already have a pending or active mentorship request with this mentor."
+            )
             return redirect('profiles:view_mentor_profile', username=mentor.username)
 
         if request.method == 'POST':
-            message = request.POST.get('message', '').strip()
+            with transaction.atomic():
+                message = request.POST.get('message', '').strip()
 
-            if not message:
-                messages.error(
-                    request, "Please provide a message for your mentorship request.")
+                if not message:
+                    messages.error(
+                        request,
+                        "Please provide a message for your mentorship request."
+                    )
+                return redirect('profiles:view_mentor_profile',
+                                username=mentor.username)
+
+                MentorshipRequest.objects.create(
+                    mentee=request.user,
+                    mentor=mentor,
+                    message=message,
+                    status='pending'
+                )
+
+                messages.success(
+                    request,
+                    "Your mentorship request has been sent successfully!"
+                )
                 return redirect('profiles:view_mentor_profile', username=mentor.username)
-
-            MentorshipRequest.objects.create(
-                mentee=request.user,
-                mentor=mentor,
-                message=message
-            )
-
-            messages.success(
-                request, "Your mentorship request has been sent successfully!")
-            return redirect('profiles:view_mentor_profile', username=mentor.username)
 
         return render(request, 'masteryhub/request_mentorship.html', {
             'mentor': mentor
@@ -183,7 +202,10 @@ def request_mentorship(request, mentor_id):
         messages.error(request, "Mentor not found.")
         return redirect('masteryhub:mentor_matching')
     except Exception as e:
-        messages.error(request, f"An error occurred: {str(e)}")
+        messages.error(
+            request,
+            "An error occurred while processing your request. Please try again."
+        )
         return redirect('masteryhub:mentor_matching')
 
 
