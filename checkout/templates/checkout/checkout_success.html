@@ -112,13 +112,16 @@
                 </a>
                 {% else %}
                 <a href="{% url 'masteryhub:session_list' %}" class="btn btn-primary">
-                    <i class="fas fa-graduation-cap mr-2"></i>Browse More Sessions
+                    <i class="fas fa-graduation-cap mr-2"></i> Browse More Sessions
                 </a>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
 {% endblock %}
 
 {% block postloadjs %}
