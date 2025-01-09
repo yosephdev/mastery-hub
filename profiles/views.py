@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Profile
 from .forms import ProfileForm, UserForm
 from django.contrib.auth import get_user_model
+from django.db import transaction
 
 # Create your views here.
 
@@ -125,18 +126,27 @@ def view_mentor_profile(request, username):
 
 
 @login_required
-def delete_profile(request, user_id):
-    """Delete the user's profile."""
+def delete_profile(request):
+    """Delete the user's profile and account."""
     if request.method == 'POST':
-        if request.user.id == user_id:
-            user = request.user
-            user.delete()
-            messages.success(
-                request, "Your profile has been deleted successfully.")
-            return redirect('home:index')
-        else:
-            messages.error(
-                request, "You don't have permission to delete this profile.")
-            return redirect('profiles:view_profiles')
+        with transaction.atomic():
+            try:
+                profile = request.user.profile
 
-    return render(request, 'profiles/delete_confirmation.html')
+                if profile:
+                    profile.delete()
+
+                request.user.delete()
+
+                messages.success(
+                    request, "Your account has been deleted successfully.")
+                return redirect('home:index')
+
+            except Exception as e:
+                messages.error(
+                    request, "An error occurred while deleting your account.")
+                return redirect('profiles:view_profile')
+
+    return render(request, 'profiles/delete_confirmation.html', {
+        'user': request.user
+    })
