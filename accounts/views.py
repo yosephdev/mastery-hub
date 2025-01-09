@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from allauth.account.views import ConfirmEmailView
 from allauth.account.models import EmailConfirmationHMAC
+from django.db import transaction
 
 from .forms import (
     CustomSignupForm,
@@ -22,26 +23,35 @@ def signup_view(request):
     if request.method == "POST":
         form = CustomSignupForm(request.POST)
         if form.is_valid():
-            try:
-                user = form.save(request)
-                username = form.cleaned_data.get("username")
-                password = form.cleaned_data.get("password1")
-                user = authenticate(username=username, password=password)
+            with transaction.atomic():
+                try:
+                    user = form.save()
 
-                if user is not None:
-                    auth_login(request, user)
-                    messages.success(
-                        request,
-                        f"Welcome, {user.username}! Registration successful!"
+                    raw_password = form.cleaned_data.get('password1')
+                    authenticated_user = authenticate(
+                        username=user.username,
+                        password=raw_password
                     )
-                    return redirect("home:index")
-                else:
-                    messages.error(request, "Authentication failed.")
-            except Exception as e:
-                messages.error(request, f"An error occurred: {str(e)}")
-        else:
-            for field, error in form.errors.items():
-                messages.error(request, f"{field}: {error}")
+
+                    if authenticated_user is not None:
+                        auth_login(request, authenticated_user)
+                        messages.success(
+                            request,
+                            f"Welcome to MasteryHub, {user.username}! Your account has been created successfully."
+                        )
+                        return redirect("home:index")
+
+                except Exception as e:
+                    print(f"Signup error: {str(e)}")
+                    messages.error(
+                        request,
+                        "There was an error creating your account. Please try again."
+                    )
+                    return redirect("accounts:signup")
+
+        for _, errors in form.errors.items():
+            for error in errors:
+                messages.error(request, f"{error}")
     else:
         form = CustomSignupForm()
 
@@ -51,7 +61,7 @@ def signup_view(request):
 class CustomConfirmEmailView(ConfirmEmailView):
     template_name = "account/email_confirm.html"
 
-    def get_object(self, queryset=None):
+    def get_object(self, _=None):
         key = self.kwargs.get("key")
         if not key:
             raise Http404("No key provided")
@@ -66,10 +76,9 @@ class CustomLoginView(LoginView):
     template_name = "account/login.html"
 
     def form_valid(self, form):
-        # Clear any existing messages first
         storage = messages.get_messages(self.request)
         storage.used = True
-        
+
         user = form.get_user()
         auth_login(self.request, user)
         if not self.request.session.get("message_sent", False):
@@ -90,7 +99,7 @@ class CustomLogoutView(LogoutView):
     template_name = "account/logout.html"
     next_page = reverse_lazy("home:index")
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request, *_args, **_kwargs):
         if request.method == "POST":
             if not self.request.session.get("message_sent", False):
                 messages.success(
@@ -108,7 +117,7 @@ class CustomPasswordResetView(PasswordResetView):
     template_name = 'account/password_reset.html'
     email_template_name = 'account/email/password_reset_key_message.txt'
     success_url = reverse_lazy('accounts:password_reset_done')
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
