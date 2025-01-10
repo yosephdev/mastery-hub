@@ -7,6 +7,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, ButtonHolder, Submit, Div
 from django.utils.translation import gettext_lazy as _
 from allauth.account.forms import SignupForm as AllAuthSignupForm
+from allauth.account.forms import LoginForm as AllAuthLoginForm
 from django.utils import timezone
 import re
 
@@ -14,6 +15,40 @@ from profiles.models import Profile
 from masteryhub.models import Session, ConcernReport
 
 User = get_user_model()
+
+
+class CustomLoginForm(AllAuthLoginForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "post"
+        self.helper.layout = Layout(
+            Div(
+                Field("login", css_class="form-control"),
+                Field("password", css_class="form-control"),
+                Div(
+                    Field("remember", css_class="form-check-input"),
+                    css_class="form-check"
+                ),
+                css_class="form-group"
+            ),
+            Div(
+                Submit("submit", "Sign In", css_class="btn btn-primary"),
+                css_class="d-flex justify-content-between align-items-center mt-4",
+            ),
+        )
+        self.fields["login"].widget.attrs.update({
+            "placeholder": "Username or Email",
+            "class": "form-control"
+        })
+        self.fields["password"].widget.attrs.update({
+            "placeholder": "Password",
+            "class": "form-control"
+        })
+        if "remember" in self.fields:
+            self.fields["remember"].widget.attrs.update({
+                "class": "form-check-input"
+            })
 
 
 class CustomSignupForm(AllAuthSignupForm):
