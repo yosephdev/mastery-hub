@@ -8,6 +8,7 @@ from crispy_forms.layout import Layout, Field, ButtonHolder, Submit, Div
 from django.utils.translation import gettext_lazy as _
 from allauth.account.forms import SignupForm as AllAuthSignupForm
 from allauth.account.forms import LoginForm as AllAuthLoginForm
+from allauth.account.forms import ResetPasswordForm
 from django.utils import timezone
 import re
 
@@ -299,5 +300,27 @@ class CustomSetPasswordForm(SetPasswordForm):
         })
         self.fields['new_password2'].widget.attrs.update({
             'placeholder': 'Confirm Password',
+            'class': 'form-control'
+        })
+
+
+class CustomResetPasswordForm(ResetPasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Div(
+                Field('email', css_class='form-control'),
+                css_class='form-group'
+            ),
+            Div(
+                Submit('submit', 'Reset Password',
+                       css_class='btn btn-primary'),
+                css_class='d-flex justify-content-between align-items-center mt-4',
+            )
+        )
+        self.fields['email'].widget.attrs.update({
+            'placeholder': 'Email Address',
             'class': 'form-control'
         })
