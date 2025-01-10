@@ -1,0 +1,91 @@
+{% load i18n %}{% autoescape off %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Confirm Your MasteryHub Email" %}</title>
+    <style>
+        body {            
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #0d6efd;
+            font-size: 28px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 12px 32px;
+            background-color: #0d6efd;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            font-size: 14px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-container">
+            <h1>MasteryHub</h1>
+            
+            <p>{% trans "Hello" %}{% if user.get_full_name %} {{ user.get_full_name }}{% endif %},</p>
+            
+            <p>{% blocktrans %}Thank you for signing up with MasteryHub! Please confirm your email address by clicking the button below:{% endblocktrans %}</p>
+            
+            <div class="button-container">
+                <a href="{{ activate_url }}" class="button">{% trans "Confirm Email Address" %}</a>
+            </div>
+            
+            <div style="margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 4px;">
+                <p style="font-size: 14px;">
+                    {% trans "If the button doesn't work, copy and paste this link into your browser:" %}<br>
+                    {{ activate_url }}
+                </p>
+            </div>
+            
+            <div class="footer">
+                <p>{% blocktrans %}This confirmation link will expire in {{ expiry_days }} days.{% endblocktrans %}</p>
+                <p>{% trans "If you didn't create an account with MasteryHub, you can safely ignore this email." %}</p>
+                <p>{% trans "Best regards" %},<br>{% trans "The MasteryHub Team" %}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endautoescape %}

@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans %}Password Reset for MasteryHub Account{% endblocktrans %}
+{% endautoescape %}
