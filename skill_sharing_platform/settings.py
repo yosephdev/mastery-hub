@@ -134,13 +134,18 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = 'home:index'
 # Security and Session Settings
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
-ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
-ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 300
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGIN_ON_PASSWORD_RESET = False
 ACCOUNT_SESSION_REMEMBER = None
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 
+# Rate Limiting Settings
+ACCOUNT_RATE_LIMITS = {   
+    "login_failed": {"calls": 5, "timeout": 300},    
+    "email": {"calls": 3, "timeout": 300},    
+    "password_reset": {"calls": 3, "timeout": 300},    
+    "email_confirmation": {"calls": 5, "timeout": 300},
+}
 # Social Auth Settings
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_REQUIRED = True
