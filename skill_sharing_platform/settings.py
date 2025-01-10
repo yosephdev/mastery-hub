@@ -114,20 +114,32 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'home:index'
 LOGOUT_REDIRECT_URL = 'home:index'
+LOGOUT_URL =  'accounts:logout'
 
 # AllAuth Settings
-ACCOUNT_EMAIL_VERIFICATION = "optional"
-ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USERNAME_MIN_LENGTH = 4
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
-ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
+ACCOUNT_FORMS = {
+    "signup": "accounts.forms.CustomSignupForm",
+    "login": "accounts.forms.CustomLoginForm",
+    "reset_password": "accounts.forms.CustomResetPasswordForm"
+}
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = 'home:index'
+
+# Security and Session Settings
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
+ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 300
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
-ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
-ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = False
+ACCOUNT_SESSION_REMEMBER = None
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 
 # Social Auth Settings
 SOCIALACCOUNT_AUTO_SIGNUP = True
@@ -177,34 +189,21 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Email Configuration
-if DEBUG:
-    # Development email settings - prints to console
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-    DEFAULT_FROM_EMAIL = 'masteryhub@example.com'
-else:
-    # Production email settings - uses Gmail SMTP
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.gmail.com'
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    
-    # Gmail credentials
-    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'yosephbet@gmail.com')
-    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASS', 'rckzxelycbkkvsas')
-    
-    # Sender email settings
-    DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'yosephbet@gmail.com')
-    SERVER_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'yosephbet@gmail.com')
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# Gmail credentials
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASS')
+
+# Sender email settings
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'yosephbet@gmail.com')
 
 # Email Subject Prefix
 EMAIL_SUBJECT_PREFIX = '[MasteryHub] '
-
-# Additional Email Settings
-ACCOUNT_EMAIL_VERIFICATION = "optional"
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 
 # Stripe Configuration
 STRIPE_CURRENCY = 'usd'
