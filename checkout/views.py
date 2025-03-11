@@ -313,7 +313,6 @@ def create_order(user, order_form, cart, grand_total):
 @login_required
 @transaction.atomic
 def checkout(request):
-    """Enhanced checkout view with better error handling and validation."""
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
     try:
@@ -352,8 +351,6 @@ def checkout(request):
                         order.save()
 
                         for item in cart.items.all():
-                            print(f"Session: {item.session.title}, Price Now: {item.session.price}, Price at Adding: {item.price_at_time_of_adding}, Quantity: {item.quantity}, Total Cost: {item.get_cost()}")
-
                             OrderLineItem.objects.create(
                                 order=order,
                                 session=item.session,
@@ -368,6 +365,8 @@ def checkout(request):
                         except Exception as e:
                             logger.warning(
                                 f"Failed to send confirmation email: {e}")
+                            messages.warning(
+                                request, "Confirmation email could not be sent, but your order has been processed successfully.")
 
                         messages.success(
                             request, f'Order {order.order_number} processed successfully!')
@@ -378,18 +377,19 @@ def checkout(request):
                     messages.error(
                         request, f"Payment processing error: {str(e)}")
                     return redirect('checkout:view_cart')
+
                 except Exception as e:
                     logger.error(
                         f"Checkout error for user {request.user.id}: {str(e)}")
                     messages.error(
                         request, "There was an error processing your order. Please try again.")
+
             else:
                 messages.error(
                     request, 'There was an error with your form. Please check your information.')
         else:
             order_form = OrderForm(instance=request.user.profile if hasattr(
                 request.user, 'profile') else None)
-
             intent = stripe.PaymentIntent.create(
                 amount=stripe_total,
                 currency=settings.STRIPE_CURRENCY,

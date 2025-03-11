@@ -5,10 +5,12 @@ from .models import Profile
 from .forms import ProfileForm, UserForm
 from django.contrib.auth import get_user_model
 from django.db import transaction
+import logging
 
 # Create your views here.
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 def get_user_profile(username):
@@ -50,33 +52,30 @@ def view_profile(request, username=None):
 
 @login_required
 def edit_profile(request):
-    """Edit the user's profile."""
-    profile, created = Profile.objects.get_or_create(
-        user=request.user,
-        defaults={
-            'bio': '',
-            'skills': '',
-            'goals': '',
-            'experience': '',
-            'achievements': '',
-            'mentorship_areas': '',
-            'availability': '',
-            'preferred_mentoring_method': '',
-            'is_available': True
-        }
-    )
+    """Edit the user's profile with enhanced error handling and logging."""
+    try:
+        profile = request.user.profile
+    except Profile.DoesNotExist:
+        logger.error(f"Profile does not exist for user: {request.user.username}")
+        messages.error(request, "Your profile does not exist. Please contact support.")
+        return redirect('home:index')
 
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
-        profile_form = ProfileForm(
-            request.POST, request.FILES, instance=profile)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
 
         if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            messages.success(
-                request, 'Your profile has been updated successfully!')
-            return redirect('profiles:view_profile', username=request.user.username)
+            try:
+                with transaction.atomic():
+                    user_form.save()
+                    profile_form.save()
+                    messages.success(request, 'Your profile has been updated successfully!')
+                    return redirect('profiles:view_profile', username=request.user.username)
+            except Exception as e:
+                logger.error(f"Error updating profile for user {request.user.username}: {str(e)}")
+                messages.error(request, "An error occurred while updating your profile. Please try again.")
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         user_form = UserForm(instance=request.user)
         profile_form = ProfileForm(instance=profile)
@@ -84,7 +83,7 @@ def edit_profile(request):
     context = {
         'user_form': user_form,
         'profile_form': profile_form,
-        'profile': profile
+        'profile': profile,
     }
 
     return render(request, 'profiles/edit_profile.html', context)

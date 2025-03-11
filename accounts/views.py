@@ -11,50 +11,44 @@ from django.shortcuts import render, redirect
 from allauth.account.views import ConfirmEmailView
 from allauth.account.models import EmailConfirmationHMAC
 from django.db import transaction
+from django.views.decorators.csrf import csrf_exempt
+import logging
 
 from .forms import (
     CustomSignupForm,
     CustomSetPasswordForm,
 )
 
+logger = logging.getLogger(__name__)
 
+
+@csrf_exempt
 def signup_view(request):
-    """Handle user signup."""
     if request.method == "POST":
         form = CustomSignupForm(request.POST)
         if form.is_valid():
-            with transaction.atomic():
-                try:
+            try:
+                with transaction.atomic():
                     user = form.save()
-
                     raw_password = form.cleaned_data.get('password1')
                     authenticated_user = authenticate(
-                        username=user.username,
-                        password=raw_password
-                    )
-
+                        username=user.username, password=raw_password)
                     if authenticated_user is not None:
                         auth_login(request, authenticated_user)
                         messages.success(
-                            request,
-                            f"Welcome to MasteryHub, {user.username}! Your account has been created successfully."
-                        )
+                            request, f"Welcome to MasteryHub, {user.username}! Your account has been created successfully.")
                         return redirect("home:index")
-
-                except Exception as e:
-                    print(f"Signup error: {str(e)}")
-                    messages.error(
-                        request,
-                        "There was an error creating your account. Please try again."
-                    )
-                    return redirect("accounts:signup")
-
-        for _, errors in form.errors.items():
-            for error in errors:
-                messages.error(request, f"{error}")
+            except Exception as e:
+                logger.error(f"Signup error: {str(e)}")
+                messages.error(
+                    request, "There was an error creating your account. Please try again.")
+                return redirect("accounts:signup")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{error}")
     else:
         form = CustomSignupForm()
-
     return render(request, "account/signup.html", {"form": form})
 
 

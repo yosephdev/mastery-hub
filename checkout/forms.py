@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -109,6 +108,12 @@ class SessionForm(forms.ModelForm):
             raise ValidationError("Price must be greater than zero")
         return price
 
+    def clean_max_participants(self):
+        max_participants = self.cleaned_data.get('max_participants')
+        if max_participants <= 0:
+            raise ValidationError("Max participants must be greater than zero")
+        return max_participants
+
 
 class ProfileForm(forms.ModelForm):
     """Form for user profile information."""
@@ -128,9 +133,20 @@ class ProfileForm(forms.ModelForm):
             'availability',
             'is_available'
         ]
+        widgets = {
+            'bio': forms.Textarea(attrs={'rows': 4}),
+            'skills': forms.Textarea(attrs={'rows': 3}),
+            'mentorship_areas': forms.Textarea(attrs={'rows': 2}),
+            'availability': forms.TextInput(attrs={'placeholder': 'e.g., Mon-Fri 9am-5pm'}),
+        }
 
     def clean_mentor_since(self):
         mentor_since = self.cleaned_data.get('mentor_since')
         if mentor_since and mentor_since > timezone.now().date():
             raise ValidationError("Mentor since date cannot be in the future")
         return mentor_since
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class': 'form-control'})

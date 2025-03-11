@@ -6,9 +6,7 @@ from django.contrib.auth import get_user_model
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Field, ButtonHolder, Submit, Div
 from django.utils.translation import gettext_lazy as _
-from allauth.account.forms import SignupForm as AllAuthSignupForm
-from allauth.account.forms import LoginForm as AllAuthLoginForm
-from allauth.account.forms import ResetPasswordForm
+from allauth.account.forms import SignupForm as AllAuthSignupForm, LoginForm as AllAuthLoginForm, ResetPasswordForm
 from django.utils import timezone
 import re
 
@@ -163,11 +161,12 @@ class SessionForm(forms.ModelForm):
             raise forms.ValidationError("Price must be greater than zero")
         return price
 
-    def clean_mentor_since(self):
-        mentor_since = self.cleaned_data.get('mentor_since')
-        if mentor_since and mentor_since > timezone.now().date():
-            raise forms.ValidationError("The date cannot be in the future.")
-        return mentor_since
+    def clean_max_participants(self):
+        max_participants = self.cleaned_data.get('max_participants')
+        if max_participants <= 0:
+            raise forms.ValidationError(
+                "Max participants must be greater than zero")
+        return max_participants
 
 
 class MentorApplicationForm(forms.Form):

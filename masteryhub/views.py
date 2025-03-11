@@ -346,45 +346,50 @@ def view_session(request, session_id):
 
 @login_required
 def create_session(request):
-    """A view that handles creating a new session."""
     if request.method == "POST":
         form = SessionForm(request.POST)
         if form.is_valid():
-            session = form.save(commit=False)
-            session.host = request.user.profile
-            session.save()
-            messages.success(request, "Session created successfully.")
-            return redirect("masteryhub:view_session", session_id=session.id)
+            try:
+                session = form.save(commit=False)
+                session.host = request.user.profile
+                session.save()
+                messages.success(request, "Session created successfully.")
+                return redirect("masteryhub:view_session", session_id=session.id)
+            except Exception as e:
+                logger.error(f"Error creating session: {str(e)}")
+                messages.error(request, "There was an error creating the session.")
     else:
         form = SessionForm()
     return render(request, "masteryhub/create_session.html", {"form": form})
 
-
 @login_required
 def edit_session(request, session_id):
-    """A view that handles editing an existing session."""
-    session = get_object_or_404(
-        Session, id=session_id, host=request.user.profile)
+    session = get_object_or_404(Session, id=session_id, host=request.user.profile)
     if request.method == "POST":
         form = SessionForm(request.POST, instance=session)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Session updated successfully.")
-            return redirect("masteryhub:view_session", session_id=session.id)
+            try:
+                form.save()
+                messages.success(request, "Session updated successfully.")
+                return redirect("masteryhub:view_session", session_id=session.id)
+            except Exception as e:
+                logger.error(f"Error updating session: {str(e)}")
+                messages.error(request, "There was an error updating the session.")
     else:
         form = SessionForm(instance=session)
     return render(request, "masteryhub/edit_session.html", {"form": form})
 
-
 @login_required
 def delete_session(request, session_id):
-    """A view that handles deleting a session."""
-    session = get_object_or_404(
-        Session, id=session_id, host=request.user.profile)
+    session = get_object_or_404(Session, id=session_id, host=request.user.profile)
     if request.method == "POST":
-        session.delete()
-        messages.success(request, "Session deleted successfully.")
-        return redirect("masteryhub:session_list")
+        try:
+            session.delete()
+            messages.success(request, "Session deleted successfully.")
+            return redirect("masteryhub:session_list")
+        except Exception as e:
+            logger.error(f"Error deleting session: {str(e)}")
+            messages.error(request, "There was an error deleting the session.")
     return render(request, "masteryhub/delete_session.html", {"session": session})
 
 
