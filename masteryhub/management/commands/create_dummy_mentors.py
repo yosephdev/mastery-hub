@@ -71,13 +71,13 @@ class Command(BaseCommand):
 
             # Define mentors
             demo_mentors = [
-                {"username": "sarah_tech", "first_name": "Sarah", "last_name": "Johnson", "email": "sarah@example.com",
+                {"username": "sarah_tech", "first_name": "Sarah", "last_name": "Johnson", "email": "sarah@masteryhub.com",
                  "bio": "Senior Software Engineer with 8 years of experience.", "experience": 8, "hourly_rate": 75.00,
                  "availability": "Evenings and weekends", "skills": ["Python", "Django", "JavaScript"]},
-                {"username": "david_data", "first_name": "David", "last_name": "Chen", "email": "david@example.com",
+                {"username": "david_data", "first_name": "David", "last_name": "Chen", "email": "david@masteryhub.com",
                  "bio": "Data Scientist specializing in Machine Learning and Analytics.", "experience": 6, "hourly_rate": 85.00,
                  "availability": "Weekday afternoons", "skills": ["Python", "Machine Learning", "Data Analysis"]},
-                {"username": "maria_web", "first_name": "Maria", "last_name": "Garcia", "email": "maria@example.com",
+                {"username": "maria_web", "first_name": "Maria", "last_name": "Garcia", "email": "maria@masteryhub.com",
                  "bio": "Frontend Developer passionate about creating beautiful user experiences.", "experience": 5, "hourly_rate": 65.00,
                  "availability": "Flexible schedule", "skills": ["JavaScript", "React"]},
             ]

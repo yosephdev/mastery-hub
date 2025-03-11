@@ -64,8 +64,8 @@ class Command(BaseCommand):
            # Create dummy client users
             client_usernames = ['client_anna',
                                 'client_sara', 'client_kidist', 'client_alex']
-            client_emails = ['anna.client@example.com', 'sara.client@example.com',
-                             'kidist.client@example.com', 'alex.client@example.com']
+            client_emails = ['anna.client@masteryhub.com', 'sara.client@masteryhub.com',
+                             'kidist.client@masteryhub.com', 'alex.client@masteryhub.com']
 
             for username, email in zip(client_usernames, client_emails):
                 try:

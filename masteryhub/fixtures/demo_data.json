@@ -6,7 +6,7 @@
       "username": "sarah_tech",
       "first_name": "Sarah",
       "last_name": "Johnson",
-      "email": "sarah@example.com",
+      "email": "sarah@masteryhub.com",
       "is_active": true,
       "password": "pbkdf2_sha256$600000$hashed_password_here"
     }
@@ -34,7 +34,7 @@
       "username": "mike_data",
       "first_name": "Michael",
       "last_name": "Chen",
-      "email": "mike@example.com",
+      "email": "mike@masteryhub.com",
       "is_active": true,
       "password": "pbkdf2_sha256$600000$hashed_password_here"
     }
@@ -62,7 +62,7 @@
       "username": "anna_design",
       "first_name": "Anna",
       "last_name": "Martinez",
-      "email": "anna@example.com",
+      "email": "anna@masteryhub.com",
       "is_active": true,
       "password": "pbkdf2_sha256$600000$hashed_password_here"
     }
