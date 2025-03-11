@@ -11,14 +11,38 @@ logger = logging.getLogger(__name__)
 def create_user_profile(sender, instance, created, **kwargs):
     """Create a user profile when a new user is created."""
     if created:
-        Profile.objects.create(user=instance)
+        Profile.objects.create(
+            user=instance,
+            bio='',
+            skills='',
+            goals='',
+            experience='',
+            achievements='',
+            mentorship_areas='',
+            availability='',
+            preferred_mentoring_method='One-on-one',
+            is_available=True,
+            github_profile=None
+        )
 
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     """Save the user profile when the user is saved."""
     try:
-        if hasattr(instance, 'profile'):
-            instance.profile.save()
-    except Profile.DoesNotExist:       
-        Profile.objects.create(user=instance)
+        profile = instance.profile
+        profile.save()
+    except Profile.DoesNotExist:
+        Profile.objects.create(
+            user=instance,
+            bio='',
+            skills='',
+            goals='',
+            experience='',
+            achievements='',
+            mentorship_areas='',
+            availability='',
+            preferred_mentoring_method='One-on-one',
+            is_available=True,
+            github_profile=None
+        )

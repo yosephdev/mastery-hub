@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 load_dotenv()
 
@@ -83,16 +84,23 @@ MIDDLEWARE = [
 ]
 
 # Database Configuration
+tmpPostgres = urlparse(os.getenv("DATABASE_URL"))
+
 DATABASES = {
-    "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True,
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': tmpPostgres.path[1:],
+        'USER': tmpPostgres.username,
+        'PASSWORD': tmpPostgres.password,
+        'HOST': tmpPostgres.hostname,
+        'PORT': 5432,
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+    }
 }
 
-DATABASES["default"]["ENGINE"] = "django.db.backends.postgresql"
-
+# Handle test database settings
 if "test" in sys.argv:
     DATABASES = {
         "default": {

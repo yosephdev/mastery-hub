@@ -82,7 +82,8 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey('Cart', related_name='items', on_delete=models.CASCADE)
+    cart = models.ForeignKey(
+        'Cart', related_name='items', on_delete=models.CASCADE)
     session = models.ForeignKey('masteryhub.Session', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -113,9 +114,9 @@ class CartItem(models.Model):
         super().save(*args, **kwargs)
 
     def get_cost(self):
-        """Calculate cost for this cart item"""
+        """Calculate cost using the price at the time of adding"""
         try:
-            return Decimal(str(self.session.price * self.quantity))
+            return Decimal(str(self.price_at_time_of_adding * self.quantity))
         except (TypeError, ValueError) as e:
             logger.error(f"Error calculating cart item cost: {e}")
             return Decimal('0.00')
@@ -171,4 +172,4 @@ class OrderLineItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f'Session {self.session.title} on order {self.order.order_number}'
+        return f'Session {self.title} - {self.date.strftime("%Y-%m-%d %H:%M")}'

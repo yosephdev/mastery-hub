@@ -166,7 +166,7 @@
                                 class="btn btn-primary">
                                 <i class="fas fa-search me-2"></i>Find Mentors
                             </a>
-                            <a href="{% url 'masteryhub:view_session' session_id=20 %}" class="btn btn-outline-primary">
+                            <a href="{% url 'masteryhub:view_session' session_id=39 %}" class="btn btn-outline-primary">
                                 <i class="fas fa-book-open me-2"></i>View Sessions
                             </a>
                         </div>
@@ -194,7 +194,7 @@
                                 class="btn btn-primary">
                                 <i class="fas fa-search me-2"></i>Find Mentors
                             </a>
-                            <a href="{% url 'masteryhub:view_session' session_id=17 %}" class="btn btn-outline-primary">
+                            <a href="{% url 'masteryhub:view_session' session_id=43 %}" class="btn btn-outline-primary">
                                 <i class="fas fa-book-open me-2"></i>View Sessions
                             </a>
                         </div>
@@ -221,7 +221,7 @@
                             <a href="{% url 'masteryhub:mentor_matching' %}?skill=data-science" class="btn btn-primary">
                                 <i class="fas fa-search me-2"></i>Find Mentors
                             </a>
-                            <a href="{% url 'masteryhub:view_session' session_id=19 %}" class="btn btn-outline-primary">
+                            <a href="{% url 'masteryhub:view_session' session_id=42 %}" class="btn btn-outline-primary">
                                 <i class="fas fa-book-open me-2"></i>View Sessions
                             </a>
                         </div>
@@ -271,8 +271,8 @@
                             </div>
                         </div>
                         {% if not mentor.is_demo %}
-                            <a href="{% url 'profiles:view_mentor_profile' username=mentor.username %}"
-                                class="btn btn-outline-primary btn-block">
+                            <a href="{% url 'profiles:view_mentor_profile' username=mentor.username %}" 
+                            class="btn btn-outline-primary btn-block">
                                 View Profile
                             </a>
                         {% else %}

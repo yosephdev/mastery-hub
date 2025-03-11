@@ -1,3 +1,10 @@
+import os
+import django
+
+# Set up Django environment
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "skill_sharing_platform.settings")
+django.setup()
+
 from masteryhub.models import Session, Category, Skill, Booking
 from django.utils import timezone
 from django.core.exceptions import ValidationError
@@ -6,12 +13,8 @@ from django.urls import reverse
 from django.test import TestCase, Client
 from django.http import HttpResponse
 from datetime import datetime, timedelta
+import psycopg2
 import json
-import os
-import django
-
-os.environ["DJANGO_SETTINGS_MODULE"] = "skill_sharing_platform.settings"
-django.setup()
 
 
 try:
@@ -199,3 +202,10 @@ class BagViewTests(TestCase):
 
 def test_view(request):
     return HttpResponse("Hello, World!")
+
+# Test database connection
+try:
+    conn = psycopg2.connect(os.getenv("DATABASE_URL"))
+    print("Database connection successful!")
+except Exception as e:
+    print(f"Error: {e}")

@@ -352,6 +352,8 @@ def checkout(request):
                         order.save()
 
                         for item in cart.items.all():
+                            print(f"Session: {item.session.title}, Price Now: {item.session.price}, Price at Adding: {item.price_at_time_of_adding}, Quantity: {item.quantity}, Total Cost: {item.get_cost()}")
+
                             OrderLineItem.objects.create(
                                 order=order,
                                 session=item.session,

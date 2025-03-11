@@ -66,6 +66,7 @@
                             </div>
                             <h5 class="card-title fw-bold text-primary">{{ session.title }}</h5>
                             <p class="card-text text-muted">{{ session.description|truncatewords:15 }}</p>
+                            <p class="fw-bold text-success">${{ session.price }}</p> 
 
                             <div class="d-flex align-items-center mb-3">
                                 <img src="{{ session.host.user.profile_image.url|default:'/static/images/default-avatar.png' }}"

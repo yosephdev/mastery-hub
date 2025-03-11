@@ -1,52 +1,67 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
-from profiles.models import Profile
-from masteryhub.models import Mentor, Skill, Category
-from decimal import Decimal
-
+from masteryhub.models import Skill, Category
 
 class Command(BaseCommand):
-    help = 'Loads initial demo data for testing'
+    help = 'Loads initial categories and skills for the platform'
 
     def handle(self, *args, **kwargs):
-        try:           
-            categories = {
-                'Programming': 'Learn various programming languages',
-                'Web Development': 'Build websites and web applications',
-                'Data Science': 'Analyze data and build models',
-                'Design': 'Create beautiful user interfaces',
+        try:
+            # Define categories
+            category_data = {
+                'programming': {'name': 'Programming', 'description': 'Learn various programming languages'},
+                'web_dev': {'name': 'Web Development', 'description': 'Build websites and web applications'},
+                'data_science': {'name': 'Data Science', 'description': 'Analyze data and build models'},
+                'design': {'name': 'Design', 'description': 'Create beautiful user interfaces'},
+                'cloud_computing': {'name': 'Cloud Computing', 'description': 'Learn AWS, Azure, and cloud security'},
+                'cybersecurity': {'name': 'Cybersecurity', 'description': 'Protect networks and systems from attacks'},
             }
 
-            for name, description in categories.items():
-                Category.objects.get_or_create(
-                    name=name,
-                    defaults={'description': description}
+            categories = {}
+            for key, data in category_data.items():
+                category, created = Category.objects.get_or_create(
+                    name=data['name'], defaults={'description': data['description']}
                 )
-           
+                categories[key] = category
+                if created:
+                    self.stdout.write(self.style.SUCCESS(f"Category created: {data['name']}"))
+                else:
+                    self.stdout.write(self.style.WARNING(f"Category already exists: {data['name']}"))
+
+            # Define skills
             skills_data = [
-                ('Python', 'Programming'),
-                ('JavaScript', 'Web Development'),
-                ('HTML/CSS', 'Web Development'),
-                ('Data Analysis', 'Data Science'),
-                ('UI Design', 'Design'),
+                ('Python', 'programming'),
+                ('JavaScript', 'web_dev'),
+                ('HTML/CSS', 'web_dev'),
+                ('Django', 'web_dev'),
+                ('React', 'web_dev'),
+                ('Machine Learning', 'data_science'),
+                ('Data Analysis', 'data_science'),
+                ('SQL', 'data_science'),
+                ('UI/UX Design', 'design'),
+                ('Cloud Security', 'cybersecurity'),
+                ('AWS Cloud', 'cloud_computing'),
+                ('Azure Cloud', 'cloud_computing'),
+                ('Penetration Testing', 'cybersecurity'),
             ]
 
-            for skill_name, category_name in skills_data:
-                category = Category.objects.get(name=category_name)
-                Skill.objects.get_or_create(
-                    title=skill_name,
-                    defaults={
-                        'name': skill_name.lower().replace(' ', '_'),
-                        'description': f'Skills in {skill_name}',
-                        'category': category
-                    }
-                )
+            for skill_name, category_key in skills_data:
+                if category_key in categories:
+                    skill, created = Skill.objects.get_or_create(
+                        title=skill_name,
+                        defaults={
+                            'name': skill_name.lower().replace(' ', '_'),
+                            'description': f'Expertise in {skill_name}',
+                            'category': categories[category_key]
+                        }
+                    )
+                    if created:
+                        self.stdout.write(self.style.SUCCESS(f"Skill created: {skill_name} in {categories[category_key].name}"))
+                    else:
+                        self.stdout.write(self.style.WARNING(f"Skill already exists: {skill_name}"))
+                else:
+                    self.stdout.write(self.style.ERROR(f"Invalid category for skill '{skill_name}': {category_key}"))
 
-            self.stdout.write(
-                self.style.SUCCESS('Successfully loaded initial demo data')
-            )
+            self.stdout.write(self.style.SUCCESS('Successfully loaded initial data! 🚀'))
 
         except Exception as e:
-            self.stdout.write(
-                self.style.ERROR(f'Error loading demo data: {str(e)}')
-            )
+            self.stdout.write(self.style.ERROR(f'Error loading demo data: {str(e)}'))

@@ -23,7 +23,7 @@
       "hourly_rate": "75.00",
       "availability": "Evenings and weekends",
       "linkedin_url": "https://linkedin.com/in/sarah-tech",
-      "github_url": "https://github.com/sarah-tech",
+      "github_profile": null,
       "website_url": "https://sarah-tech.dev"
     }
   },
@@ -51,7 +51,7 @@
       "hourly_rate": "85.00",
       "availability": "Weekday afternoons",
       "linkedin_url": "https://linkedin.com/in/mike-data",
-      "github_url": "https://github.com/mike-data",
+      "github_profile": null,
       "website_url": "https://mike-data.ai"
     }
   },
@@ -71,16 +71,17 @@
     "model": "profiles.profile",
     "pk": 3,
     "fields": {
-      "user": 3,
-      "bio": "UX/UI Designer with a background in psychology. Specialized in creating user-centered designs and teaching design thinking principles.",
-      "is_expert": true,
-      "expertise_areas": "UI/UX Design, Figma, Adobe XD, User Research",
-      "years_of_experience": 5,
-      "hourly_rate": "65.00",
-      "availability": "Flexible schedule",
-      "linkedin_url": "https://linkedin.com/in/anna-design",
-      "github_url": "",
-      "website_url": "https://anna-design.com"
+        "user": 3,
+        "bio": "UX/UI Designer with a background in psychology. Specialized in creating user-centered designs and teaching design thinking principles.",
+        "is_expert": true,
+        "expertise_areas": "UI/UX Design, Figma, Adobe XD, User Research",
+        "years_of_experience": 5,
+        "hourly_rate": "65.00",
+        "availability": "Flexible schedule",
+        "linkedin_url": "https://linkedin.com/in/anna-design",
+        "github_profile": null,
+        "website_url": "https://anna-design.com"
     }
-  }
+ }
+ 
 ]
