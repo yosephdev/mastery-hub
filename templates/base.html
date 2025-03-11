@@ -51,7 +51,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="{% static 'js/custom.js' %}" defer></script>
     {% endblock %}
-    {% block extra_js %}{% endblock %}
+    {% block extra_js %}
+    <!-- Mailchimp validation script -->
+    <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script>
+    <script type="text/javascript">
+    (function($) {
+        window.fnames = new Array(); 
+        window.ftypes = new Array();
+        fnames[0]='EMAIL'; ftypes[0]='email';
+    }(jQuery));
+    var $mcj = jQuery.noConflict(true);
+    </script>
+    {% endblock %}
 
     <title>MasteryHub {% block extra_title %}{% endblock %}</title>
 </head>
@@ -215,16 +226,29 @@
                 <!-- Newsletter -->
                 <div class="col-lg-3 col-md-6">
                     <h5 class="fw-bold mb-4">Stay Updated</h5>
-                    <form action="https://herokuapp.us22.list-manage.com/subscribe/post" method="post"
-                        class="newsletter-form">
+                    <form action="https://herokuapp.us22.list-manage.com/subscribe/post?u=a275e3dd2f77917d9aca96c96&amp;id=e536f9e1e0" 
+                          method="post" class="newsletter-form" target="_blank" novalidate>
+                          
                         <div class="mb-3">
                             <label for="mce-EMAIL" class="form-label">Subscribe to our newsletter</label>
                             <input type="email" class="form-control" id="mce-EMAIL" name="EMAIL"
-                                placeholder="Enter your email" required>
+                                   placeholder="Enter your email" required>
                         </div>
+                
+                        <!-- Hidden field for bot prevention -->
+                        <div style="position: absolute; left: -5000px;" aria-hidden="true">
+                            <input type="text" name="b_a275e3dd2f77917d9aca96c96_e536f9e1e0" tabindex="-1" value="">
+                        </div>
+                
                         <button type="submit" class="btn btn-primary w-100">Subscribe</button>
+                
+                        <!-- Success/Error Messages -->
+                        <div id="mce-responses" class="mt-2">
+                            <div class="response text-danger" id="mce-error-response" style="display:none;"></div>
+                            <div class="response text-success" id="mce-success-response" style="display:none;"></div>
+                        </div>
                     </form>
-                </div>
+                </div>                     
             </div>
 
             <!-- Social Links -->
