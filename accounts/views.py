@@ -1,4 +1,10 @@
 from django.http import HttpResponseRedirect, Http404
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.views import (
     LoginView, LogoutView, PasswordResetView,
@@ -12,6 +18,7 @@ from allauth.account.views import ConfirmEmailView
 from allauth.account.models import EmailConfirmationHMAC
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
+from accounts.forms import CustomSetPasswordForm
 import logging
 
 from .forms import (
@@ -37,6 +44,7 @@ def signup_view(request):
                         auth_login(request, authenticated_user)
                         messages.success(
                             request, f"Welcome to MasteryHub, {user.username}! Your account has been created successfully.")
+                        send_confirmation_email(user, request)
                         return redirect("home:index")
             except Exception as e:
                 logger.error(f"Signup error: {str(e)}")
@@ -63,6 +71,32 @@ class CustomConfirmEmailView(ConfirmEmailView):
         if email_confirmation is None:
             raise Http404("Invalid key")
         return email_confirmation
+
+    def dispatch(self, request, *args, **kwargs):
+        email_confirmation = self.get_object()
+        if email_confirmation.key_expired():
+            messages.error(request, "The confirmation link has expired.")
+            return redirect("accounts:login")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        email_confirmation = self.get_object()
+        email_confirmation.confirm(request)
+        messages.success(
+            request, "Your email has been confirmed. You can now log in.")
+        return redirect("accounts:login")
+
+
+def send_confirmation_email(user, request):
+    current_site = get_current_site(request)
+    subject = 'Confirm Your Email'
+    message = render_to_string('account/email_confirmation_message.html', {
+        'user': user,
+        'domain': current_site.domain,
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': default_token_generator.make_token(user),
+    })
+    send_mail(subject, message, 'noreply@masteryhub.com', [user.email])
 
 
 class CustomLoginView(LoginView):

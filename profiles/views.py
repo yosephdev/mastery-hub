@@ -56,24 +56,30 @@ def edit_profile(request):
     try:
         profile = request.user.profile
     except Profile.DoesNotExist:
-        logger.error(f"Profile does not exist for user: {request.user.username}")
-        messages.error(request, "Your profile does not exist. Please contact support.")
+        logger.error(
+            f"Profile does not exist for user: {request.user.username}")
+        messages.error(
+            request, "Your profile does not exist. Please contact support.")
         return redirect('home:index')
 
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
-        profile_form = ProfileForm(request.POST, request.FILES, instance=profile)
+        profile_form = ProfileForm(
+            request.POST, request.FILES, instance=profile)
 
         if user_form.is_valid() and profile_form.is_valid():
             try:
                 with transaction.atomic():
                     user_form.save()
                     profile_form.save()
-                    messages.success(request, 'Your profile has been updated successfully!')
+                    messages.success(
+                        request, 'Your profile has been updated successfully!')
                     return redirect('profiles:view_profile', username=request.user.username)
             except Exception as e:
-                logger.error(f"Error updating profile for user {request.user.username}: {str(e)}")
-                messages.error(request, "An error occurred while updating your profile. Please try again.")
+                logger.error(
+                    f"Error updating profile for user {request.user.username}: {str(e)}")
+                messages.error(
+                    request, "An error occurred while updating your profile. Please try again.")
         else:
             messages.error(request, 'Please correct the errors below.')
     else:

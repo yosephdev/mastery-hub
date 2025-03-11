@@ -24,11 +24,11 @@
                             </p>
                         </div>
 
-                        <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                        <form method="post" action="{% url 'accounts:confirm_email' confirmation.key %}">
                             {% csrf_token %}
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary btn-lg">{% trans "Confirm" %}</button>
-                                <a href="{% url 'account_login' %}" class="btn btn-outline-secondary">{% trans "Back to Login" %}</a>
+                                <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary">{% trans "Back to Login" %}</a>
                             </div>
                         </form>
                     {% else %}
@@ -41,7 +41,7 @@
                             </p>
                         </div>
                         <div class="d-grid gap-2 mt-3">
-                            <a href="{% url 'account_login' %}" class="btn btn-primary">{% trans "Back to Login" %}</a>
+                            <a href="{% url 'accounts:login' %}" class="btn btn-primary">{% trans "Back to Login" %}</a>
                         </div>
                     {% endif %}
                 </div>
