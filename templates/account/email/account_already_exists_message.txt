@@ -1,14 +1,19 @@
 {% extends "account/email/base_message.txt" %}
 {% load i18n %}
 
-{% block content %}{% autoescape off %}{% blocktrans %}
-You are receiving this email because you or someone else tried to sign up for a MasteryHub account using this email address:
+{% block content %}
+{% autoescape off %}
+{% blocktrans %}
+You are receiving this email because a signup attempt was made for a MasteryHub account using this email:  
 
-{{ email }}
+**{{ email }}**  
 
-However, an account using this email address already exists. If you forgot your password, you can reset it here:
+However, an account with this email already exists. If you forgot your password, you can reset it here:  
 
-{{ password_reset_url }}
+{{ password_reset_url }}  
 
-If you did not attempt to sign up for MasteryHub, you can safely ignore this email.
-{% endblocktrans %}{% endautoescape %}{% endblock %}
+If you did not initiate this request, you can safely ignore this email.  
+{% endblocktrans %}
+{% endautoescape %}
+{% endblock %}
+
