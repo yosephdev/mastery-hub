@@ -14,10 +14,9 @@ class Session(models.Model):
     duration = models.DurationField(default=timedelta(hours=1))
     price = models.DecimalField(max_digits=10, decimal_places=2, default=99.99)
     host = models.ForeignKey(
-        'profiles.Profile',
+        Profile,
         on_delete=models.CASCADE,
-        related_name="sessions_hosted",
-        db_constraint=False
+        related_name="sessions_hosted"
     )
     participants = models.ManyToManyField(
         Profile, related_name="sessions_participated", blank=True

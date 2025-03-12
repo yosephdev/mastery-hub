@@ -1,9 +1,12 @@
 import os
 import sys
 from pathlib import Path
-import dj_database_url
+from django.db.backends.sqlite3.base import DatabaseWrapper
+from django.dispatch import receiver
 from dotenv import load_dotenv
 from urllib.parse import urlparse
+from django.db.backends.postgresql import base as postgres_backend
+from django.db import connections
 
 load_dotenv()
 
@@ -93,24 +96,51 @@ DATABASES = {
         'USER': tmpPostgres.username,
         'PASSWORD': tmpPostgres.password,
         'HOST': tmpPostgres.hostname,
-        'PORT': 5432,
+        'PORT': tmpPostgres.port or 5432,
         'OPTIONS': {
             'sslmode': 'require',
         },
     }
 }
 
+
 # Handle test database settings
 if "test" in sys.argv:
+    tmpPostgresTest = urlparse(
+        os.getenv("TEST_DATABASE_URL", os.getenv("DATABASE_URL")))
+
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": ":memory:",
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": tmpPostgresTest.path[1:],
+            "USER": tmpPostgresTest.username,
+            "PASSWORD": tmpPostgresTest.password,
+            "HOST": tmpPostgresTest.hostname,
+            "PORT": tmpPostgresTest.port or 5432,
+            "OPTIONS": {
+                "sslmode": "require",
+            },
         }
     }
+
+# Disable secure redirects for testing
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
+
+# PRAGMA for SQLite foreign keys enabled without using the signal
+
+
+def enable_foreign_keys():
+    db_vendor = connections['default'].vendor
+    if db_vendor == 'sqlite':
+        with connections['default'].cursor() as cursor:
+            cursor.execute('PRAGMA foreign_keys = ON;')
+
+
+# Call the function in your setup process
+enable_foreign_keys()
+
 
 # Authentication Settings
 AUTHENTICATION_BACKENDS = [
@@ -122,7 +152,7 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'home:index'
 LOGOUT_REDIRECT_URL = 'home:index'
-LOGOUT_URL =  'accounts:logout'
+LOGOUT_URL = 'accounts:logout'
 
 # AllAuth Settings
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
@@ -148,9 +178,9 @@ ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 
 # Rate Limiting Settings
-ACCOUNT_RATE_LIMITS = {   
+ACCOUNT_RATE_LIMITS = {
     "login": "5/h",
-    "signup": "2/h",      
+    "signup": "2/h",
     "password_reset": "2/h",
 }
 

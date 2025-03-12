@@ -4,10 +4,9 @@ from django.dispatch import receiver
 from .models import Profile
 
 @receiver(post_save, sender=User)
-def create_profile(sender, instance, created, **kwargs):
+def create_or_save_profile(sender, instance, created, **kwargs):
+    """Ensure Profile is created only once per User."""
     if created:
         Profile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_profile(sender, instance, **kwargs):
-    instance.profile.save() 
+    else:
+        instance.profile.save()

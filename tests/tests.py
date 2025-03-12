@@ -1,21 +1,20 @@
+from django.db import connection
+from datetime import datetime, timedelta
+from django.contrib.sessions.models import Session
+from django.test import TestCase
+from django.urls import reverse
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from masteryhub.models import Category, Skill, Booking
 import os
 import django
+from django.test import TransactionTestCase
 
 # Set up Django environment
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "skill_sharing_platform.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE",
+                      "skill_sharing_platform.settings")
 django.setup()
-
-from masteryhub.models import Session, Category, Skill, Booking
-from django.utils import timezone
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
-from django.urls import reverse
-from django.test import TestCase, Client
-from django.http import HttpResponse
-from datetime import datetime, timedelta
-import psycopg2
-import json
-
 
 try:
     from profiles.models import Profile
@@ -23,15 +22,17 @@ except ImportError:
     raise ImportError(
         "Could not import Profile model. Is the profiles app in INSTALLED_APPS?")
 
+def tearDown(self):
+    if hasattr(self, 'user'):
+        self.user.delete()
+    Profile.objects.filter(user=self.user).delete()
+
 
 class SkillModelTest(TestCase):
     def setUp(self):
-
         self.category = Category.objects.create(name="Tech")
         self.user = User.objects.create_user(
-            username='testuser',
-            password='testpass123'
-        )
+            username='testuser', password='testpass123')
 
     def test_skill_creation(self):
         skill = Skill.objects.create(
@@ -87,13 +88,11 @@ class SkillModelTest(TestCase):
             skill.full_clean()
 
 
-class BookingModelTest(TestCase):
+class BookingModelTest(TransactionTestCase):
     def setUp(self):
         self.category = Category.objects.create(name="Tech")
         self.user = User.objects.create_user(
-            username='testuser',
-            password='testpass123'
-        )
+            username='testuser', password='testpass123')
         self.skill = Skill.objects.create(
             name="Python Basics",
             title="Python Programming",
@@ -157,12 +156,12 @@ class BookingModelTest(TestCase):
             booking.full_clean()
 
 
-class BagViewTests(TestCase):
+class BagViewTests(TransactionTestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username='testuser',
-            password='testpass123'
-        )
+            username='testuser', password='testpass123')
+        Profile.objects.get_or_create(user=self.user, defaults={
+                                      "bio": "Test bio"})  # Ensuring unique profile
         self.category = Category.objects.create(name="Tech")
         self.skill = Skill.objects.create(
             name="Python Basics",
@@ -189,6 +188,11 @@ class BagViewTests(TestCase):
 
         self.session_id = self.session.id
 
+    def tearDown(self):
+        # Ensure profiles are cleaned up
+        Profile.objects.filter(user=self.user).delete()
+        self.user.delete()
+
     def test_add_to_cart(self):
         url = reverse("checkout:add_to_cart", args=[self.skill.id])
         response = self.client.get(url)
@@ -200,12 +204,12 @@ class BagViewTests(TestCase):
         self.assertEqual(response.status_code, 301)
 
 
-def test_view(request):
-    return HttpResponse("Hello, World!")
-
-# Test database connection
-try:
-    conn = psycopg2.connect(os.getenv("DATABASE_URL"))
-    print("Database connection successful!")
-except Exception as e:
-    print(f"Error: {e}")
+class DatabaseConnectionTest(TestCase):
+    def test_database_connection(self):
+        try:
+            conn = connection.cursor()
+            conn.execute("SELECT 1")
+            self.assertEqual(conn.fetchone()[0], 1)
+            print("Database connection successful.")
+        except Exception as e:
+            self.fail(f"Database connection failed: {e}")

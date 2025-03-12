@@ -9,7 +9,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("masteryhub", "0006_alter_session_host"),
+        ("masteryhub", "0005_alter_session_host"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
