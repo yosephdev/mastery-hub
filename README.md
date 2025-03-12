@@ -574,18 +574,24 @@ For all testing, please refer to the [TESTING.md](TESTING.md) file.
 
 The live deployed application can be found deployed on [Heroku](https://skill-sharing-446c0336ffb5.herokuapp.com/).
 
-### ElephantSQL Database
+### Neon PostgreSQL Database  
 
-This project uses [ElephantSQL](https://www.elephantsql.com) for the PostgreSQL Database.
+This project now uses [Neon](https://neon.tech) for the PostgreSQL database.  
 
-To obtain your own Postgres Database, sign-up with your GitHub account, then follow these steps:
+### Setting Up a Neon Database  
 
-- Click **Create New Instance** to start a new database.
-- Provide a name.
-- Select the **Tiny Turtle (Free)** plan.
-- You can leave the **Tags** blank.
-- Select the **Region** and **Data Center** closest to you.
-- Once created, click on the new database name, where you can view the database URL and Password.
+To obtain your own Postgres database on Neon, follow these steps:  
+
+1. Sign up at [Neon.tech](https://neon.tech) using your GitHub or email.  
+2. Click **Create a new project** to set up a database.  
+3. Provide a **project name** and select **PostgreSQL version** (latest recommended).  
+4. Choose the **Free Tier** plan if you’re just getting started.  
+5. Select a **Region** closest to you for better performance.  
+6. Once created, go to the **Connection Details** to find your database URL, username, password, and other credentials.  
+
+### Connecting to the Database  
+
+Use the provided connection string in your application's environment variables to connect to the Neon database:  
 
 ### Amazon AWS
 
