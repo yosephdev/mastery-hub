@@ -12,14 +12,23 @@ class Session(models.Model):
     description = models.TextField()
     date = models.DateTimeField(auto_now_add=True)
     duration = models.DurationField(default=timedelta(hours=1))
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=99.99)
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=99.99,
+        help_text="Session price in USD"
+    )
     host = models.ForeignKey(
         Profile,
         on_delete=models.CASCADE,
         related_name="sessions_hosted"
     )
     participants = models.ManyToManyField(
-        Profile, related_name="sessions_participated", blank=True
+        'profiles.Profile',
+        related_name="sessions_participated",
+        blank=True,
+        db_table='masteryhub_session_participants',
+        db_constraint=False
     )
     category = models.ForeignKey(
         "Category", on_delete=models.SET_NULL, null=True)
@@ -47,11 +56,11 @@ class Session(models.Model):
         return self.participants.count()
 
     def is_full(self):
-        return self.current_participants >= self.max_participants
+        return self.participants.count() >= self.max_participants
 
     @property
     def available_spots(self):
-        return self.max_participants - self.current_participants
+        return self.max_participants - self.participants.count()
 
     @property
     def total_duration(self):
@@ -202,6 +211,7 @@ class Mentor(models.Model):
     rating = models.DecimalField(
         max_digits=3, decimal_places=2, null=True, blank=True)
     is_available = models.BooleanField(default=False)
+    is_demo = models.BooleanField(default=False)
     skills = models.ManyToManyField(Skill, related_name='mentors')
     categories = models.ManyToManyField(Category, related_name='mentors')
     experience_level = models.CharField(

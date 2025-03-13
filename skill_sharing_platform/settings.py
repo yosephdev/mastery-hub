@@ -1,11 +1,8 @@
 import os
 import sys
 from pathlib import Path
-from django.db.backends.sqlite3.base import DatabaseWrapper
-from django.dispatch import receiver
 from dotenv import load_dotenv
 from urllib.parse import urlparse
-from django.db.backends.postgresql import base as postgres_backend
 from django.db import connections
 
 load_dotenv()
@@ -63,10 +60,10 @@ INSTALLED_APPS = [
     "widget_tweaks",
 
     # Local
+    "profiles.apps.ProfilesConfig",
     "masteryhub.apps.MasteryhubConfig",
     "home",
     "checkout",
-    "profiles",
     "accounts",
 ]
 

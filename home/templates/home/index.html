@@ -155,20 +155,24 @@
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">Web Development</h5>
-                        <p class="card-text text-muted">Build modern, responsive websites using the latest technologies.
-                        </p>
+                        <p class="card-text text-muted">Build modern, responsive websites using the latest technologies.</p>
                         <div class="skill-stats d-flex justify-content-between mb-3">
                             <span><i class="fas fa-users text-primary"></i> 1.2k+ Students</span>
                             <span><i class="fas fa-star text-warning"></i> 4.8/5</span>
                         </div>
                         <div class="d-grid gap-2">
-                            <a href="{% url 'masteryhub:mentor_matching' %}?skill=web-development"
-                                class="btn btn-primary">
+                            <a href="{% url 'masteryhub:mentor_matching' %}?skill=web-development" class="btn btn-primary">
                                 <i class="fas fa-search me-2"></i>Find Mentors
                             </a>
-                            <a href="{% url 'masteryhub:view_session' session_id=39 %}" class="btn btn-outline-primary">
-                                <i class="fas fa-book-open me-2"></i>View Sessions
-                            </a>
+                            {% if web_dev_sessions %}
+                                {% for session in web_dev_sessions %}
+                                    <a href="{% url 'masteryhub:view_session' session_id=session.id %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-book-open me-2"></i>{{ session.title }}
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted">No sessions available.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -190,13 +194,18 @@
                             <span><i class="fas fa-star text-warning"></i> 4.7/5</span>
                         </div>
                         <div class="d-grid gap-2">
-                            <a href="{% url 'masteryhub:mentor_matching' %}?skill=digital-marketing"
-                                class="btn btn-primary">
+                            <a href="{% url 'masteryhub:mentor_matching' %}?skill=digital-marketing" class="btn btn-primary">
                                 <i class="fas fa-search me-2"></i>Find Mentors
                             </a>
-                            <a href="{% url 'masteryhub:view_session' session_id=43 %}" class="btn btn-outline-primary">
-                                <i class="fas fa-book-open me-2"></i>View Sessions
-                            </a>
+                            {% if digital_marketing_sessions %}
+                                {% for session in digital_marketing_sessions %}
+                                    <a href="{% url 'masteryhub:view_session' session_id=session.id %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-book-open me-2"></i>{{ session.title }}
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted">No sessions available.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -221,9 +230,15 @@
                             <a href="{% url 'masteryhub:mentor_matching' %}?skill=data-science" class="btn btn-primary">
                                 <i class="fas fa-search me-2"></i>Find Mentors
                             </a>
-                            <a href="{% url 'masteryhub:view_session' session_id=42 %}" class="btn btn-outline-primary">
-                                <i class="fas fa-book-open me-2"></i>View Sessions
-                            </a>
+                            {% if data_science_sessions %}
+                                {% for session in data_science_sessions %}
+                                    <a href="{% url 'masteryhub:view_session' session_id=session.id %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-book-open me-2"></i>{{ session.title }}
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted">No sessions available.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -271,13 +286,13 @@
                             </div>
                         </div>
                         {% if not mentor.is_demo %}
-                            <a href="{% url 'profiles:view_mentor_profile' username=mentor.username %}" 
-                            class="btn btn-outline-primary btn-block">
-                                View Profile
-                            </a>
+                        <a href="{% url 'masteryhub:view_mentor_profile' username=mentor.username %}" 
+                           class="btn btn-outline-primary btn-block">
+                            View Profile
+                        </a>
                         {% else %}
                             <button class="btn btn-secondary" disabled>Demo Profile</button>
-                        {% endif %}
+                        {% endif %}                       
                     </div>
                 </div>
             </div>

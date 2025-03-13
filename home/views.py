@@ -3,18 +3,103 @@ from django.core.mail import send_mail, BadHeaderError
 from django.conf import settings
 from django.http import HttpResponse
 from django.db.models import Q
-from masteryhub.models import Session
+from masteryhub.models import Session, Category
 from profiles.models import Profile
 from .forms import ContactForm
 from allauth.socialaccount.models import SocialApp
+from django.contrib.auth.models import User
+from decimal import Decimal
 
 # Create your views here.
+
+
+def create_default_sessions():
+    categories = {
+        'Technology': Category.objects.get_or_create(name='Technology')[0],
+        'Marketing': Category.objects.get_or_create(name='Marketing')[0],
+        'Data Science': Category.objects.get_or_create(name='Data Science')[0],
+    }
+
+    try:
+        default_host = Profile.objects.first()
+        if not default_host:
+            user = User.objects.create_user(
+                username='default_mentor',
+                email='default@example.com',
+                password='defaultpassword123'
+            )
+            default_host = Profile.objects.create(user=user)
+    except Exception as e:
+        print(f"Error creating default host: {e}")
+        return
+
+    default_sessions = [
+        {
+            'title': 'Introduction to Web Development',
+            'description': 'Learn the basics of HTML, CSS, and JavaScript',
+            'category': categories['Technology'],
+            'price': Decimal('99.99'),
+            'max_participants': 20,
+        },
+        {
+            'title': 'Advanced React Development',
+            'description': 'Master React.js and build modern web applications',
+            'category': categories['Technology'],
+            'price': Decimal('149.99'),
+            'max_participants': 15,
+        },
+        {
+            'title': 'Digital Marketing Fundamentals',
+            'description': 'Learn essential digital marketing strategies',
+            'category': categories['Marketing'],
+            'price': Decimal('79.99'),
+            'max_participants': 25,
+        },
+        {
+            'title': 'Social Media Marketing',
+            'description': 'Master social media marketing campaigns',
+            'category': categories['Marketing'],
+            'price': Decimal('89.99'),
+            'max_participants': 20,
+        },
+        {
+            'title': 'Python for Data Science',
+            'description': 'Learn Python programming for data analysis',
+            'category': categories['Data Science'],
+            'price': Decimal('129.99'),
+            'max_participants': 15,
+        },
+        {
+            'title': 'Machine Learning Basics',
+            'description': 'Introduction to machine learning algorithms',
+            'category': categories['Data Science'],
+            'price': Decimal('159.99'),
+            'max_participants': 12,
+        },
+    ]
+
+    # Create sessions
+    for session_data in default_sessions:
+        Session.objects.get_or_create(
+            title=session_data['title'],
+            defaults={
+                'description': session_data['description'],
+                'category': session_data['category'],
+                'host': default_host,
+                'price': session_data['price'],
+                'max_participants': session_data['max_participants'],
+                'is_active': True,
+            }
+        )
 
 
 def index(request):
     """
     A view to return the index page for the home app
     """
+    if Session.objects.count() == 0:
+        create_default_sessions()
+
     social_auth_google_enabled = SocialApp.objects.filter(
         provider='google').exists()
 
@@ -227,6 +312,24 @@ def index(request):
         }
     ]
 
+    web_dev_sessions = Session.objects.filter(
+        category__name='Technology',
+        is_active=True
+    ).order_by('-created_at')[:3]
+    print(f"Web Dev Sessions: {web_dev_sessions.count()}")
+
+    digital_marketing_sessions = Session.objects.filter(
+        category__name='Marketing',
+        is_active=True
+    ).order_by('-created_at')[:3]
+    print(f"Marketing Sessions: {digital_marketing_sessions.count()}")
+
+    data_science_sessions = Session.objects.filter(
+        category__name='Data Science',
+        is_active=True
+    ).order_by('-created_at')[:3]
+    print(f"Data Science Sessions: {data_science_sessions.count()}")
+
     context = {
         'slides': slides,
         'mentors': mentors,
@@ -235,6 +338,9 @@ def index(request):
         'featured_mentors': mentors[:4],
         'featured_testimonials': testimonials[:3],
         'social_auth_google_enabled': social_auth_google_enabled,
+        'web_dev_sessions': web_dev_sessions,
+        'digital_marketing_sessions': digital_marketing_sessions,
+        'data_science_sessions': data_science_sessions,
     }
 
     return render(request, "home/index.html", context)

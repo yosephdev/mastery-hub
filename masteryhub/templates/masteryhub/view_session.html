@@ -2,78 +2,75 @@
 {% load static %}
 
 {% block content %}
-<div class="container pt-5">
+<div class="container py-5">
     <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card shadow rounded-3 border-0">               
-                <div class="card-header bg-gradient text-white py-4">
-                    <h2 class="mb-0 text-center">{{ session.title }}</h2>
-                </div>
-                
-                <div class="card-body p-4">                 
-                    {% if session.image %}
-                    <div class="text-center mb-4">
-                        <img src="{{ session.image.url }}" class="img-fluid rounded-3 shadow-sm" 
-                             style="max-height: 400px; object-fit: cover;"
-                             loading="lazy" alt="{{ session.title }}">
-                    </div>
-                    {% endif %}
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">{{ session.title }}</h2>
                     
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="info-card p-3 bg-light rounded-3 mb-3">
-                                <p class="mb-2"><i class="fas fa-calendar-alt text-primary me-2"></i>{{ session.date|date:"F d, Y" }}</p>
-                                <p class="mb-2"><i class="fas fa-clock text-primary me-2"></i>{{ session.duration }} hours</p>
-                                <p class="mb-0"><i class="fas fa-user-tie text-primary me-2"></i>{{ session.host.user.get_full_name }}</p>
-                            </div>
+                    <div class="session-meta mb-4">
+                        <p><i class="far fa-calendar-alt me-2"></i>{{ session.date|date:"F j, Y" }}</p>
+                        <p><i class="far fa-clock me-2"></i>{{ session.duration }}</p>
+                        <p><i class="fas fa-user me-2"></i>{{ session.host.user.get_full_name }}</p>
+                        <p><i class="fas fa-tag me-2"></i>${{ session.price|floatformat:2 }}</p>
+                        <p><i class="fas fa-users me-2"></i>{{ session.max_participants }} max</p>
+                        <p><i class="fas fa-chair me-2"></i>{{ session.available_spots }} spots left</p>
+                    </div>
+
+                    <div class="session-description mb-4">
+                        <h4>Description</h4>
+                        <p>{{ session.description }}</p>
+                    </div>
+
+                    <div class="session-participants mb-4">
+                        <h4>Participants</h4>
+                        {% if session.participants.all %}
+                            <ul class="list-unstyled">
+                                {% for participant in session.participants.all %}
+                                    <li>{{ participant.user.get_full_name }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">No participants yet.</p>
+                        {% endif %}
+                    </div>
+
+                    {% if not is_participant %}
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'masteryhub:enroll_session' session.id %}" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Enroll in this session
+                            </a>
                         </div>
-                        <div class="col-md-6">
-                            <div class="info-card p-3 bg-light rounded-3 mb-3">
-                                <p class="mb-2"><i class="fas fa-tag text-success me-2"></i>${{ get_cost }}</p>
-                                <p class="mb-2"><i class="fas fa-users text-primary me-2"></i>{{ session.max_participants }} max</p>
-                                <p class="mb-0"><i class="fas fa-chair text-primary me-2"></i>{{ session.available_spots }} spots left</p>
-                            </div>
-                        </div>
-                    </div>
-                   
-                    <div class="mb-4">
-                        <h5 class="border-bottom pb-2 mb-3"><i class="fas fa-info-circle text-primary me-2"></i>Description</h5>
-                        <p class="text-muted">{{ session.description }}</p>
-                    </div>
-                   
-                    <div class="participants-section">
-                        <h5 class="border-bottom pb-2 mb-3"><i class="fas fa-user-friends text-primary me-2"></i>Participants</h5>
-                        <div class="participant-list">
-                            {% for participant in session.participants.all %}
-                            <div class="participant-item p-2 bg-light rounded-3 mb-2">
-                                <i class="fas fa-user text-primary me-2"></i>{{ participant.user.get_full_name }}
-                            </div>
-                            {% empty %}
-                            <p class="text-muted fst-italic">No participants yet.</p>
-                            {% endfor %}
-                        </div>
-                    </div>
-                   
-                    {% if is_participant %}
-                    <div class="alert alert-success mt-4" role="alert">
-                        <i class="fas fa-check-circle me-2"></i>You are enrolled in this session
-                    </div>
                     {% else %}
-                    <div class="alert alert-warning mt-4" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i>You are not enrolled in this session
-                    </div>
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>You are enrolled in this session
+                        </div>
                     {% endif %}
                 </div>
-                
-                <div class="card-footer bg-white border-0 p-4 text-center">
-                    <a href="{% url 'masteryhub:session_list' %}" class="btn btn-outline-dark me-2">
-                        <i class="fas fa-arrow-left me-2"></i>Back to Sessions
-                    </a>
-                    {% if not is_participant %}
-                    <a href="{% url 'masteryhub:book_session' session.id %}" class="btn btn-primary">
-                        <i class="fas fa-bookmark me-2"></i>Book This Session
-                    </a>
-                    {% endif %}
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title">Host Profile</h4>
+                    <div class="text-center mb-3">
+                        {% if session.host.profile_picture %}
+                            <img src="{{ session.host.profile_picture.url }}" alt="{{ session.host.user.get_full_name }}" 
+                                class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'images/default_profile.webp' %}" alt="{{ session.host.user.get_full_name }}" 
+                                class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% endif %}
+                    </div>
+                    <h5 class="text-center mb-3">{{ session.host.user.get_full_name }}</h5>
+                    <p class="text-muted text-center">{{ session.host.bio|truncatewords:30 }}</p>
+                    <div class="d-grid">
+                        <a href="{% url 'profiles:view_profile' session.host.user.username %}" class="btn btn-outline-primary">
+                            <i class="fas fa-user me-2"></i>View Profile
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

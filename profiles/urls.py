@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from masteryhub.views import view_mentor_profile
 
 app_name = 'profiles'
 
@@ -14,5 +15,6 @@ urlpatterns = [
 
     # View specific profiles
     path('profile/<str:username>/', views.view_profile, name='view_profile'),
-    path('mentor/<str:username>/', views.view_mentor_profile, name='view_mentor_profile'),
+    path('mentor/<str:username>/', view_mentor_profile,
+         name='view_mentor_profile'),
 ]

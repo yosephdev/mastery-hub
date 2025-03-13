@@ -26,6 +26,8 @@ from .views import (
     review_list,
     create_review,
     booking_success,
+    view_mentor_profile,
+    list_mentors
 )
 
 app_name = 'masteryhub'
@@ -38,7 +40,9 @@ urlpatterns = [
     path('browse-skills/', views.browse_skills, name='browse_skills'),
     path('checkout/', include('checkout.urls')),
     # Mentors
-    path('mentors/', views.list_mentors, name='list_mentors'),
+    path('mentors/', list_mentors, name='list_mentors'),
+    path('mentor/<str:username>/', view_mentor_profile,
+         name='view_mentor_profile'),
     path('search-mentors/', views.search_mentors, name='search_mentors'),
     path("become-mentor/", become_mentor, name="become_mentor"),
     path("mentor-help/", mentor_help, name="mentor_help"),
@@ -46,8 +50,8 @@ urlpatterns = [
     # Mentorship
     path("expert-dashboard/", expert_dashboard, name="expert_dashboard"),
     path("mentee-dashboard/", mentee_dashboard, name="mentee_dashboard"),
-    path("mentor-matching/", views.mentor_matching_view, name="mentor_matching"),
-    path('matching-results/', views.matching_results, name='matching_results'),
+    path("mentor-matching/", mentor_matching_view, name="mentor_matching"),
+    path("matching-results/", views.matching_results, name='matching_results'),
     path("request-mentorship/<int:mentor_id>/",
          request_mentorship, name="request_mentorship"),
     path("manage-mentorship-requests/", manage_mentorship_requests,
@@ -66,11 +70,15 @@ urlpatterns = [
     path("sessions/<int:session_id>/delete/",
          delete_session, name="delete_session"),
     path("session/<int:session_id>/book/", book_session, name="book_session"),
+    path("session/<int:session_id>/enroll/",
+         views.enroll_session,
+         name='enroll_session'),
     # Forums
     path("forums/", forum_list, name="forum_list"),
     path("forums/new/", create_forum_post, name="create_forum_post"),
     path("forums/<int:post_id>/", view_forum_post, name="view_forum_post"),
     path("forums/<int:post_id>/reply/",
          reply_forum_post, name="reply_forum_post"),
-    path('booking/success/', views.booking_success, name='booking_success'),
+    path('booking/success/', booking_success, name='booking_success'),
+    path("create-session/", views.create_session, name="create_session"),
 ]

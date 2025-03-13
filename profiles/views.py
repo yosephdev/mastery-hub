@@ -96,41 +96,6 @@ def edit_profile(request):
 
 
 @login_required
-def view_mentor_profile(request, username):
-    """View a mentor's profile."""
-    try:
-        user = get_object_or_404(User, username=username)
-
-        profile, created = Profile.objects.get_or_create(
-            user=user,
-            defaults={
-                'is_expert': True,
-                'bio': f"Welcome to {username}'s profile"
-            }
-        )
-
-        if not profile.is_expert:
-            messages.error(request, "This user is not registered as a mentor.")
-            return redirect('home:index')
-
-        is_own_profile = request.user.username == username
-
-        context = {
-            "profile": profile,
-            "is_own_profile": is_own_profile,
-        }
-
-        return render(request, "profiles/view_mentor_profile.html", context)
-
-    except User.DoesNotExist:
-        messages.error(request, "This user does not exist.")
-        return redirect('home:index')
-    except Exception as e:
-        messages.error(request, f"An error occurred: {str(e)}")
-        return redirect('home:index')
-
-
-@login_required
 def delete_profile(request):
     """Delete the user's profile and account."""
     if request.method == 'POST':

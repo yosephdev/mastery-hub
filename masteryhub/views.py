@@ -13,7 +13,8 @@ from .forms import (
     SessionForm,
     ForumPostForm,
 )
-from .models import Feedback, Session, Category, Mentorship, Forum, Review, Skill, Mentor, MentorshipRequest, Activity, Profile
+from .models import Feedback, Session, Category, Mentorship, Forum, Review, Skill, Mentor, MentorshipRequest, Activity
+from profiles.models import Profile
 import stripe
 import logging
 from django.contrib.auth import get_user_model
@@ -145,29 +146,7 @@ def search_mentors(request):
 def request_mentorship(request, mentor_id):
     """Handle mentorship request."""
     try:
-        mentor = get_object_or_404(User, id=mentor_id)
-
-        if mentor == request.user:
-            messages.error(
-                request, "You cannot request mentorship from yourself.")
-            return redirect('masteryhub:mentor_matching')
-
-        if not hasattr(mentor, 'profile') or not mentor.profile.is_expert:
-            messages.error(request, "This user is not registered as a mentor.")
-            return redirect('masteryhub:mentor_matching')
-
-        existing_request = MentorshipRequest.objects.filter(
-            mentee=request.user,
-            mentor=mentor,
-            status__in=['pending', 'accepted']
-        ).exists()
-
-        if existing_request:
-            messages.warning(
-                request,
-                "You already have a pending or active mentorship request with this mentor."
-            )
-            return redirect('profiles:view_mentor_profile', username=mentor.username)
+        mentor = get_object_or_404(Mentor, id=mentor_id)
 
         if request.method == 'POST':
             with transaction.atomic():
@@ -178,12 +157,11 @@ def request_mentorship(request, mentor_id):
                         request,
                         "Please provide a message for your mentorship request."
                     )
-                return redirect('profiles:view_mentor_profile',
-                                username=mentor.username)
+                    return redirect('masteryhub:request_mentorship', mentor_id=mentor_id)
 
                 MentorshipRequest.objects.create(
                     mentee=request.user,
-                    mentor=mentor,
+                    mentor=mentor.user,
                     message=message,
                     status='pending'
                 )
@@ -192,20 +170,20 @@ def request_mentorship(request, mentor_id):
                     request,
                     "Your mentorship request has been sent successfully!"
                 )
-                return redirect('profiles:view_mentor_profile', username=mentor.username)
+                return redirect('profiles:view_mentor_profile', username=mentor.user.username)
 
-        return render(request, 'masteryhub/request_mentorship.html', {
-            'mentor': mentor
-        })
+        context = {
+            'mentor': mentor.user
+        }
+        return render(request, 'masteryhub/request_mentorship.html', context)
 
-    except User.DoesNotExist:
-        messages.error(request, "Mentor not found.")
+    except Mentor.DoesNotExist:
+        messages.error(
+            request, f"Mentor with ID {mentor_id} not found in database.")
         return redirect('masteryhub:mentor_matching')
     except Exception as e:
         messages.error(
-            request,
-            "An error occurred while processing your request. Please try again."
-        )
+            request, f"An error occurred while processing your request: {str(e)}")
         return redirect('masteryhub:mentor_matching')
 
 
@@ -357,14 +335,17 @@ def create_session(request):
                 return redirect("masteryhub:view_session", session_id=session.id)
             except Exception as e:
                 logger.error(f"Error creating session: {str(e)}")
-                messages.error(request, "There was an error creating the session.")
+                messages.error(
+                    request, "There was an error creating the session.")
     else:
         form = SessionForm()
     return render(request, "masteryhub/create_session.html", {"form": form})
 
+
 @login_required
 def edit_session(request, session_id):
-    session = get_object_or_404(Session, id=session_id, host=request.user.profile)
+    session = get_object_or_404(
+        Session, id=session_id, host=request.user.profile)
     if request.method == "POST":
         form = SessionForm(request.POST, instance=session)
         if form.is_valid():
@@ -374,14 +355,17 @@ def edit_session(request, session_id):
                 return redirect("masteryhub:view_session", session_id=session.id)
             except Exception as e:
                 logger.error(f"Error updating session: {str(e)}")
-                messages.error(request, "There was an error updating the session.")
+                messages.error(
+                    request, "There was an error updating the session.")
     else:
         form = SessionForm(instance=session)
     return render(request, "masteryhub/edit_session.html", {"form": form})
 
+
 @login_required
 def delete_session(request, session_id):
-    session = get_object_or_404(Session, id=session_id, host=request.user.profile)
+    session = get_object_or_404(
+        Session, id=session_id, host=request.user.profile)
     if request.method == "POST":
         try:
             session.delete()
@@ -707,11 +691,18 @@ def my_mentorships(request):
     return render(request, 'masteryhub/my_mentorships.html', context)
 
 
+@login_required
 def view_mentor_profile(request, username):
-    """A view that displays the mentor's profile."""
-    user = get_object_or_404(User, username=username)
-    mentor = get_object_or_404(Mentor, user=user)
-    return render(request, 'masteryhub/mentor_profile.html', {'mentor': mentor})
+    try:
+        mentor = Mentor.objects.get(user__username__iexact=username)
+    except Mentor.DoesNotExist:
+        return render(request, 'profiles/mentor_not_found.html', status=404)
+
+    context = {
+        'profile': mentor,
+        'is_own_profile': request.user.username == username,
+    }
+    return render(request, 'profiles/view_mentor_profile.html', context)
 
 
 @login_required
@@ -780,3 +771,27 @@ def matching_results(request):
 def booking_success(request):
     """A view that displays the booking success page."""
     return render(request, 'masteryhub/booking_success.html')
+
+
+@login_required
+def enroll_session(request, session_id):
+    session = get_object_or_404(Session, id=session_id)
+
+    try:
+        profile = request.user.profile
+        print(f"Found profile: {profile.id}")
+    except Profile.DoesNotExist:
+        profile = Profile.objects.create(user=request.user)
+        print(f"Created new profile: {profile.id}")
+        messages.info(request, "A new profile was created for you.")
+
+    try:
+        session.participants.add(profile)
+        session.save()
+        messages.success(
+            request, "You have successfully enrolled in this session!")
+    except Exception as e:
+        print(f"Error details: {str(e)}")
+        messages.error(request, f"An error occurred while enrolling: {str(e)}")
+
+    return redirect('masteryhub:view_session', session_id=session.id)

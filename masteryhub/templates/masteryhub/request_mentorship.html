@@ -9,7 +9,7 @@
                 <div class="card-body">
                     <h3 class="card-title mb-4">Request Mentorship</h3>
                     <p class="text-muted mb-4">
-                        You're requesting mentorship from <strong>{{ mentor.get_full_name }}</strong>
+                        You're requesting mentorship from <strong>{{ mentor.get_full_name|default:mentor.username }}</strong>
                     </p>
 
                     <form method="POST">
