@@ -120,24 +120,9 @@ if "test" in sys.argv:
         }
     }
 
-# Disable secure redirects for testing
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
     CSRF_COOKIE_SECURE = False
-
-# PRAGMA for SQLite foreign keys enabled without using the signal
-
-
-def enable_foreign_keys():
-    db_vendor = connections['default'].vendor
-    if db_vendor == 'sqlite':
-        with connections['default'].cursor() as cursor:
-            cursor.execute('PRAGMA foreign_keys = ON;')
-
-
-# Call the function in your setup process
-enable_foreign_keys()
-
 
 # Authentication Settings
 AUTHENTICATION_BACKENDS = [
