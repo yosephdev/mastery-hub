@@ -1,34 +1,35 @@
-from django import forms
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 import re
-import os
-from django.utils import timezone
-from django.shortcuts import render, get_object_or_404, redirect
-from django.conf import settings
-from django.contrib import messages
-from django.views.decorators.csrf import csrf_exempt
-import stripe
-from django.http import JsonResponse
-import logging
 import uuid
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from django.db import transaction
-from django.core.cache import cache
-from django.db.models import Prefetch, F, Sum
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-from django.views.decorators.vary import vary_on_cookie
+import logging
 from functools import wraps
 from decimal import Decimal
 
+from django import forms
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
+from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
+from django.db import transaction
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
+from django.views.decorators.cache import cache_page
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.views.decorators.vary import vary_on_cookie
+
+import stripe
+
 from profiles.models import Profile
+from profiles.forms import ProfileForm
 from masteryhub.models import Session
 from .models import Order, CartItem, Cart, OrderLineItem
-from .tasks import send_order_confirmation
+from .tasks import send_order_confirmation, send_payment_failure_email
 from .decorators import cart_action_handler
-from profiles.forms import ProfileForm
+
 
 User = get_user_model()
 
@@ -471,32 +472,59 @@ def remove_from_cart(request, item_id):
 
 
 def checkout_success(request, order_number):
-    """Handle successful checkouts"""
+    """
+    Handle successful checkouts.
+    """
+
     order = get_object_or_404(Order, order_number=order_number)
     save_info = request.session.get('save_info', False)
 
     if request.user.is_authenticated:
-        profile = Profile.objects.get(user=request.user)
-        order.user_profile = profile
-        order.save()
+        try:
+            profile = Profile.objects.get(user=request.user)
+            order.user_profile = profile
+            order.save()
 
-        if save_info:
-            profile_data = {
-                'default_phone_number': order.phone_number,
-                'default_country': order.country,
-                'default_postcode': order.postcode,
-                'default_town_or_city': order.town_or_city,
-                'default_street_address1': order.street_address1,
-                'default_street_address2': order.street_address2,
-                'default_county': order.county,
-            }
-            profile_form = ProfileForm(profile_data, instance=profile)
-            if profile_form.is_valid():
-                profile_form.save()
+            if save_info:
+                profile_data = {
+                    'default_phone_number': order.phone_number,
+                    'default_country': order.country,
+                    'default_postcode': order.postcode,
+                    'default_town_or_city': order.town_or_city,
+                    'default_street_address1': order.street_address1,
+                    'default_street_address2': order.street_address2,
+                    'default_county': order.county,
+                }
+                profile_form = ProfileForm(profile_data, instance=profile)
+                if profile_form.is_valid():
+                    profile_form.save()
+                    messages.success(
+                        request, "Your profile has been updated with your order details.")
+                else:
+                    messages.warning(
+                        request, "Failed to update your profile. Please check your information.")
 
-    # Clear the cart
+        except Profile.DoesNotExist:
+            messages.error(
+                request, "Profile not found. Unable to link order to your account.")
+            return redirect('home')
+
     if 'cart' in request.session:
         del request.session['cart']
+
+    try:
+        send_mail(
+            subject="Order Confirmation",
+            message=f"Thank you for your order! Your order number is {order.order_number}.",
+            from_email="noreply@skill-sharing.com",
+            recipient_list=[order.email],
+            fail_silently=False,
+        )
+        messages.success(
+            request, "A confirmation email has been sent to your inbox.")
+    except Exception as e:
+        messages.warning(
+            request, "Failed to send confirmation email. Please contact support.")
 
     template = 'checkout/checkout_success.html'
     context = {
@@ -509,6 +537,7 @@ def checkout_success(request, order_number):
 
 def payment_cancel(request):
     """A view that displays a cancellation message after payment is canceled."""
+    messages.error(request, "Payment was canceled. Please try again.")
     return render(request, 'checkout/cancel.html')
 
 
@@ -589,21 +618,60 @@ def cart_contents_view(request):
 
 
 @csrf_exempt
+@require_POST
 def stripe_webhook(request):
     payload = request.body
-    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+    if not sig_header:
+        logger.error("Missing HTTP_STRIPE_SIGNATURE header")
+        return HttpResponse(status=400)
+    wh_secret = settings.STRIPE_WH_SECRET
+
+    logger.info(f"Received webhook payload: {payload}")
+    logger.info(f"Received signature header: {sig_header}")
 
     try:
         event = stripe.Webhook.construct_event(
-            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+            payload, sig_header, wh_secret
         )
+
+        logger.info(f"Received event: {event}")
+
         if event.type == 'payment_intent.succeeded':
             payment_intent = event.data.object
             handle_payment_success(payment_intent)
+            logger.info(
+                f"Payment succeeded for PaymentIntent {payment_intent.id}")
+
+        elif event.type == 'payment_intent.payment_failed':
+            payment_intent = event.data.object
+            handle_payment_failure(payment_intent)
+            logger.warning(
+                f"Payment failed for PaymentIntent {payment_intent.id}")
+
+        elif event.type == 'charge.succeeded':
+            charge = event.data.object
+            handle_charge_success(charge)
+            logger.info(f"Payment succeeded for Charge {charge.id}")
+
+        elif event.type == 'charge.dispute.created':
+            dispute = event.data.object
+            handle_dispute_created(dispute)
+            logger.warning(f"Dispute created for Charge {dispute.charge}")
 
         return JsonResponse({'status': 'success'})
+
+    except ValueError as e:
+        logger.error(f"Invalid payload: {str(e)}")
+        return JsonResponse({'error': 'Invalid payload'}, status=400)
+
+    except stripe.error.SignatureVerificationError as e:
+        logger.error(f"Invalid signature: {str(e)}")
+        return JsonResponse({'error': 'Invalid signature'}, status=400)
+
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=400)
+        logger.error(f"Unexpected error: {str(e)}")
+        return JsonResponse({'error': 'An unexpected error occurred'}, status=500)
 
 
 @transaction.atomic
@@ -628,9 +696,31 @@ def check_session_availability(cart):
 
 
 def handle_payment_success(payment_intent):
-    order = Order.objects.get(stripe_pid=payment_intent.id)
-    order.payment_status = 'COMPLETED'
-    order.save()
+    """Handle successful payment event from Stripe."""
+
+    try:
+        order = Order.objects.get(stripe_pid=payment_intent.id)
+        order.payment_status = 'COMPLETED'
+        order.save()
+
+        send_order_confirmation.delay(order.id)
+
+        logger.info(f"Order {order.order_number} marked as completed.")
+
+    except Order.DoesNotExist:
+        logger.error(f"Order not found for PaymentIntent {payment_intent.id}")
+        raise Exception("Order not found")
+
+
+def handle_charge_success(charge):
+    """Handle successful charge event from Stripe."""
+    logger.info(f"Charge {charge.id} succeeded.")
+    logger.info(f"Payment succeeded for Charge {charge.id}")
+
+
+def handle_dispute_created(dispute):
+    """Handle dispute created event from Stripe."""
+    logger.warning(f"Dispute created for Charge {dispute.charge}")
 
 
 def create_payment_intent(amount, currency='usd'):
@@ -639,6 +729,17 @@ def create_payment_intent(amount, currency='usd'):
         currency=currency,
     )
     return payment_intent.client_secret
+
+
+def handle_payment_failure(payment_intent):
+    order = Order.objects.filter(stripe_pid=payment_intent.id).first()
+    if order:
+        order.payment_status = 'FAILED'
+        order.save()
+
+        send_payment_failure_email.delay(order.id)
+
+        logger.warning(f"Order {order.order_number} marked as failed.")
 
 
 @login_required

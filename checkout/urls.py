@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from .webhooks import stripe_webhook
 
 app_name = 'checkout'
 
@@ -25,5 +24,5 @@ urlpatterns = [
          views.decrease_quantity, name="decrease_quantity"),
     path("remove_from_cart/<int:item_id>/",
          views.remove_from_cart, name="remove_from_cart"),
-    path("wh/", stripe_webhook, name="stripe_webhook"),
+    path("wh/", views.stripe_webhook, name="stripe_webhook"),
 ]
