@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MasteryHub Payment Failed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4285F4;
+        }
+        h1 {
+            color: #EA4335;
+            font-size: 22px;
+        }
+        h2 {
+            color: #34A853;
+            font-size: 18px;
+            margin-top: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        .order-info {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .order-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #eee;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .total {
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #777;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .contact {
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .alert {
+            background-color: #FFEBEE;
+            border-left: 4px solid #EA4335;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">MasteryHub</div>
+        <p>Your Skill Development Platform</p>
+    </div>
+
+    <div class="alert">
+        <h1>Payment Failed</h1>
+        <p>We're sorry to inform you that your payment for order #{{ order.order_number }} has failed.</p>
+    </div>
+    
+    <p>Dear {{ order.full_name }},</p>
+    
+    <div class="order-info">
+        <h2>Order Information</h2>
+        <p><strong>Order Number:</strong> {{ order.order_number }}</p>
+        <p><strong>Order Date:</strong> {{ order.date }}</p>
+    </div>
+    
+    <h2>Order Summary</h2>
+    {% for item in order.lineitems.all %}
+    <div class="order-item">
+        <p><strong>{{ item.session.title }}</strong></p>
+        <p>Quantity: {{ item.quantity }}</p>
+        <p>Price per session: ${{ item.price }}</p>
+    </div>
+    {% endfor %}
+    
+    <h2>Payment Summary</h2>
+    <p>Subtotal: ${{ order.order_total }}</p>
+    <p>Delivery: ${{ order.delivery_cost }}</p>
+    <p class="total">TOTAL: ${{ order.grand_total }}</p>
+    
+    <div class="contact">
+        <p>Please try again with a different payment method or contact your bank for more information.</p>
+        <p>If you need assistance, please contact us at <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.</p>
+    </div>
+    
+    <p>Thank you for choosing MasteryHub for your skill development journey!</p>
+    
+    <p>Best regards,<br>
+    The MasteryHub Team</p>
+    
+    <div class="footer">
+        <p>&copy; {% now "Y" %} MasteryHub. All rights reserved.</p>
+    </div>
+</body>
+</html> 
