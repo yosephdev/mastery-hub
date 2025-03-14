@@ -384,22 +384,40 @@ def checkout(request):
                         f"Checkout error for user {request.user.id}: {str(e)}")
                     messages.error(
                         request, "There was an error processing your order. Please try again.")
+                    return redirect('checkout:view_cart')
 
             else:
+                for field, errors in order_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
                 messages.error(
                     request, 'There was an error with your form. Please check your information.')
         else:
-            order_form = OrderForm(instance=request.user.profile if hasattr(
-                request.user, 'profile') else None)
-            intent = stripe.PaymentIntent.create(
-                amount=stripe_total,
-                currency=settings.STRIPE_CURRENCY,
-                metadata={
-                    'user_id': request.user.id,
-                    'username': request.user.username,
-                    'cart_id': cart.id
-                }
-            )
+            # GET request - display the form
+            try:
+                # Get user profile if it exists
+                profile = None
+                if hasattr(request.user, 'profile'):
+                    profile = request.user.profile
+                
+                # Create a new intent for the payment
+                intent = stripe.PaymentIntent.create(
+                    amount=stripe_total,
+                    currency=settings.STRIPE_CURRENCY,
+                    metadata={
+                        'user_id': request.user.id,
+                        'username': request.user.username,
+                        'cart_id': cart.id
+                    }
+                )
+                
+                # Initialize the form with profile data if available
+                order_form = OrderForm(instance=profile)
+                
+            except stripe.error.StripeError as e:
+                logger.error(f"Stripe error: {str(e)}")
+                messages.error(request, f"Payment processing error: {str(e)}")
+                return redirect('checkout:view_cart')
 
         context = {
             'order_form': order_form,
@@ -417,6 +435,10 @@ def checkout(request):
         return redirect('checkout:view_cart')
     except ValidationError as e:
         messages.error(request, str(e))
+        return redirect('checkout:view_cart')
+    except Exception as e:
+        logger.error(f"Unexpected error in checkout: {str(e)}")
+        messages.error(request, "An unexpected error occurred. Please try again.")
         return redirect('checkout:view_cart')
 
 

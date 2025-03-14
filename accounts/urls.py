@@ -55,8 +55,4 @@ urlpatterns = [
     path('social/login/error/',
          CustomSocialLoginErrorView.as_view(),
          name='socialaccount_login_error'),
-    # Custom Google callback
-    path('google/login/callback/', 
-         CustomGoogleCallbackView.as_view(), 
-         name='google_callback'),
 ]

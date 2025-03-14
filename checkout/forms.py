@@ -38,19 +38,33 @@ class OrderForm(forms.ModelForm):
 
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
-        if not re.match(r'^\+?1?\d{9,15}$', phone_number):
+        # Remove any non-digit characters except for the leading +
+        cleaned_phone = re.sub(r'[^\d+]', '', phone_number)
+        
+        # Check if the phone number is valid
+        if not re.match(r'^\+?[1-9]\d{8,14}$', cleaned_phone):
             raise ValidationError(
                 'Please enter a valid phone number (9-15 digits)'
             )
-        return phone_number
+        return cleaned_phone
 
     def clean_postcode(self):
         postcode = self.cleaned_data.get('postcode')
-        if not re.match(r'^\d{5}(?:[-\s]\d{4})?$', postcode):
+        # Remove any spaces or hyphens
+        cleaned_postcode = re.sub(r'[\s-]', '', postcode)
+        
+        # Check if the postcode contains only digits
+        if not cleaned_postcode.isdigit():
             raise ValidationError(
-                'Please enter a valid postal code (e.g., 12345 or 12345-6789)'
+                'Postal code should contain only numbers'
             )
-        return postcode
+        
+        # Check if the postcode is a valid format
+        if not re.match(r'^\d{5}(\d{4})?$', cleaned_postcode):
+            raise ValidationError(
+                'Please enter a valid postal code (e.g., 12345 or 123456789)'
+            )
+        return cleaned_postcode
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
