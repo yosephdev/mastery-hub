@@ -1,5 +1,5 @@
 from django.http import HttpResponseRedirect, Http404
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -23,6 +23,8 @@ import logging
 from allauth.socialaccount.views import LoginCancelledView
 from allauth.socialaccount.models import SocialLogin
 from django.views.generic import RedirectView
+from allauth.socialaccount.providers.oauth2.views import OAuth2CallbackView
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 
 from .forms import (
     CustomSignupForm,
@@ -140,16 +142,37 @@ def send_confirmation_email(user, request):
     protocol = 'https' if request.is_secure() else 'http'
     activate_url = f"{protocol}://{current_site.domain}/accounts/confirm-email/{email_confirmation.key}/"
     
+    # Set site name and domain
+    current_site.name = "MasteryHub"
+    
     # Render email template with context
     message = render_to_string('account/email/email_confirmation_message.html', {
         'user': user,
+        'current_site': current_site,
         'domain': current_site.domain,
         'activate_url': activate_url,
-        'expiry_days': 3,  # Match ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS from settings
+        'expiry_days': 3,
+        'site_name': "MasteryHub"
+    })
+    
+    # Create plain text version
+    text_message = render_to_string('account/email/email_confirmation_message.txt', {
+        'user': user,
+        'current_site': current_site,
+        'domain': current_site.domain,
+        'activate_url': activate_url,
+        'site_name': "MasteryHub"
     })
     
     # Send the email
-    send_mail(subject, message, 'noreply@masteryhub.com', [user.email])
+    email = EmailMultiAlternatives(
+        subject=subject,
+        body=text_message,
+        from_email='noreply@masteryhub.com',
+        to=[user.email]
+    )
+    email.attach_alternative(message, "text/html")
+    email.send()
 
 
 class CustomLoginView(LoginView):
@@ -255,3 +278,40 @@ class CustomSocialLoginErrorView(RedirectView):
             "There was an error with your social login. Please try again or use your MasteryHub account."
         )
         return super().get(request, *args, **kwargs)
+
+
+class CustomGoogleCallbackView(OAuth2CallbackView):
+    """Custom callback view for Google OAuth2."""
+    adapter_class = GoogleOAuth2Adapter
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Set a session flag to indicate this is a social login
+        request.session['is_social_login'] = True
+        
+        # Log the callback
+        logger.info("Google OAuth callback received")
+        
+        try:
+            # Call the parent dispatch method
+            response = super().dispatch(request, *args, **kwargs)
+            
+            # If the user is authenticated, add a success message
+            if request.user.is_authenticated:
+                messages.success(
+                    request, 
+                    f"Welcome, {request.user.username or request.user.email}! You've successfully signed in with Google."
+                )
+                
+            return response
+        except Exception as e:
+            # Log the error
+            logger.error(f"Google OAuth callback error: {str(e)}")
+            
+            # Add an error message
+            messages.error(
+                request, 
+                "There was an error with your Google login. Please try again or use your MasteryHub account."
+            )
+            
+            # Redirect to login page
+            return redirect("accounts:login")

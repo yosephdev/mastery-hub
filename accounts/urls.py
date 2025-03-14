@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 from . import admin_views
 from django.contrib.auth import views as auth_views
@@ -10,7 +10,8 @@ from .views import (
     CustomPasswordResetConfirmView,
     CustomPasswordResetCompleteView,
     CustomSocialLoginCancelledView,
-    CustomSocialLoginErrorView
+    CustomSocialLoginErrorView,
+    CustomGoogleCallbackView
 )
 
 app_name = 'accounts'
@@ -54,4 +55,8 @@ urlpatterns = [
     path('social/login/error/',
          CustomSocialLoginErrorView.as_view(),
          name='socialaccount_login_error'),
+    # Custom Google callback
+    re_path(r'^google/login/callback/$', 
+            CustomGoogleCallbackView.as_view(), 
+            name='google_callback'),
 ]

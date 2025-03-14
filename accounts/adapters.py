@@ -29,6 +29,14 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         Whether registration is allowed.
         """
         return True
+    
+    def is_email_verification_mandatory(self, request):
+        """
+        Skip email verification for social accounts.
+        """
+        if hasattr(request, 'session') and request.session.get('sociallogin_provider'):
+            return False
+        return True
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -42,6 +50,10 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         Invoked just after a user successfully authenticates via a social provider,
         but before the login is actually processed.
         """
+        # Store the provider in the session
+        if hasattr(request, 'session'):
+            request.session['sociallogin_provider'] = sociallogin.account.provider
+        
         # Get the email from the social account
         email = sociallogin.account.extra_data.get('email')
         if not email:
@@ -80,4 +92,10 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         Returns the default URL to redirect to after successfully
         connecting a social account.
         """
-        return reverse('home:index') 
+        return reverse('home:index')
+        
+    def is_auto_signup_allowed(self, request, sociallogin):
+        """
+        Always allow auto signup for social accounts.
+        """
+        return True 

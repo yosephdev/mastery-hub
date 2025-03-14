@@ -27,7 +27,7 @@
             {% get_providers as socialaccount_providers %}
             {% if socialaccount_providers %}
               <div class="d-grid mb-4">
-                <a href="{% provider_login_url 'google' process='signup' scope='email profile' %}" class="btn btn-outline-dark">
+                <a href="/accounts/google/login/?process=signup&scope=email+profile&next=/" class="btn btn-outline-dark">
                   <i class="fab fa-google me-2"></i>{% trans "Sign up with Google" %}
                 </a>
               </div>
