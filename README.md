@@ -295,7 +295,7 @@ The Skill-Sharing Sessions page allows users to explore and register for various
   - **Admin Dashboard**: Link visible to superusers.
   - **Mentee Dashboard**: Visible to non-expert users.
   - **Mentor Matching**: Link to mentor matching page.
-  - **My Profile**: Link to the user’s profile.
+  - **My Profile**: Link to the user's profile.
   - **Logout**: Link to log out.
   - **Expert Dashboard**: Visible to expert users.
   - **Manage Mentorship Requests**: Link to manage mentorship requests.
@@ -519,7 +519,7 @@ The robots.txt file was created using this guide [https://www.conductor.com/acad
 - [boto3](https://pypi.org/project/boto3/) - An Amazon Web Services (AWS) software development kit (SDK) used to connect to the S3 bucket.
 - [Black](https://pypi.org/project/black/) - A Python code formatter.
 - [django storages](https://django-storages.readthedocs.io/en/latest/) - Collection of custom storage backends for Django.
-- [stripe](https://pypi.org/project/stripe/) - A Python library for Stripe’s API.
+- [stripe](https://pypi.org/project/stripe/) - A Python library for Stripe's API.
 
 <br>
 
@@ -585,7 +585,7 @@ To obtain your own Postgres database on Neon, follow these steps:
 1. Sign up at [Neon.tech](https://neon.tech) using your GitHub or email.  
 2. Click **Create a new project** to set up a database.  
 3. Provide a **project name** and select **PostgreSQL version** (latest recommended).  
-4. Choose the **Free Tier** plan if you’re just getting started.  
+4. Choose the **Free Tier** plan if you're just getting started.  
 5. Select a **Region** closest to you for better performance.  
 6. Once created, go to the **Connection Details** to find your database URL, username, password, and other credentials.  
 
@@ -903,5 +903,33 @@ I wish to extend my heartfelt thanks to my mentor, Mitko Bachvarov, for his exce
 I am also deeply appreciative of the entire Code Institute team for their outstanding management of the educational process and the high-quality resources they provided.
 
 Furthermore, I am grateful to my classmates for their camaraderie and encouragement. Your shared knowledge and enthusiasm significantly enriched our learning experience and made the process both enjoyable and rewarding.
+
+[Back to Top](#table-of-contents)
+
+## Recent Improvements and Fixes
+
+The MasteryHub platform has undergone several important improvements to enhance user experience and fix functionality issues:
+
+### Authentication Enhancements
+- Fixed Google OAuth2 authentication to work properly with existing accounts
+- Improved email verification process with proper site name and domain
+- Enhanced social account adapter to better handle existing users
+
+### E-commerce Functionality
+- Improved checkout process with robust error handling and validation
+- Enhanced payment processing with detailed feedback for successful and failed payments
+- Fixed form validation for phone numbers and postal codes to ensure proper formats
+
+### Content Management
+- Enhanced forum post creation, editing, and deletion functionality
+- Fixed server errors when creating forum posts as admin users
+- Improved error messaging and user feedback throughout the platform
+
+### User Profile Management
+- Fixed profile deletion functionality to properly handle user accounts
+- Enhanced profile editing with improved validation
+- Added proper error handling for all profile operations
+
+These improvements ensure a smoother user experience and more reliable functionality across the platform.
 
 [Back to Top](#table-of-contents)

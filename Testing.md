@@ -207,3 +207,62 @@ During testing, two specific issues were identified:
    - **Action Taken:** Commented out the test to address the attribute issue separately.
 
 The problematic tests were re-evaluated and fixed.
+
+## Additional Testing for Recent Fixes
+
+The following tests were conducted to verify the functionality of recent fixes and improvements:
+
+### Google Authentication Testing
+
+| Test Case | Steps | Expected Result | Actual Result | Pass/Fail |
+|-----------|-------|-----------------|---------------|-----------|
+| Google Sign-In | 1. Click on "Sign in with Google" button<br>2. Select Google account<br>3. Authorize the application | User is successfully authenticated and redirected to the home page | User is successfully authenticated and redirected to the home page | Pass |
+| Google Sign-In with Existing Email | 1. Create an account with email X<br>2. Log out<br>3. Try to sign in with Google using the same email X | User is successfully authenticated and accounts are connected | User is successfully authenticated and accounts are connected | Pass |
+| Google Sign-Up | 1. Click on "Sign up with Google" button<br>2. Select Google account<br>3. Authorize the application | New user account is created and user is redirected to the home page | New user account is created and user is redirected to the home page | Pass |
+
+### Checkout Functionality Testing
+
+| Test Case | Steps | Expected Result | Actual Result | Pass/Fail |
+|-----------|-------|-----------------|---------------|-----------|
+| Valid Phone Number | 1. Enter a valid phone number (e.g., +1234567890)<br>2. Submit the form | Form is submitted successfully | Form is submitted successfully | Pass |
+| Invalid Phone Number | 1. Enter an invalid phone number (e.g., abc123)<br>2. Submit the form | Error message is displayed | Error message is displayed | Pass |
+| Valid Postal Code | 1. Enter a valid postal code (e.g., 12345)<br>2. Submit the form | Form is submitted successfully | Form is submitted successfully | Pass |
+| Invalid Postal Code | 1. Enter an invalid postal code (e.g., abc)<br>2. Submit the form | Error message is displayed | Error message is displayed | Pass |
+| Successful Payment | 1. Fill out checkout form with valid details<br>2. Enter valid card details<br>3. Submit the form | Payment is processed and success message is displayed | Payment is processed and success message is displayed | Pass |
+| Failed Payment | 1. Fill out checkout form with valid details<br>2. Enter invalid card details<br>3. Submit the form | Error message is displayed with details about the failure | Error message is displayed with details about the failure | Pass |
+
+### Forum Post Functionality Testing
+
+| Test Case | Steps | Expected Result | Actual Result | Pass/Fail |
+|-----------|-------|-----------------|---------------|-----------|
+| Create Forum Post | 1. Navigate to forum page<br>2. Click "Create Post"<br>3. Fill out form<br>4. Submit | Post is created and success message is displayed | Post is created and success message is displayed | Pass |
+| Create Forum Post as Admin | 1. Log in as admin<br>2. Navigate to forum page<br>3. Click "Create Post"<br>4. Fill out form<br>5. Submit | Post is created and success message is displayed | Post is created and success message is displayed | Pass |
+| Edit Forum Post | 1. Navigate to a forum post<br>2. Click "Edit"<br>3. Modify content<br>4. Submit | Post is updated and success message is displayed | Post is updated and success message is displayed | Pass |
+| Delete Forum Post | 1. Navigate to a forum post<br>2. Click "Delete"<br>3. Confirm deletion | Post is deleted and success message is displayed | Post is deleted and success message is displayed | Pass |
+| Reply to Forum Post | 1. Navigate to a forum post<br>2. Click "Reply"<br>3. Enter reply<br>4. Submit | Reply is added to the post and success message is displayed | Reply is added to the post and success message is displayed | Pass |
+
+### Profile Management Testing
+
+| Test Case | Steps | Expected Result | Actual Result | Pass/Fail |
+|-----------|-------|-----------------|---------------|-----------|
+| Delete Profile | 1. Navigate to profile page<br>2. Click "Delete Profile"<br>3. Confirm deletion | Profile is deleted and user is logged out | Profile is deleted and user is logged out | Pass |
+| Delete Profile with No Profile | 1. Create user without profile<br>2. Navigate to profile page<br>3. Click "Delete Profile"<br>4. Confirm deletion | User account is deleted without errors | User account is deleted without errors | Pass |
+| Edit Profile | 1. Navigate to profile page<br>2. Click "Edit Profile"<br>3. Modify details<br>4. Submit | Profile is updated and success message is displayed | Profile is updated and success message is displayed | Pass |
+
+### Newsletter Functionality Testing
+
+| Test Case | Steps | Expected Result | Actual Result | Pass/Fail |
+|-----------|-------|-----------------|---------------|-----------|
+| Subscribe to Newsletter | 1. Enter email in newsletter form<br>2. Click "Subscribe" | Subscription is processed and confirmation is shown | Subscription is processed and confirmation is shown | Pass |
+| Subscribe with Invalid Email | 1. Enter invalid email in newsletter form<br>2. Click "Subscribe" | Error message is displayed | Error message is displayed | Pass |
+
+### Social Links Testing
+
+| Test Case | Steps | Expected Result | Actual Result | Pass/Fail |
+|-----------|-------|-----------------|---------------|-----------|
+| Facebook Link | Click Facebook icon in footer | Facebook page opens in a new tab | Facebook page opens in a new tab | Pass |
+| Twitter Link | Click Twitter icon in footer | Twitter page opens in a new tab | Twitter page opens in a new tab | Pass |
+| LinkedIn Link | Click LinkedIn icon in footer | LinkedIn page opens in a new tab | LinkedIn page opens in a new tab | Pass |
+| Instagram Link | Click Instagram icon in footer | Instagram page opens in a new tab | Instagram page opens in a new tab | Pass |
+
+These additional tests ensure that the recent fixes and improvements are functioning as expected, providing users with a more reliable and seamless experience on the MasteryHub platform.
