@@ -406,15 +406,19 @@ def forum_list(request):
 
 @login_required
 def create_forum_post(request):
-    """A view that handles creating a forum post."""
+    """A view that handles creating a forum post with error handling."""
     if request.method == "POST":
         form = ForumPostForm(request.POST)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user.profile
-            post.save()
-            messages.success(request, "Forum post created successfully.")
-            return redirect("forum_posts")
+            try:
+                post = form.save(commit=False)
+                post.author = request.user.profile
+                post.save()
+                messages.success(request, "Forum post created successfully.")
+                return redirect("forum_posts")
+            except Exception as e:
+                logger.error(f"Error creating post: {str(e)}")
+                messages.error(request, "An error occurred while creating the post.")
     else:
         form = ForumPostForm()
     return render(request, "masteryhub/create_forum_post.html", {"form": form})
@@ -430,32 +434,43 @@ def view_forum_post(request, post_id):
 
 @login_required
 def reply_forum_post(request, post_id):
-    """A view that handles replying to a forum post."""
+    """A view that handles replying to a forum post with error handling."""
     parent_post = get_object_or_404(Forum, id=post_id)
     if request.method == "POST":
         form = ForumPostForm(request.POST)
         if form.is_valid():
-            reply = form.save(commit=False)
-            reply.author = request.user.profile
-            reply.parent_post = parent_post
-            reply.save()
-            messages.success(request, "Reply posted successfully.")
-            return redirect("masteryhub:view_forum_post", post_id=parent_post.id)
+            try:
+                reply = form.save(commit=False)
+                reply.author = request.user.profile
+                reply.parent_post = parent_post
+                reply.save()
+                messages.success(request, "Reply posted successfully.")
+                return redirect("masteryhub:view_forum_post", post_id=parent_post.id)
+            except Exception as e:
+                logger.error(f"Error posting reply: {str(e)}")
+                messages.error(request, "An error occurred while posting the reply.")
+    
     else:
         form = ForumPostForm()
     return render(request, "masteryhub/reply_forum_post.html", {"form": form, "parent_post": parent_post})
 
 
+
 @login_required
 def edit_forum_post(request, post_id):
-    """A view that handles editing a forum post."""
+    """A view that handles editing a forum post with error handling."""
     post = get_object_or_404(Forum, id=post_id, author=request.user.profile)
     if request.method == "POST":
         form = ForumPostForm(request.POST, instance=post)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Forum post updated successfully.")
-            return redirect("forum_posts")
+            try:
+                form.save()
+                messages.success(request, "Forum post updated successfully.")
+                return redirect("forum_posts")
+            except Exception as e:
+                logger.error(f"Error updating post: {str(e)}")
+                messages.error(request, "An error occurred while updating the post.")
+    
     else:
         form = ForumPostForm(instance=post)
     return render(request, "masteryhub/edit_forum_post.html", {"form": form})
@@ -463,12 +478,17 @@ def edit_forum_post(request, post_id):
 
 @login_required
 def delete_forum_post(request, post_id):
-    """A view that handles deleting a forum post."""
+    """A view that handles deleting a forum post with error handling."""
     post = get_object_or_404(Forum, id=post_id, author=request.user.profile)
     if request.method == "POST":
-        post.delete()
-        messages.success(request, "Forum post deleted successfully.")
-        return redirect("forum_posts")
+        try:
+            post.delete()
+            messages.success(request, "Forum post deleted successfully.")
+            return redirect("forum_posts")
+        except Exception as e:
+            logger.error(f"Error deleting post: {str(e)}")
+            messages.error(request, "An error occurred while deleting the post.")
+
     return render(request, "masteryhub/delete_forum_post.html", {"post": post})
 
 
