@@ -169,7 +169,7 @@ ACCOUNT_RATE_LIMITS = {
 
 # Social Auth Settings
 SOCIALACCOUNT_AUTO_SIGNUP = True
-SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_EMAIL_REQUIRED = False
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
@@ -179,6 +179,20 @@ SOCIALACCOUNT_STORE_TOKENS = True
 # Disable email verification for social accounts
 SOCIALACCOUNT_EMAIL_REQUIRED = False
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+
+# Additional social account settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'VERIFIED_EMAIL': True,
+        'APP': {
+            'client_id': os.environ.get('SOCIALACCOUNT_GOOGLE_CLIENT_ID'),
+            'secret': os.environ.get('SOCIALACCOUNT_GOOGLE_SECRET'),
+            'key': ''
+        }
+    }
+}
 
 # Files Storage Settings
 STATIC_URL = "/static/"
@@ -277,14 +291,3 @@ TEMPLATES = [
 # Crispy Forms Settings
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-
-# Social Account Settings
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': os.environ.get('SOCIALACCOUNT_GOOGLE_CLIENT_ID'),
-            'secret': os.environ.get('SOCIALACCOUNT_GOOGLE_SECRET'),
-            'key': ''
-        }
-    }
-}

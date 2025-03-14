@@ -3,6 +3,9 @@ from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.models import EmailAddress
 from django.contrib import messages
 from django.urls import reverse
+from django.shortcuts import redirect
+from allauth.account.utils import perform_login
+from allauth.exceptions import ImmediateHttpResponse
 import logging
 
 logger = logging.getLogger(__name__)
@@ -37,6 +40,16 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         if hasattr(request, 'session') and request.session.get('sociallogin_provider'):
             return False
         return True
+    
+    def render_mail(self, template_prefix, email, context):
+        """
+        Override to ensure proper site name and domain in emails.
+        """
+        context['current_site'] = {
+            'name': 'MasteryHub',
+            'domain': context.get('current_site', {}).get('domain', 'skill-sharing-446c0336ffb5.herokuapp.com')
+        }
+        return super().render_mail(template_prefix, email, context)
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -63,9 +76,23 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         try:
             existing_email = EmailAddress.objects.get(email=email)
             
-            # If the email exists but belongs to a different user, we'll let allauth handle it
+            # If the email exists but belongs to a different user, connect the accounts
             if existing_email.user != sociallogin.user:
-                return
+                # Log the user in directly with the existing account
+                user = existing_email.user
+                sociallogin.connect(request, user)
+                
+                # Add a success message
+                messages.success(
+                    request, 
+                    f"Welcome back, {user.username or user.email}! You've successfully signed in with Google."
+                )
+                
+                # Perform login and redirect
+                perform_login(request, user, email_verification="none")
+                
+                # Redirect to home page
+                raise ImmediateHttpResponse(redirect(reverse('home:index')))
                 
         except EmailAddress.DoesNotExist:
             # Email doesn't exist yet, we'll create it as verified
@@ -98,4 +125,15 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         Always allow auto signup for social accounts.
         """
-        return True 
+        return True
+        
+    def populate_user(self, request, sociallogin, data):
+        """
+        Hook that can be used to further populate the user instance.
+        """
+        user = super().populate_user(request, sociallogin, data)
+        
+        # Set email as verified
+        user.emailaddress_set.create(email=user.email, verified=True, primary=True)
+        
+        return user 

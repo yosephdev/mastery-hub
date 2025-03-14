@@ -1,14 +1,14 @@
 {% load i18n %}
 {% autoescape off %}
 
-{% blocktrans with site_name=current_site.name %} 
+{% blocktrans with site_name="MasteryHub" %} 
     Hello from {{ site_name }}! 
 {% endblocktrans %}
 
 {% block content %} 
 {% endblock content %}
 
-{% blocktrans with site_name=current_site.name site_domain=current_site.domain %} 
+{% blocktrans with site_name="MasteryHub" site_domain=current_site.domain %} 
     Thank you for using {{ site_name }}!  
     Visit us at {{ site_domain }}. 
 {% endblocktrans %}

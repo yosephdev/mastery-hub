@@ -287,6 +287,7 @@ class CustomGoogleCallbackView(OAuth2CallbackView):
     def dispatch(self, request, *args, **kwargs):
         # Set a session flag to indicate this is a social login
         request.session['is_social_login'] = True
+        request.session['sociallogin_provider'] = 'google'
         
         # Log the callback
         logger.info("Google OAuth callback received")
@@ -297,6 +298,20 @@ class CustomGoogleCallbackView(OAuth2CallbackView):
             
             # If the user is authenticated, add a success message
             if request.user.is_authenticated:
+                # Mark the user's email as verified
+                try:
+                    email_address, created = EmailAddress.objects.get_or_create(
+                        user=request.user,
+                        email=request.user.email,
+                        defaults={'verified': True, 'primary': True}
+                    )
+                    
+                    if not email_address.verified:
+                        email_address.verified = True
+                        email_address.save()
+                except Exception as e:
+                    logger.error(f"Error verifying email: {str(e)}")
+                
                 messages.success(
                     request, 
                     f"Welcome, {request.user.username or request.user.email}! You've successfully signed in with Google."
