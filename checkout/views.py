@@ -530,19 +530,9 @@ def checkout_success(request, order_number):
     if 'cart' in request.session:
         del request.session['cart']
 
-    try:
-        send_mail(
-            subject="Order Confirmation",
-            message=f"Thank you for your order! Your order number is {order.order_number}.",
-            from_email="noreply@skill-sharing.com",
-            recipient_list=[order.email],
-            fail_silently=False,
-        )
-        messages.success(
-            request, "A confirmation email has been sent to your inbox.")
-    except Exception as e:
-        messages.warning(
-            request, "Failed to send confirmation email. Please contact support.")
+    # The email is already sent by the Celery task in the checkout function
+    messages.success(
+        request, "A confirmation email has been sent to your inbox.")
 
     template = 'checkout/checkout_success.html'
     context = {
