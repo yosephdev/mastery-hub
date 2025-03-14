@@ -96,26 +96,34 @@ def edit_profile(request):
 
 
 @login_required
-def delete_profile(request):
+def delete_profile(request, user_id=None):
     """Delete the user's profile and account."""
+    # Ensure the user is trying to delete their own profile
+    if user_id and user_id != request.user.id:
+        messages.error(request, "You can only delete your own account.")
+        return redirect('profiles:view_profile', username=request.user.username)
+    
     if request.method == 'POST':
-        with transaction.atomic():
-            try:
-                profile = request.user.profile
-
-                if profile:
+        try:
+            with transaction.atomic():
+                # Try to get the profile, but don't error if it doesn't exist
+                try:
+                    profile = request.user.profile
                     profile.delete()
-
-                request.user.delete()
-
-                messages.success(
-                    request, "Your account has been deleted successfully.")
+                except Profile.DoesNotExist:
+                    # Profile doesn't exist, just continue to delete the user
+                    pass
+                
+                # Delete the user
+                user = request.user
+                user.delete()
+                
+                messages.success(request, "Your account has been deleted successfully.")
                 return redirect('home:index')
-
-            except Exception as e:
-                messages.error(
-                    request, "An error occurred while deleting your account.")
-                return redirect('profiles:view_profile')
+        except Exception as e:
+            logger.error(f"Error deleting profile for user {request.user.username}: {str(e)}")
+            messages.error(request, "An error occurred while deleting your account.")
+            return redirect('profiles:view_profile', username=request.user.username)
 
     return render(request, 'profiles/delete_confirmation.html', {
         'user': request.user

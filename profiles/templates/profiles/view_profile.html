@@ -51,7 +51,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <form action="{% url 'profiles:delete_profile' user.id %}" method="POST" style="display: inline;">
+                            <form action="{% url 'profiles:delete_profile' %}" method="POST" style="display: inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">Delete Profile</button>
                             </form>
