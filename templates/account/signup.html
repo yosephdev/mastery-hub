@@ -18,10 +18,16 @@
               <a href="{% url 'accounts:login' %}" class="text-decoration-none">{% trans "Log in" %}</a>
             </p>
 
+            <!-- Email verification notice -->
+            <div class="alert alert-info mb-4">
+              <i class="fas fa-info-circle me-2"></i>
+              {% trans "After signing up, you'll need to verify your email address to fully access all features." %}
+            </div>
+
             {% get_providers as socialaccount_providers %}
             {% if socialaccount_providers %}
               <div class="d-grid mb-4">
-                <a href="{% provider_login_url 'google' process='signup' %}" class="btn btn-outline-dark">
+                <a href="{% provider_login_url 'google' process='signup' scope='email profile' %}" class="btn btn-outline-dark">
                   <i class="fab fa-google me-2"></i>{% trans "Sign up with Google" %}
                 </a>
               </div>

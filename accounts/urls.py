@@ -2,12 +2,15 @@ from django.urls import path
 from . import views
 from . import admin_views
 from django.contrib.auth import views as auth_views
+from allauth.account.views import EmailVerificationSentView
 from .views import (
     CustomConfirmEmailView,
     CustomPasswordResetView,
     CustomPasswordResetDoneView,
     CustomPasswordResetConfirmView,
-    CustomPasswordResetCompleteView
+    CustomPasswordResetCompleteView,
+    CustomSocialLoginCancelledView,
+    CustomSocialLoginErrorView
 )
 
 app_name = 'accounts'
@@ -40,4 +43,15 @@ urlpatterns = [
     path('confirm-email/<str:key>/',
          CustomConfirmEmailView.as_view(),
          name='account_confirm_email'),
+    path('confirm-email/',
+         EmailVerificationSentView.as_view(
+             template_name='account/verification_sent.html'),
+         name='account_email_verification_sent'),
+    # Social login URLs
+    path('social/login/cancelled/',
+         CustomSocialLoginCancelledView.as_view(),
+         name='socialaccount_login_cancelled'),
+    path('social/login/error/',
+         CustomSocialLoginErrorView.as_view(),
+         name='socialaccount_login_error'),
 ]

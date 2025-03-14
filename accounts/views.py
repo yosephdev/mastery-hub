@@ -15,11 +15,14 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from allauth.account.views import ConfirmEmailView
-from allauth.account.models import EmailConfirmationHMAC
+from allauth.account.models import EmailConfirmationHMAC, EmailAddress
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 from accounts.forms import CustomSetPasswordForm
 import logging
+from allauth.socialaccount.views import LoginCancelledView
+from allauth.socialaccount.models import SocialLogin
+from django.views.generic import RedirectView
 
 from .forms import (
     CustomSignupForm,
@@ -36,15 +39,38 @@ def signup_view(request):
         if form.is_valid():
             try:
                 with transaction.atomic():
+                    # Check if user already exists with this email
+                    email = form.cleaned_data.get('email')
+                    if EmailAddress.objects.filter(email=email).exists():
+                        messages.error(
+                            request, "An account with this email already exists. Please use a different email or try to log in.")
+                        return render(request, "account/signup.html", {"form": form})
+                    
+                    # Create the user
                     user = form.save()
                     raw_password = form.cleaned_data.get('password1')
                     authenticated_user = authenticate(
                         username=user.username, password=raw_password)
+                    
                     if authenticated_user is not None:
                         auth_login(request, authenticated_user)
-                        messages.success(
-                            request, f"Welcome to MasteryHub, {user.username}! Your account has been created successfully.")
-                        send_confirmation_email(user, request)
+                        
+                        # Send confirmation email
+                        try:
+                            send_confirmation_email(user, request)
+                            messages.success(
+                                request, 
+                                f"Welcome to MasteryHub, {user.username}! Your account has been created successfully. "
+                                f"We've sent a verification email to {user.email}. Please check your inbox and verify your email address."
+                            )
+                        except Exception as email_error:
+                            logger.error(f"Email sending error: {str(email_error)}")
+                            messages.warning(
+                                request, 
+                                f"Your account was created, but we couldn't send the verification email. "
+                                f"Please contact support if you don't receive a verification email soon."
+                            )
+                        
                         return redirect("home:index")
             except Exception as e:
                 logger.error(f"Signup error: {str(e)}")
@@ -73,29 +99,56 @@ class CustomConfirmEmailView(ConfirmEmailView):
         return email_confirmation
 
     def dispatch(self, request, *args, **kwargs):
-        email_confirmation = self.get_object()
-        if email_confirmation.key_expired():
-            messages.error(request, "The confirmation link has expired.")
+        try:
+            email_confirmation = self.get_object()
+            if email_confirmation.key_expired():
+                messages.error(request, "The confirmation link has expired. Please request a new one.")
+                return redirect("accounts:login")
+            return super().dispatch(request, *args, **kwargs)
+        except Http404:
+            messages.error(request, "Invalid confirmation link. Please request a new one.")
             return redirect("accounts:login")
-        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        email_confirmation = self.get_object()
-        email_confirmation.confirm(request)
-        messages.success(
-            request, "Your email has been confirmed. You can now log in.")
-        return redirect("accounts:login")
+        try:
+            email_confirmation = self.get_object()
+            email_confirmation.confirm(request)
+            messages.success(
+                request, "Your email has been confirmed successfully! You can now fully access all features of MasteryHub.")
+            return redirect("accounts:login")
+        except Exception as e:
+            logger.error(f"Email confirmation error: {str(e)}")
+            messages.error(request, "There was an error confirming your email. Please try again or contact support.")
+            return redirect("accounts:login")
 
 
 def send_confirmation_email(user, request):
     current_site = get_current_site(request)
-    subject = 'Confirm Your Email'
-    message = render_to_string('account/email_confirmation_message.html', {
+    subject = 'Confirm Your MasteryHub Email Address'
+    
+    # Create email confirmation for the user
+    email_address, created = EmailAddress.objects.get_or_create(
+        user=user,
+        email=user.email,
+        defaults={'verified': False, 'primary': True}
+    )
+    
+    # Generate confirmation key
+    email_confirmation = EmailConfirmationHMAC(email_address)
+    
+    # Generate confirmation URL
+    protocol = 'https' if request.is_secure() else 'http'
+    activate_url = f"{protocol}://{current_site.domain}/accounts/confirm-email/{email_confirmation.key}/"
+    
+    # Render email template with context
+    message = render_to_string('account/email/email_confirmation_message.html', {
         'user': user,
         'domain': current_site.domain,
-        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-        'token': default_token_generator.make_token(user),
+        'activate_url': activate_url,
+        'expiry_days': 3,  # Match ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS from settings
     })
+    
+    # Send the email
     send_mail(subject, message, 'noreply@masteryhub.com', [user.email])
 
 
@@ -176,3 +229,29 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 
 class CustomPasswordResetCompleteView(PasswordResetCompleteView):
     template_name = 'account/password_reset_complete.html'
+
+
+class CustomSocialLoginCancelledView(LoginCancelledView):
+    """Handle cancelled social logins."""
+    
+    def get(self, request, *args, **kwargs):
+        messages.error(
+            request, 
+            "Social login was cancelled. Please try again or use your MasteryHub account."
+        )
+        return redirect("accounts:login")
+
+
+class CustomSocialLoginErrorView(RedirectView):
+    """Handle social login errors."""
+    
+    permanent = False
+    query_string = True
+    pattern_name = 'accounts:login'
+    
+    def get(self, request, *args, **kwargs):
+        messages.error(
+            request, 
+            "There was an error with your social login. Please try again or use your MasteryHub account."
+        )
+        return super().get(request, *args, **kwargs)

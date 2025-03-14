@@ -150,6 +150,7 @@ ACCOUNT_FORMS = {
     "reset_password": "accounts.forms.CustomResetPasswordForm"
 }
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = 'home:index'
+ACCOUNT_ADAPTER = "accounts.adapters.CustomAccountAdapter"
 
 # Security and Session Settings
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
@@ -169,9 +170,10 @@ ACCOUNT_RATE_LIMITS = {
 # Social Auth Settings
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_REQUIRED = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = "optional"
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_ADAPTER = "accounts.adapters.CustomSocialAccountAdapter"
 
 # Files Storage Settings
 STATIC_URL = "/static/"
