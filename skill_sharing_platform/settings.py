@@ -193,6 +193,14 @@ SOCIALACCOUNT_PROVIDERS = {
             'prompt': 'consent',
         },
         'VERIFIED_EMAIL': True,
+        'FIELDS': [
+            'id',
+            'email',
+            'name',
+            'given_name',
+            'family_name',
+            'picture',
+        ],
     }
 }
 

@@ -325,6 +325,9 @@ class CustomGoogleCallbackView(View):
                     f"Welcome, {request.user.username or request.user.email}! You've successfully signed in with Google."
                 )
                 
+                # Redirect to home page after successful login
+                return redirect('home:index')
+                
             return response
         except Exception as e:
             # Log detailed error information
@@ -340,6 +343,10 @@ class CustomGoogleCallbackView(View):
                 error_message += "Invalid request. Please try again."
             elif "invalid_client" in str(e).lower():
                 error_message += "Invalid client configuration. Please contact support."
+            elif "invalid_grant" in str(e).lower():
+                error_message += "Invalid grant. Please try logging in again."
+            elif "invalid_scope" in str(e).lower():
+                error_message += "Invalid scope. Please contact support."
             else:
                 error_message += "Please try again or use your MasteryHub account."
             
