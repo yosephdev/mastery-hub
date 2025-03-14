@@ -1,0 +1,44 @@
+Dear {{ order.full_name }},
+
+Thank you for your order with MasteryHub!
+
+This email confirms that we have successfully processed your order. Please find your order details below:
+
+ORDER INFORMATION
+-----------------
+Order Number: {{ order.order_number }}
+Order Date: {{ order.date }}
+
+ORDER SUMMARY
+------------
+{% for item in order.lineitems.all %}
+{{ item.session.title }} (Quantity: {{ item.quantity }})
+Price per session: ${{ item.price }}
+{% endfor %}
+
+BILLING INFORMATION
+------------------
+Name: {{ order.full_name }}
+Email: {{ order.email }}
+Phone: {{ order.phone_number }}
+
+Address:
+{{ order.street_address1 }}
+{% if order.street_address2 %}{{ order.street_address2 }}{% endif %}
+{{ order.town_or_city }}
+{% if order.county %}{{ order.county }}{% endif %}
+{{ order.country }}
+{{ order.postcode }}
+
+PAYMENT SUMMARY
+--------------
+Subtotal: ${{ order.order_total }}
+Delivery: ${{ order.delivery_cost }}
+TOTAL: ${{ order.grand_total }}
+
+If you have any questions about your order, please contact us at {{ contact_email }}.
+
+Thank you for choosing MasteryHub for your skill development journey!
+
+Best regards,
+The MasteryHub Team 

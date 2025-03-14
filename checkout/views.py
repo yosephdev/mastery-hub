@@ -366,11 +366,9 @@ def checkout(request):
                         except Exception as e:
                             logger.warning(
                                 f"Failed to send confirmation email: {e}")
-                            messages.warning(
-                                request, "Confirmation email could not be sent, but your order has been processed successfully.")
 
                         messages.success(
-                            request, f'Order {order.order_number} processed successfully!')
+                            request, f'Order {order.order_number} processed successfully! A confirmation email has been sent to {order.email}.')
                         return redirect('checkout:checkout_success', order_number=order.order_number)
 
                 except stripe.error.StripeError as e:

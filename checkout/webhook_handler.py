@@ -30,11 +30,26 @@ class StripeWH_Handler:
                 "checkout/confirmation_emails/confirmation_email_subject.txt",
                 {"order": order},
             )
+            # Plain text email
             body = render_to_string(
                 "checkout/confirmation_emails/confirmation_email_body.txt",
                 {"order": order, "contact_email": settings.DEFAULT_FROM_EMAIL},
             )
-            send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [cust_email])
+            
+            # HTML email
+            html_body = render_to_string(
+                "checkout/confirmation_emails/confirmation_email.html",
+                {"order": order, "contact_email": settings.DEFAULT_FROM_EMAIL},
+            )
+            
+            send_mail(
+                subject, 
+                body, 
+                settings.DEFAULT_FROM_EMAIL, 
+                [cust_email],
+                fail_silently=False,
+                html_message=html_body
+            )
         except Exception as e:
             logger.error(
                 f"Failed to send confirmation email for order {order.order_number}: {str(e)}")

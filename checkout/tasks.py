@@ -12,7 +12,10 @@ def send_order_confirmation(order_id):
     """
     try:
         order = Order.objects.get(id=order_id)
-        subject = f'MasteryHub - Order Confirmation #{order.order_number}'
+        subject = render_to_string(
+            'checkout/confirmation_emails/confirmation_email_subject.txt',
+            {'order': order}
+        )
 
         context = {
             'order': order,
@@ -20,11 +23,13 @@ def send_order_confirmation(order_id):
             'site_name': 'MasteryHub',
         }
 
+        # Plain text email
         message = render_to_string(
-            'checkout/confirmation_emails/confirmation_email.txt',
+            'checkout/confirmation_emails/confirmation_email_body.txt',
             context
         )
 
+        # HTML email
         html_message = render_to_string(
             'checkout/confirmation_emails/confirmation_email.html',
             context
