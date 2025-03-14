@@ -327,8 +327,15 @@ class CustomGoogleCallbackView(View):
                 
                 # Redirect to home page after successful login
                 return redirect('home:index')
-                
-            return response
+            
+            # If we get here, something went wrong with the authentication
+            logger.error("User not authenticated after OAuth2 callback")
+            messages.error(
+                request,
+                "There was an error with your Google login. Please try again or use your MasteryHub account."
+            )
+            return redirect("accounts:login")
+            
         except Exception as e:
             # Log detailed error information
             logger.error(f"Google OAuth callback error: {str(e)}")

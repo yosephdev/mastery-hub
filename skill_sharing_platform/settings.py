@@ -187,6 +187,7 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': [
             'profile',
             'email',
+            'openid',
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
@@ -207,6 +208,16 @@ SOCIALACCOUNT_PROVIDERS = {
 # Ensure these settings are not duplicated
 SOCIALACCOUNT_EMAIL_REQUIRED = False
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+
+# Additional social account settings
+SOCIALACCOUNT_ACCOUNT_EMAIL_REQUIRED = False
+SOCIALACCOUNT_ACCOUNT_UNIQUE_EMAIL = True
+SOCIALACCOUNT_ACCOUNT_USERNAME_REQUIRED = False
+SOCIALACCOUNT_ACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_ACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_ACCOUNT_LOGOUT_ON_GET = True
+SOCIALACCOUNT_ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+SOCIALACCOUNT_ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 
 # Files Storage Settings
 STATIC_URL = "/static/"
