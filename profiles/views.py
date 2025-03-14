@@ -98,33 +98,55 @@ def edit_profile(request):
 @login_required
 def delete_profile(request, user_id=None):
     """Delete the user's profile and account."""
-    # Ensure the user is trying to delete their own profile
-    if user_id and user_id != request.user.id:
+    # Ensure the user is trying to delete their own profile or is an admin
+    if user_id and user_id != request.user.id and not request.user.is_staff:
         messages.error(request, "You can only delete your own account.")
         return redirect('profiles:view_profile', username=request.user.username)
+    
+    # If user_id is provided and user is admin, use that ID, otherwise use the current user's ID
+    target_user_id = user_id if user_id and request.user.is_staff else request.user.id
+    
+    try:
+        # Get the user to delete
+        target_user = get_object_or_404(User, id=target_user_id)
+    except Exception as e:
+        logger.error(f"Error finding user with ID {target_user_id}: {str(e)}")
+        messages.error(request, "User not found.")
+        return redirect('home:index')
     
     if request.method == 'POST':
         try:
             with transaction.atomic():
                 # Try to get the profile, but don't error if it doesn't exist
                 try:
-                    profile = request.user.profile
+                    profile = target_user.profile
                     profile.delete()
+                    logger.info(f"Profile deleted for user {target_user.username}")
                 except Profile.DoesNotExist:
                     # Profile doesn't exist, just continue to delete the user
+                    logger.info(f"No profile found for user {target_user.username}")
                     pass
+                except Exception as profile_error:
+                    logger.error(f"Error deleting profile for user {target_user.username}: {str(profile_error)}")
+                    # Continue to delete the user even if profile deletion fails
                 
                 # Delete the user
-                user = request.user
-                user.delete()
+                username = target_user.username
+                target_user.delete()
+                logger.info(f"User {username} deleted successfully")
                 
-                messages.success(request, "Your account has been deleted successfully.")
-                return redirect('home:index')
+                messages.success(request, "The account has been deleted successfully.")
+                
+                # If the user deleted their own account, redirect to home
+                if target_user_id == request.user.id:
+                    return redirect('home:index')
+                # If admin deleted another user, redirect to admin dashboard or profiles list
+                return redirect('profiles:view_profiles')
         except Exception as e:
-            logger.error(f"Error deleting profile for user {request.user.username}: {str(e)}")
-            messages.error(request, "An error occurred while deleting your account.")
-            return redirect('profiles:view_profile', username=request.user.username)
+            logger.error(f"Error deleting user {target_user.username}: {str(e)}")
+            messages.error(request, f"An error occurred while deleting the account: {str(e)}")
+            return redirect('profiles:view_profile', username=target_user.username)
 
     return render(request, 'profiles/delete_confirmation.html', {
-        'user': request.user
+        'user': target_user
     })
