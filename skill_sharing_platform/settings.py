@@ -176,23 +176,29 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_ADAPTER = "accounts.adapters.CustomSocialAccountAdapter"
 SOCIALACCOUNT_STORE_TOKENS = True
 
-# Disable email verification for social accounts
-SOCIALACCOUNT_EMAIL_REQUIRED = False
-SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
-
-# Additional social account settings
+# Google OAuth2 Settings
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
-        'VERIFIED_EMAIL': True,
         'APP': {
             'client_id': os.environ.get('SOCIALACCOUNT_GOOGLE_CLIENT_ID'),
             'secret': os.environ.get('SOCIALACCOUNT_GOOGLE_SECRET'),
             'key': ''
-        }
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+            'prompt': 'consent',
+        },
+        'VERIFIED_EMAIL': True,
     }
 }
+
+# Ensure these settings are not duplicated
+SOCIALACCOUNT_EMAIL_REQUIRED = False
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 
 # Files Storage Settings
 STATIC_URL = "/static/"

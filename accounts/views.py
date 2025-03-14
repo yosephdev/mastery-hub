@@ -292,6 +292,9 @@ class CustomGoogleCallbackView(View):
         
         # Log the callback
         logger.info("Google OAuth callback received")
+        logger.info(f"Request path: {request.path}")
+        logger.info(f"Request method: {request.method}")
+        logger.info(f"Request GET params: {request.GET}")
         
         try:
             # Create an instance of OAuth2CallbackView
@@ -324,14 +327,23 @@ class CustomGoogleCallbackView(View):
                 
             return response
         except Exception as e:
-            # Log the error
+            # Log detailed error information
             logger.error(f"Google OAuth callback error: {str(e)}")
+            logger.error(f"Error type: {type(e).__name__}")
+            logger.error(f"Error traceback: {e.__traceback__}")
             
-            # Add an error message
-            messages.error(
-                request, 
-                "There was an error with your Google login. Please try again or use your MasteryHub account."
-            )
+            # Add a more specific error message
+            error_message = "There was an error with your Google login. "
+            if "access_denied" in str(e).lower():
+                error_message += "Access was denied. Please try again."
+            elif "invalid_request" in str(e).lower():
+                error_message += "Invalid request. Please try again."
+            elif "invalid_client" in str(e).lower():
+                error_message += "Invalid client configuration. Please contact support."
+            else:
+                error_message += "Please try again or use your MasteryHub account."
+            
+            messages.error(request, error_message)
             
             # Redirect to login page
             return redirect("accounts:login")
