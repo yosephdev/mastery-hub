@@ -276,7 +276,7 @@ class CustomSocialLoginErrorView(RedirectView):
         return super().get(request, *args, **kwargs)
 
 
-class CustomGoogleCallbackView(OAuth2CallbackView):
+class CustomGoogleCallbackView(View):
     """Custom callback view for Google OAuth2."""
     adapter_class = GoogleOAuth2Adapter
     
@@ -289,10 +289,14 @@ class CustomGoogleCallbackView(OAuth2CallbackView):
         logger.info("Google OAuth callback received")
         
         try:
-            # Call the parent dispatch method to handle the OAuth2 callback
-            response = super().dispatch(request, *args, **kwargs)
+            # Create an instance of OAuth2CallbackView
+            oauth2_view = OAuth2CallbackView()
+            oauth2_view.adapter_class = self.adapter_class
             
-            # If the user is authenticated after the callback, add a success message
+            # Call the parent dispatch method
+            response = oauth2_view.dispatch(request, *args, **kwargs)
+            
+            # If the user is authenticated, add a success message
             if request.user.is_authenticated:
                 # Mark the user's email as verified
                 try:
@@ -313,10 +317,16 @@ class CustomGoogleCallbackView(OAuth2CallbackView):
                     f"Welcome, {request.user.username or request.user.email}! You've successfully signed in with Google."
                 )
                 
-                # Return the response from the parent class
-                return response
+                # Redirect to home page after successful login
+                return redirect('home:index')
             
-            return response
+            # If we get here, something went wrong with the authentication
+            logger.error("User not authenticated after OAuth2 callback")
+            messages.error(
+                request,
+                "There was an error with your Google login. Please try again or use your MasteryHub account."
+            )
+            return redirect("accounts:login")
             
         except Exception as e:
             # Log detailed error information

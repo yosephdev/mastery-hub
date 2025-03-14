@@ -23,14 +23,14 @@ from accounts.views import CustomGoogleCallbackView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # Default allauth URLs first to ensure proper routing
-    path("accounts/", include("allauth.urls")),
-    # Our custom accounts URLs 
+    # Our custom accounts URLs first to ensure our custom views are used
     path("accounts/", include("accounts.urls")),
     # Custom Google callback
     re_path(r'^accounts/google/login/callback/$', 
             CustomGoogleCallbackView.as_view(), 
             name='google_callback'),
+    # Default allauth URLs for any routes not covered by our custom views
+    path("accounts/", include("allauth.urls")),
     path('checkout/', include('checkout.urls', namespace='checkout')),
     path('profiles/', include('profiles.urls', namespace='profiles')),
     path('masteryhub/', include('masteryhub.urls', namespace='masteryhub')),
