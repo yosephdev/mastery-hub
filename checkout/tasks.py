@@ -12,6 +12,11 @@ def send_order_confirmation(order_id):
     """
     try:
         order = Order.objects.get(id=order_id)
+        
+        # Check if email has already been sent
+        if order.confirmation_email_sent:
+            return f"Confirmation email already sent for order {order.order_number}"
+            
         subject = render_to_string(
             'checkout/confirmation_emails/confirmation_email_subject.txt',
             {'order': order}
@@ -43,6 +48,10 @@ def send_order_confirmation(order_id):
             fail_silently=False,
             html_message=html_message
         )
+        
+        # Mark the email as sent
+        order.confirmation_email_sent = True
+        order.save()
 
         return f"Confirmation email sent for order {order.order_number}"
 

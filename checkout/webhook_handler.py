@@ -24,6 +24,12 @@ class StripeWH_Handler:
         Send the user a confirmation email.
         Logs any errors during email sending.
         """
+        # Check if the order has a confirmation_email_sent field and it's True
+        # This is to prevent duplicate emails
+        if hasattr(order, 'confirmation_email_sent') and order.confirmation_email_sent:
+            logger.info(f"Confirmation email already sent for order {order.order_number}")
+            return
+            
         try:
             cust_email = order.email
             subject = render_to_string(
@@ -50,6 +56,12 @@ class StripeWH_Handler:
                 fail_silently=False,
                 html_message=html_body
             )
+            
+            # Mark the order as having had a confirmation email sent
+            if hasattr(order, 'confirmation_email_sent'):
+                order.confirmation_email_sent = True
+                order.save()
+                
         except Exception as e:
             logger.error(
                 f"Failed to send confirmation email for order {order.order_number}: {str(e)}")

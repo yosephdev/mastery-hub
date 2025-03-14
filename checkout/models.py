@@ -150,6 +150,7 @@ class Order(models.Model):
         max_digits=10, decimal_places=2, default=0)
     grand_total = models.DecimalField(max_digits=10, decimal_places=2)
     stripe_pid = models.CharField(max_length=255, null=True, blank=True)
+    confirmation_email_sent = models.BooleanField(default=False)
 
     def _generate_order_number(self):
         """Generate a random, unique order number using UUID"""
