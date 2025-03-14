@@ -191,10 +191,6 @@ class CustomLoginView(LoginView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(
-            self.request,
-            "Login failed. Please check your username and password."
-        )
         return self.render_to_response(self.get_context_data(form=form))
 
 
