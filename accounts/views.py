@@ -276,10 +276,9 @@ class CustomSocialLoginErrorView(RedirectView):
         return super().get(request, *args, **kwargs)
 
 
-class CustomGoogleCallbackView(View):
+class CustomGoogleCallbackView(OAuth2CallbackView):
     """Custom callback view for Google OAuth2."""
     adapter_class = GoogleOAuth2Adapter
-    template_name = "account/login.html"
     
     def dispatch(self, request, *args, **kwargs):
         # Set a session flag to indicate this is a social login
@@ -288,19 +287,12 @@ class CustomGoogleCallbackView(View):
         
         # Log the callback
         logger.info("Google OAuth callback received")
-        logger.info(f"Request path: {request.path}")
-        logger.info(f"Request method: {request.method}")
-        logger.info(f"Request GET params: {request.GET}")
         
         try:
-            # Create an instance of OAuth2CallbackView
-            oauth2_view = OAuth2CallbackView()
-            oauth2_view.adapter_class = self.adapter_class
+            # Call the parent dispatch method to handle the OAuth2 callback
+            response = super().dispatch(request, *args, **kwargs)
             
-            # Call the parent dispatch method
-            response = oauth2_view.dispatch(request, *args, **kwargs)
-            
-            # If the user is authenticated, add a success message
+            # If the user is authenticated after the callback, add a success message
             if request.user.is_authenticated:
                 # Mark the user's email as verified
                 try:
@@ -321,22 +313,14 @@ class CustomGoogleCallbackView(View):
                     f"Welcome, {request.user.username or request.user.email}! You've successfully signed in with Google."
                 )
                 
-                # Redirect to home page after successful login
-                return redirect('home:index')
+                # Return the response from the parent class
+                return response
             
-            # If we get here, something went wrong with the authentication
-            logger.error("User not authenticated after OAuth2 callback")
-            messages.error(
-                request,
-                "There was an error with your Google login. Please try again or use your MasteryHub account."
-            )
-            return redirect("accounts:login")
+            return response
             
         except Exception as e:
             # Log detailed error information
             logger.error(f"Google OAuth callback error: {str(e)}")
-            logger.error(f"Error type: {type(e).__name__}")
-            logger.error(f"Error traceback: {e.__traceback__}")
             
             # Add a more specific error message
             error_message = "There was an error with your Google login. "

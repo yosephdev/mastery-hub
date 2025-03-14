@@ -187,23 +187,15 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': [
             'profile',
             'email',
-            'openid',
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
-            'prompt': 'consent',
         },
-        'VERIFIED_EMAIL': True,
-        'FIELDS': [
-            'id',
-            'email',
-            'name',
-            'given_name',
-            'family_name',
-            'picture',
-        ],
     }
 }
+
+# Site ID for django.contrib.sites
+SITE_ID = 1
 
 # Ensure these settings are not duplicated
 SOCIALACCOUNT_EMAIL_REQUIRED = False
@@ -283,7 +275,6 @@ STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WH_SECRET = os.environ.get('STRIPE_WH_SECRET')
 
 # Additional Settings
-SITE_ID = 1
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
