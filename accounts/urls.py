@@ -56,7 +56,7 @@ urlpatterns = [
          CustomSocialLoginErrorView.as_view(),
          name='socialaccount_login_error'),
     # Custom Google callback
-    re_path(r'^google/login/callback/$', 
-            CustomGoogleCallbackView.as_view(), 
-            name='google_callback'),
+    path('google/login/callback/', 
+         CustomGoogleCallbackView.as_view(), 
+         name='google_callback'),
 ]

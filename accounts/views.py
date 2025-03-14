@@ -22,7 +22,7 @@ from accounts.forms import CustomSetPasswordForm
 import logging
 from allauth.socialaccount.views import LoginCancelledView
 from allauth.socialaccount.models import SocialLogin
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, View
 from allauth.socialaccount.providers.oauth2.views import OAuth2CallbackView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 
@@ -280,9 +280,10 @@ class CustomSocialLoginErrorView(RedirectView):
         return super().get(request, *args, **kwargs)
 
 
-class CustomGoogleCallbackView(OAuth2CallbackView):
+class CustomGoogleCallbackView(View):
     """Custom callback view for Google OAuth2."""
     adapter_class = GoogleOAuth2Adapter
+    template_name = "account/login.html"
     
     def dispatch(self, request, *args, **kwargs):
         # Set a session flag to indicate this is a social login
@@ -293,8 +294,12 @@ class CustomGoogleCallbackView(OAuth2CallbackView):
         logger.info("Google OAuth callback received")
         
         try:
+            # Create an instance of OAuth2CallbackView
+            oauth2_view = OAuth2CallbackView()
+            oauth2_view.adapter_class = self.adapter_class
+            
             # Call the parent dispatch method
-            response = super().dispatch(request, *args, **kwargs)
+            response = oauth2_view.dispatch(request, *args, **kwargs)
             
             # If the user is authenticated, add a success message
             if request.user.is_authenticated:
