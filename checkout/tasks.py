@@ -3,6 +3,9 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from celery import shared_task
 from .models import Order
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @shared_task
@@ -10,13 +13,16 @@ def send_order_confirmation(order_id):
     """
     Task to send an order confirmation email
     """
+    logger.info(f"Attempting to send confirmation email for order ID: {order_id}")
     try:
         order = Order.objects.get(id=order_id)
         
         # Check if email has already been sent
         if order.confirmation_email_sent:
+            logger.info(f"Confirmation email already sent for order {order.order_number}")
             return f"Confirmation email already sent for order {order.order_number}"
             
+        logger.info(f"Preparing email for order {order.order_number}")
         subject = render_to_string(
             'checkout/confirmation_emails/confirmation_email_subject.txt',
             {'order': order}
@@ -40,6 +46,7 @@ def send_order_confirmation(order_id):
             context
         )
 
+        logger.info(f"Sending email to {order.email} for order {order.order_number}")
         send_mail(
             subject,
             message,
@@ -52,19 +59,24 @@ def send_order_confirmation(order_id):
         # Mark the email as sent
         order.confirmation_email_sent = True
         order.save()
+        logger.info(f"Confirmation email sent successfully for order {order.order_number}")
 
         return f"Confirmation email sent for order {order.order_number}"
 
     except Order.DoesNotExist:
+        logger.error(f"Order {order_id} not found when trying to send confirmation email")
         return f"Order {order_id} not found"
     except Exception as e:
+        logger.error(f"Error sending confirmation email for order {order_id}: {str(e)}")
         return f"Error sending confirmation email: {str(e)}"
 
 
+@shared_task
 def send_payment_failure_email(order_id):
     """
     Task to send an email to the user when payment fails
     """
+    logger.info(f"Attempting to send payment failure email for order ID: {order_id}")
     try:
         order = Order.objects.get(id=order_id)
         subject = f'MasteryHub - Payment Failed for Order #{order.order_number}'
@@ -85,6 +97,7 @@ def send_payment_failure_email(order_id):
             context
         )
 
+        logger.info(f"Sending payment failure email to {order.email} for order {order.order_number}")
         send_mail(
             subject,
             message,
@@ -93,10 +106,13 @@ def send_payment_failure_email(order_id):
             fail_silently=False,
             html_message=html_message
         )
+        logger.info(f"Payment failure email sent successfully for order {order.order_number}")
 
         return f"Payment failure email sent for order {order.order_number}"
 
     except Order.DoesNotExist:
+        logger.error(f"Order {order_id} not found when trying to send payment failure email")
         return f"Order {order_id} not found"
     except Exception as e:
+        logger.error(f"Error sending payment failure email for order {order_id}: {str(e)}")
         return f"Error sending payment failure email: {str(e)}"

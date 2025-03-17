@@ -362,10 +362,11 @@ def checkout(request):
                         cart.items.all().delete()
 
                         try:
-                            send_order_confirmation.delay(order.id)
+                            send_order_confirmation(order.id)
                         except Exception as e:
-                            logger.warning(
+                            logger.error(
                                 f"Failed to send confirmation email: {e}")
+                            # Continue with the checkout process even if email fails
 
                     return redirect('checkout:checkout_success', order_number=order.order_number)
 
@@ -654,7 +655,8 @@ def handle_payment_success(payment_intent):
         order.payment_status = 'COMPLETED'
         order.save()
 
-        send_order_confirmation.delay(order.id)
+        from .tasks import send_order_confirmation
+        send_order_confirmation(order.id)
 
         logger.info(f"Order {order.order_number} marked as completed.")
 

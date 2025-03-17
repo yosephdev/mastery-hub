@@ -268,6 +268,15 @@ SERVER_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'yosephbet@gmail.com')
 # Email Subject Prefix
 EMAIL_SUBJECT_PREFIX = '[MasteryHub] '
 
+# Celery Configuration
+CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'memory://')
+CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'memory://')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_ALWAYS_EAGER = True  # Run tasks synchronously in all environments
+
 # Stripe Configuration
 STRIPE_CURRENCY = 'usd'
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')

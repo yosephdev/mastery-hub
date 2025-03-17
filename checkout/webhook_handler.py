@@ -31,37 +31,9 @@ class StripeWH_Handler:
             return
             
         try:
-            cust_email = order.email
-            subject = render_to_string(
-                "checkout/confirmation_emails/confirmation_email_subject.txt",
-                {"order": order},
-            )
-            # Plain text email
-            body = render_to_string(
-                "checkout/confirmation_emails/confirmation_email_body.txt",
-                {"order": order, "contact_email": settings.DEFAULT_FROM_EMAIL},
-            )
-            
-            # HTML email
-            html_body = render_to_string(
-                "checkout/confirmation_emails/confirmation_email.html",
-                {"order": order, "contact_email": settings.DEFAULT_FROM_EMAIL},
-            )
-            
-            send_mail(
-                subject, 
-                body, 
-                settings.DEFAULT_FROM_EMAIL, 
-                [cust_email],
-                fail_silently=False,
-                html_message=html_body
-            )
-            
-            # Mark the order as having had a confirmation email sent
-            if hasattr(order, 'confirmation_email_sent'):
-                order.confirmation_email_sent = True
-                order.save()
-                
+            # Use the task function directly
+            from .tasks import send_order_confirmation
+            send_order_confirmation(order.id)
         except Exception as e:
             logger.error(
                 f"Failed to send confirmation email for order {order.order_number}: {str(e)}")
@@ -147,6 +119,8 @@ class StripeWH_Handler:
                 status=200,
             )
 
+        # Initialize order variable to None before trying to create it
+        order = None
         try:
             order = Order.objects.create(
                 full_name=billing_details.name,
@@ -163,20 +137,21 @@ class StripeWH_Handler:
                 grand_total=grand_total,
             )
             if session_id:
-                session = Session.objects.get(id=session_id)
-                Payment.objects.create(
-                    user=profile,
-                    amount=grand_total,
-                    session=session,
-                )
-        except Session.DoesNotExist:
-            logger.error(f"Session not found for session_id: {session_id}")
-            if order:
-                order.delete()
-            return HttpResponse(
-                content=f'Webhook received: {event["type"]} | ERROR: Session not found',
-                status=500,
-            )
+                try:
+                    session = Session.objects.get(id=session_id)
+                    Payment.objects.create(
+                        user=profile,
+                        amount=grand_total,
+                        session=session,
+                    )
+                except Session.DoesNotExist:
+                    logger.error(f"Session not found for session_id: {session_id}")
+                    if order:
+                        order.delete()
+                    return HttpResponse(
+                        content=f'Webhook received: {event["type"]} | ERROR: Session not found',
+                        status=500,
+                    )
         except Exception as e:
             logger.error(
                 f"Error creating order for PaymentIntent {pid}: {str(e)}")
@@ -187,11 +162,18 @@ class StripeWH_Handler:
                 status=500,
             )
 
-        self._send_confirmation_email(order)
-        return HttpResponse(
-            content=f'Webhook received: {event["type"]} | SUCCESS: Created order in webhook',
-            status=200,
-        )
+        # Only send confirmation email if order was successfully created
+        if order:
+            self._send_confirmation_email(order)
+            return HttpResponse(
+                content=f'Webhook received: {event["type"]} | SUCCESS: Created order in webhook',
+                status=200,
+            )
+        else:
+            return HttpResponse(
+                content=f'Webhook received: {event["type"]} | ERROR: Failed to create order',
+                status=500,
+            )
 
     def handle_payment_intent_payment_failed(self, event):
         """
