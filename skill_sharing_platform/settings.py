@@ -274,8 +274,8 @@ CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'memory://')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = TIME_ZONE
-CELERY_TASK_ALWAYS_EAGER = True  # Run tasks synchronously in all environments
+CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_ALWAYS_EAGER = True
 
 # Stripe Configuration
 STRIPE_CURRENCY = 'usd'
