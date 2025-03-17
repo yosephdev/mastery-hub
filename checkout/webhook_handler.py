@@ -124,7 +124,7 @@ class StripeWH_Handler:
         try:
             order = Order.objects.create(
                 full_name=billing_details.name,
-                user_profile=profile,
+                user=profile.user if profile else None,
                 email=billing_details.email,
                 phone_number=billing_details.phone,
                 country=billing_details.address.country,
