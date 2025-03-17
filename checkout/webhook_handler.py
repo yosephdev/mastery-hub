@@ -73,7 +73,7 @@ class StripeWH_Handler:
         """
         logger.info(f"Unhandled webhook received: {event['type']}")
         return HttpResponse(
-            content=f'Unhandled webhook received: {event["type"]}', status=200
+            content=f'Webhook received: {event["type"]}', status=200
         )
 
     def handle_payment_intent_succeeded(self, event):
@@ -195,21 +195,31 @@ class StripeWH_Handler:
 
     def handle_payment_intent_payment_failed(self, event):
         """
-        Handle the payment_intent.payment_failed webhook from Stripe.
-        Notify the user about the failed payment.
+        Handle the payment_intent.payment_failed webhook from Stripe
         """
         intent = event.data.object
-        email = intent.metadata.get('email')
-
+        pid = intent.id
+        
+        logger.warning(f"Payment failed for PaymentIntent {pid}")
+        
+        # Find the order associated with this payment intent
         try:
-            send_mail(
-                subject="Payment Failed",
-                message="Your payment could not be processed. Please try again.",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[email],
-            )
+            order = Order.objects.get(stripe_pid=pid)
+            order.payment_status = 'FAILED'
+            order.save()
+            
+            # Send email notification about failed payment
+            from .tasks import send_payment_failure_email
+            send_payment_failure_email(order.id)
+            
+            logger.info(f"Order {order.order_number} marked as failed payment")
+            
+        except Order.DoesNotExist:
+            logger.warning(f"No order found for failed PaymentIntent {pid}")
         except Exception as e:
-            logger.error(
-                f"Failed to notify user about payment failure: {str(e)}")
-
-        return HttpResponse(content=f'Webhook received: {event["type"]}', status=200)
+            logger.error(f"Error handling payment failure for PaymentIntent {pid}: {str(e)}")
+        
+        return HttpResponse(
+            content=f'Webhook received: {event["type"]} | SUCCESS: Payment failure recorded',
+            status=200
+        )

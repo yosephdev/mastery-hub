@@ -625,63 +625,6 @@ def cart_contents_view(request):
     return render(request, 'checkout/cart_contents.html', context)
 
 
-@csrf_exempt
-@require_POST
-def stripe_webhook(request):
-    payload = request.body
-    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
-    if not sig_header:
-        logger.error("Missing HTTP_STRIPE_SIGNATURE header")
-        return HttpResponse(status=400)
-    wh_secret = settings.STRIPE_WH_SECRET
-
-    logger.info(f"Received webhook payload: {payload}")
-    logger.info(f"Received signature header: {sig_header}")
-
-    try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, wh_secret
-        )
-
-        logger.info(f"Received event: {event}")
-
-        if event.type == 'payment_intent.succeeded':
-            payment_intent = event.data.object
-            handle_payment_success(payment_intent)
-            logger.info(
-                f"Payment succeeded for PaymentIntent {payment_intent.id}")
-
-        elif event.type == 'payment_intent.payment_failed':
-            payment_intent = event.data.object
-            handle_payment_failure(payment_intent)
-            logger.warning(
-                f"Payment failed for PaymentIntent {payment_intent.id}")
-
-        elif event.type == 'charge.succeeded':
-            charge = event.data.object
-            handle_charge_success(charge)
-            logger.info(f"Payment succeeded for Charge {charge.id}")
-
-        elif event.type == 'charge.dispute.created':
-            dispute = event.data.object
-            handle_dispute_created(dispute)
-            logger.warning(f"Dispute created for Charge {dispute.charge}")
-
-        return JsonResponse({'status': 'success'})
-
-    except ValueError as e:
-        logger.error(f"Invalid payload: {str(e)}")
-        return JsonResponse({'error': 'Invalid payload'}, status=400)
-
-    except stripe.error.SignatureVerificationError as e:
-        logger.error(f"Invalid signature: {str(e)}")
-        return JsonResponse({'error': 'Invalid signature'}, status=400)
-
-    except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}")
-        return JsonResponse({'error': 'An unexpected error occurred'}, status=500)
-
-
 @transaction.atomic
 def process_order(order, cart):
     order.save()
