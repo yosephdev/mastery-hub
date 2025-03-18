@@ -482,6 +482,11 @@ def create_forum_post(request):
             except Exception as e:
                 logger.error(f"Error creating post: {str(e)}")
                 messages.error(request, f"An error occurred while creating the post: {str(e)}")
+                # Log additional details for debugging
+                logger.error(f"User: {request.user.username}, User ID: {request.user.id}")
+                logger.error(f"Profile exists: {hasattr(request.user, 'profile')}")
+                if hasattr(request.user, 'profile'):
+                    logger.error(f"Profile ID: {request.user.profile.id}")
         else:
             for field, errors in form.errors.items():
                 for error in errors:

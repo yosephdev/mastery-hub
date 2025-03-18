@@ -1,8 +1,18 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.db import models
 from profiles.models import Profile
 from datetime import timedelta
 from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
+from django.utils.text import slugify
+from django.urls import reverse
+from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
+
+User = get_user_model()
 
 # Create your models here.
 
@@ -169,7 +179,7 @@ class Review(models.Model):
 class Forum(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
-    author = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    author = models.ForeignKey('profiles.Profile', on_delete=models.CASCADE)
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
