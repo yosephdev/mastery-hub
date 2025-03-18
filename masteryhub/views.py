@@ -470,28 +470,29 @@ def create_forum_post(request):
         if form.is_valid():
             try:
                 post = form.save(commit=False)
-
-                try:
-                    if not hasattr(request.user, 'profile'):
-                        profile = Profile.objects.create(user=request.user)
-                        logger.info(
-                            f"Created new profile for user {request.user.username}")
-                    else:
-                        profile = request.user.profile
-
-                    post.author = profile
-                except Exception as profile_error:
-                    logger.error(
-                        f"Error with profile for user {request.user.username}: {str(profile_error)}")
-                    post.author = None
-
+                
+                # Ensure user has a profile
+                profile, created = Profile.objects.get_or_create(
+                    user=request.user,
+                    defaults={
+                        'bio': '',
+                        'skills': '',
+                        'goals': '',
+                        'is_expert': False
+                    }
+                )
+                
+                if created:
+                    logger.info(f"Created new profile for user {request.user.username}")
+                
+                post.author = profile
                 post.save()
+                
                 messages.success(request, "Forum post created successfully.")
                 return redirect("masteryhub:forum_list")
             except Exception as e:
                 logger.error(f"Error creating post: {str(e)}")
-                messages.error(
-                    request, f"An error occurred while creating the post: {str(e)}")
+                messages.error(request, "An error occurred while creating the post. Please try again.")
         else:
             for field, errors in form.errors.items():
                 for error in errors:
@@ -1000,7 +1001,7 @@ def matching_results(request):
                     mentor_skills)) / len(mentor_skills)) * 100
 
                 matches.append({
-                    'mentor': mentor.user.profile,
+                    'mentor': mentor,
                     'skill_match': round(skill_match, 1),
                     'style_match': 75,
                     'availability_match': 80,

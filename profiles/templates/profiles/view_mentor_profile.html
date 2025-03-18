@@ -5,8 +5,8 @@
 <div class="container pt-4 mt-5">
     <div class="row">
         <div class="col-md-4">
-            {% if profile.profile_picture %}
-            <img src="{{ profile.profile_picture.url }}" loading="lazy" alt="{{ profile.user.username }}"
+            {% if profile.user.profile.profile_picture %}
+            <img src="{{ profile.user.profile.profile_picture.url }}" loading="lazy" alt="{{ profile.user.username }}"
                 class="img-fluid rounded-circle mb-3">
             {% else %}
             <img src="{% static 'images/default_profile.webp' %}" loading="lazy" alt="{{ profile.user.username }}"
@@ -15,38 +15,31 @@
         </div>
         <div class="col-md-8">
             <h2>{{ profile.user.get_full_name }}</h2>
-            <p class="text-muted">Mentor since {{ profile.mentor_since|date:"F Y" }}</p>
+            <p class="text-muted">Experience Level: {{ profile.get_experience_level_display }}</p>
+            <p class="text-muted">Hourly Rate: ${{ profile.hourly_rate }}/hour</p>
             <p>{{ profile.bio }}</p>
 
             <h4>Skills</h4>
-            <p>{{ profile.skills }}</p>
-
-            <h4>Experience</h4>
-            <p>{{ profile.experience }}</p>
-
-            <h4>Achievements</h4>
-            <p>{{ profile.achievements }}</p>
-
-            <h4>Mentorship Areas</h4>
-            <p>{{ profile.mentorship_areas }}</p>
+            <div class="d-flex flex-wrap gap-1 mb-3">
+                {% for skill in profile.skills.all %}
+                <span class="badge bg-light text-dark">{{ skill.title }}</span>
+                {% endfor %}
+            </div>
 
             <h4>Availability</h4>
-            <p>{{ profile.availability }}</p>
+            <p>{% if profile.is_available %}Available for Mentoring{% else %}Not Available{% endif %}</p>
 
-            <h4>Preferred Mentoring Method</h4>
-            <p>{{ profile.preferred_mentoring_method }}</p>
-
-            {% if profile.linkedin_profile %}
-            <a href="{{ profile.linkedin_profile }}" target="_blank" class="btn btn-primary">LinkedIn Profile</a>
+            {% if profile.user.profile.linkedin_profile %}
+            <a href="{{ profile.user.profile.linkedin_profile }}" target="_blank" class="btn btn-primary">LinkedIn Profile</a>
             {% endif %}
-            {% if profile.github_profile %}
-            <a href="{{ profile.github_profile }}" target="_blank" class="btn btn-secondary">GitHub Profile</a>
+            {% if profile.user.profile.github_profile %}
+            <a href="{{ profile.user.profile.github_profile }}" target="_blank" class="btn btn-secondary">GitHub Profile</a>
             {% endif %}
 
             {% if is_own_profile %}
             <a href="{% url 'profiles:edit_profile' %}" class="btn btn-warning">Edit Profile</a>
             {% else %}
-            <a href="{% url 'masteryhub:request_mentorship_profile' profile_id=profile.id %}" class="btn btn-success">Request Mentorship</a>
+            <a href="{% url 'masteryhub:request_mentorship_profile' profile_id=profile.user.profile.id %}" class="btn btn-success">Request Mentorship</a>
             {% endif %}
         </div>
     </div>
