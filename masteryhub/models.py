@@ -104,6 +104,14 @@ class Category(models.Model):
 
 
 class Mentorship(models.Model):
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("active", "Active"),
+        ("paused", "Paused"),
+        ("completed", "Completed"),
+        ("cancelled", "Cancelled"),
+    ]
+    
     mentor = models.ForeignKey(
         Profile, related_name="mentorships_as_mentor", on_delete=models.CASCADE
     )
@@ -115,18 +123,35 @@ class Mentorship(models.Model):
     goals = models.TextField(blank=True)
     status = models.CharField(
         max_length=20,
-        choices=[
-            ("pending", "Pending"),
-            ("accepted", "Accepted"),
-            ("rejected", "Rejected"),
-            ("completed", "Completed"),
-        ],
+        choices=STATUS_CHOICES,
         default="pending",
     )
     created_at = models.DateTimeField(auto_now_add=True)
-
+    updated_at = models.DateTimeField(auto_now=True)
+    session_count = models.PositiveIntegerField(default=0)
+    last_session_date = models.DateField(null=True, blank=True)
+    notes = models.TextField(blank=True, help_text="Private notes about this mentorship")
+    
     def __str__(self):
         return f"{self.mentor.user.username} mentoring {self.mentee.user.username} - {self.status}"
+        
+    def get_next_session_date(self):
+        """Calculate the next session date based on preferences."""
+        from datetime import datetime, timedelta
+        
+        if not self.last_session_date:
+            return datetime.now().date()
+            
+        # Default: weekly sessions
+        return self.last_session_date + timedelta(days=7)
+        
+    def record_session(self, session_date=None):
+        """Record a new session."""
+        from django.utils import timezone
+        
+        self.session_count += 1
+        self.last_session_date = session_date or timezone.now().date()
+        self.save()
 
 
 class Review(models.Model):
@@ -294,11 +319,16 @@ class Activity(models.Model):
         ('SESSION_COMPLETED', 'Session Completed'),
         ('REVIEW_ADDED', 'Review Added'),
         ('GOAL_ACHIEVED', 'Goal Achieved'),
+        ('MENTORSHIP_REQUESTED', 'Mentorship Requested'),
+        ('MENTORSHIP_ACCEPTED', 'Mentorship Accepted'),
+        ('MENTORSHIP_REJECTED', 'Mentorship Rejected'),
+        ('MENTORSHIP_CANCELLED', 'Mentorship Cancelled'),
+        ('MENTORSHIP_COMPLETED', 'Mentorship Completed'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    activity_type = models.CharField(max_length=20, choices=ACTIVITY_TYPES)
-    description = models.TextField()
+    activity_type = models.CharField(max_length=25, choices=ACTIVITY_TYPES)
+    description = models.TextField(blank=True)
     timestamp = models.DateTimeField(default=timezone.now)
     related_session = models.ForeignKey(
         'Session', on_delete=models.SET_NULL, null=True, blank=True)

@@ -19,6 +19,7 @@ from .views import (
     manage_mentorship_requests,
     accept_mentorship,
     reject_mentorship,
+    cancel_mentorship_request,
     my_mentorships,
     view_session,
     create_session,
@@ -62,6 +63,8 @@ urlpatterns = [
          accept_mentorship, name="accept_mentorship"),
     path("reject-mentorship/<int:mentorship_id>/",
          reject_mentorship, name="reject_mentorship"),
+    path("cancel-mentorship-request/<int:request_id>/",
+         cancel_mentorship_request, name="cancel_mentorship_request"),
     path("my-mentorships/", my_mentorships, name="my_mentorships"),
     path("report-concern/", report_concern, name="report_concern"),
     # Sessions
