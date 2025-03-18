@@ -461,12 +461,11 @@ def create_forum_post(request):
             try:
                 post = form.save(commit=False)
                 
-                # Ensure user has a profile
+                # Get or create user profile
                 profile, created = Profile.objects.get_or_create(
                     user=request.user,
                     defaults={
                         'bio': '',
-                        'skills': '',
                         'goals': '',
                         'is_expert': False
                     }
@@ -482,7 +481,7 @@ def create_forum_post(request):
                 return redirect("masteryhub:forum_list")
             except Exception as e:
                 logger.error(f"Error creating post: {str(e)}")
-                messages.error(request, "An error occurred while creating the post. Please try again.")
+                messages.error(request, f"An error occurred while creating the post: {str(e)}")
         else:
             for field, errors in form.errors.items():
                 for error in errors:
@@ -490,7 +489,15 @@ def create_forum_post(request):
     else:
         form = ForumPostForm()
 
-    return render(request, "masteryhub/create_forum_post.html", {"form": form})
+    # Get available categories
+    categories = Category.objects.all()
+    
+    context = {
+        "form": form,
+        "categories": categories
+    }
+    
+    return render(request, "masteryhub/create_forum_post.html", context)
 
 
 @login_required

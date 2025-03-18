@@ -105,6 +105,10 @@ class ForumPostForm(forms.ModelForm):
             "category": forms.Select(attrs={"class": "form-control"}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].empty_label = "Select a category"
+
 
 class MentorApplicationForm(forms.Form):
     name = forms.CharField(
