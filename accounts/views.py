@@ -14,7 +14,7 @@ from django.contrib.auth.views import (
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.shortcuts import render, redirect
-from allauth.account.views import ConfirmEmailView
+from allauth.account.views import ConfirmEmailView, SignupView
 from allauth.account.models import EmailConfirmationHMAC, EmailAddress
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
@@ -26,6 +26,11 @@ from django.views.generic import RedirectView, View
 from allauth.socialaccount.providers.oauth2.views import OAuth2CallbackView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from profiles.models import Profile
+from django.contrib.auth import login
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
 
 from .forms import (
     CustomSignupForm,
@@ -35,56 +40,26 @@ from .forms import (
 logger = logging.getLogger(__name__)
 
 
-@csrf_exempt
-def signup_view(request):
-    if request.method == "POST":
-        form = CustomSignupForm(request.POST)
-        if form.is_valid():
-            try:
-                with transaction.atomic():
-                    email = form.cleaned_data.get('email')
-                    if EmailAddress.objects.filter(email=email).exists():
-                        logger.warning(f"Signup attempt with existing email: {email}")
-                        messages.error(request, "An account with this email already exists. Please use a different email or try to log in.")
-                        return render(request, "account/signup.html", {"form": form})
+@method_decorator(sensitive_post_parameters(), name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
+@method_decorator(never_cache, name='dispatch')
+class CustomSignupView(SignupView):
+    form_class = CustomSignupForm
+    template_name = 'account/signup.html'
+    success_url = reverse_lazy('home:index')
 
-                    # Create user first
-                    user = form.save(request)
-                    logger.info(f"New user created: {user.email}")
+    def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+            if self.user:
+                login(self.request, self.user)
+                messages.success(self.request, 'Account created successfully!')
+            return response
+        except Exception as e:
+            messages.error(self.request, f'An error occurred during signup: {str(e)}')
+            return self.form_invalid(form)
 
-                    # Create profile with safe defaults
-                    try:
-                        Profile.objects.create(
-                            user=user,
-                            full_name=form.cleaned_data.get('full_name', user.email.split('@')[0]),
-                            bio=form.cleaned_data.get('bio', ''),
-                            country=form.cleaned_data.get('country', ''),
-                            is_mentor=form.cleaned_data.get('is_mentor', False)
-                        )
-                        logger.info(f"Profile created for user: {user.email}")
-                    except Exception as profile_error:
-                        logger.error(f"Profile creation error: {str(profile_error)}")
-                        # Continue even if profile creation fails
-                        messages.warning(request, "Account created but profile setup was incomplete. You can update your profile later.")
-
-                    # Log the user in immediately
-                    auth_login(request, user)
-                    logger.info(f"User logged in: {user.email}")
-
-                    messages.success(request, "Account created successfully!")
-                    return redirect('home:index')
-
-            except Exception as e:
-                logger.error(f"Error during signup: {str(e)}")
-                messages.error(request, "An error occurred during signup. Please try again.")
-                return render(request, "account/signup.html", {"form": form})
-        else:
-            logger.warning(f"Invalid signup form submission: {form.errors}")
-            messages.error(request, "Please correct the errors below.")
-    else:
-        form = CustomSignupForm()
-
-    return render(request, "account/signup.html", {"form": form})
+signup_view = CustomSignupView.as_view()
 
 
 class CustomConfirmEmailView(ConfirmEmailView):
