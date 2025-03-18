@@ -5,83 +5,29 @@
 
 {% block head_title %}{% trans "Sign Up" %}{% endblock %}
 
-{% block content %}
-<div class="account-container">
-  <div class="container">
-    <div class="row justify-content-center w-100">
-      <div class="col-md-6 col-lg-5">
-        <div class="card shadow-sm">
-          <div class="card-body p-5">
-            <h2 class="text-center mb-4">{% trans "Join us for Free" %}</h2>
-            <p class="text-center mb-4">
-              {% trans "Already have an account?" %}
-              <a href="{% url 'accounts:login' %}" class="text-decoration-none">{% trans "Log in" %}</a>
-            </p>
+{% block form_title %}
+    <h2 class="h3 mb-3">{% trans "Sign Up" %}</h2>
+    <p class="text-muted">{% trans "Already have an account?" %} <a href="{{ login_url }}" class="text-decoration-none">{% trans "Sign In" %}</a></p>
+{% endblock %}
 
-            <!-- Email verification notice -->
-            <div class="alert alert-info mb-4">
-              <i class="fas fa-info-circle me-2"></i>
-              {% trans "After signing up, you'll need to verify your email address to fully access all features." %}
-            </div>
-
-            {% get_providers as socialaccount_providers %}
-            {% if socialaccount_providers %}
-              <div class="d-grid mb-4">
-                <a href="/accounts/google/login/?process=signup&scope=email+profile&next=/" class="btn btn-outline-dark">
-                  <i class="fab fa-google me-2"></i>{% trans "Sign up with Google" %}
-                </a>
-              </div>
-              <p class="text-center">{% trans "or MasteryHub account" %}</p>
-            {% endif %}
-
-            <form class="signup" id="signup_form" method="post" action="{% url 'accounts:signup' %}">
-              {% csrf_token %}
-              
-              {% if form.non_field_errors %}
-                <div class="alert alert-danger">
-                  {% for error in form.non_field_errors %}
-                    <p class="mb-0">{{ error }}</p>
-                  {% endfor %}
-                </div>
-              {% endif %}
-
-              {{ form|crispy }}
-
-              <div class="form-group mb-4">
-                <div class="form-check">
-                  <input type="checkbox" name="terms" class="form-check-input" id="id_terms" required>
-                  <label for="id_terms" class="form-check-label">
-                    {% trans "I have read and agree to MasteryHub's" %}
-                    <a href="https://www.termsfeed.com/live/0f539249-0d33-4a4c-b95d-a62c56808701" 
-                       class="text-decoration-none" target="_blank">
-                      {% trans "Privacy Policy" %}
-                    </a>
-                    {% trans "and" %}
-                    <a href="https://www.termsfeed.com/live/1c785e96-6ff6-4948-99ff-c333f8923466" 
-                       class="text-decoration-none" target="_blank">
-                      {% trans "Terms of Service" %}
-                    </a>
-                  </label>
-                </div>
-              </div>
-
-              {% if redirect_field_value %}
-                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-              {% endif %}
-
-              <div class="d-grid gap-2 mt-4">
-                <button type="submit" class="btn btn-primary btn-lg">
-                  <i class="fas fa-user-plus me-2"></i>{% trans "Sign Up" %}
-                </button>
-                <a class="btn btn-outline-dark" href="{% url 'accounts:login' %}">
-                  <i class="fas fa-arrow-left me-2"></i>{% trans "Back to Login" %}
-                </a>
-              </div>
-            </form>
-          </div>
+{% block inner_content %}
+    <form class="signup" id="signup_form" method="post" action="{% url 'accounts:signup' %}">
+        {% csrf_token %}
+        {{ form|crispy }}
+        {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+        <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">{% trans "Sign Up" %}</button>
         </div>
-      </div>
+    </form>
+
+    <div class="mt-4 text-center">
+        <p class="text-muted mb-3">{% trans "Or sign up with" %}</p>
+        <div class="d-grid gap-2">
+            <a href="{% provider_login_url 'google' %}" class="btn btn-outline-dark">
+                <i class="fab fa-google me-2"></i>{% trans "Continue with Google" %}
+            </a>
+        </div>
     </div>
-  </div>
-</div>
 {% endblock %}
