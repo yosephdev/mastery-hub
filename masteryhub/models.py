@@ -66,6 +66,34 @@ class Session(models.Model):
     def total_duration(self):
         return self.duration
 
+    @property
+    def image_url(self):
+        """
+        Returns the URL for the session image.
+        If no image is set, returns a category-specific default image from S3.
+        """
+        if self.image:
+            return self.image.url
+        
+        # Default images based on category
+        if self.category:
+            category_name = self.category.name.lower()
+            if 'technology' in category_name or 'web' in category_name:
+                return 'https://skill-sharing.s3.amazonaws.com/static/images/web-development.webp'
+            elif 'marketing' in category_name:
+                return 'https://skill-sharing.s3.amazonaws.com/static/images/digital-marketing.webp'
+            elif 'data' in category_name:
+                return 'https://skill-sharing.s3.amazonaws.com/static/images/data-science.webp'
+            elif 'design' in category_name:
+                return 'https://skill-sharing.s3.amazonaws.com/static/images/design.webp'
+            elif 'business' in category_name:
+                return 'https://skill-sharing.s3.amazonaws.com/static/images/business.webp'
+            elif 'soft' in category_name:
+                return 'https://skill-sharing.s3.amazonaws.com/static/images/soft-skills.webp'
+        
+        # Default for any other category
+        return 'https://skill-sharing.s3.amazonaws.com/static/images/no-image-available.webp'
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100)

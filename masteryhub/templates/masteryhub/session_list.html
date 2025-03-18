@@ -51,7 +51,7 @@
                     <div class="card h-100 shadow-sm hover-lift border-0 rounded-3">
                         <div class="position-relative">
                             <img class="card-img-top"
-                                src="{% if session.image %}{{ session.image.url }}{% else %}{% static 'images/no-image-available.webp' %}{% endif %}"
+                                src="{{ session.image_url }}"
                                 loading="lazy" alt="{{ session.title }}">
                             <div class="position-absolute top-0 end-0 m-2">
                                 <span class="badge bg-primary rounded-pill">

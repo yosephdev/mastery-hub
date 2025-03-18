@@ -41,12 +41,7 @@
         {% for session in sessions %}
         <div class="col-md-4">
             <div class="card mb-4">
-                {% if session.image %}
-                <img class="card-img-top" src="{{ session.image.url }}" loading="lazy" alt="{{ session.title }}">
-                {% else %}
-                <img class="card-img-top" src="{% static 'images/no-image-available.webp' %}" loading="lazy"
-                    alt="No Image Available">
-                {% endif %}
+                <img class="card-img-top" src="{{ session.image_url }}" loading="lazy" alt="{{ session.title }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ session.title }}</h5>
                     <p class="card-text">{{ session.description|truncatewords:20 }}</p>

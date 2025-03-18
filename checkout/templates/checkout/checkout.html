@@ -30,12 +30,7 @@
             {% for item in cart.items.all %}
             <div class="row">
                 <div class="col-2 mb-1">
-                    {% if item.session.image %}
-                    <img class="w-100" src="{{ item.session.image.url }}" loading="lazy" alt="{{ item.session.title }}">
-                    {% else %}
-                    <img class="w-100" src="{% static 'images/no-image-available.webp' %}"
-                        alt="{{ item.session.title }}">
-                    {% endif %}
+                    <img class="w-100" src="{{ item.session.image_url }}" loading="lazy" alt="{{ item.session.title }}">
                 </div>
                 <div class="col-7">
                     <p class="my-0"><strong>{{ item.session.title }}</strong></p>
