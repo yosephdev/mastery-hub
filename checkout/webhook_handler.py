@@ -23,15 +23,12 @@ class StripeWH_Handler:
         """
         Send the user a confirmation email.
         Logs any errors during email sending.
-        """
-        # Check if the order has a confirmation_email_sent field and it's True
-        # This is to prevent duplicate emails
+        """      
         if hasattr(order, 'confirmation_email_sent') and order.confirmation_email_sent:
             logger.info(f"Confirmation email already sent for order {order.order_number}")
             return
             
-        try:
-            # Use the task function directly
+        try:            
             from .tasks import send_order_confirmation
             send_order_confirmation(order.id)
         except Exception as e:
@@ -118,8 +115,7 @@ class StripeWH_Handler:
                 content=f'Webhook received: {event["type"]} | SUCCESS: Verified order already in database',
                 status=200,
             )
-
-        # Initialize order variable to None before trying to create it
+        
         order = None
         try:
             order = Order.objects.create(
@@ -135,6 +131,7 @@ class StripeWH_Handler:
                 county=billing_details.address.state,
                 stripe_pid=pid,
                 order_total=grand_total,
+                grand_total=grand_total,
                 delivery_cost=0,
             )
             if session_id:
@@ -162,8 +159,7 @@ class StripeWH_Handler:
                 content=f'Webhook received: {event["type"]} | ERROR: {str(e)}',
                 status=500,
             )
-
-        # Only send confirmation email if order was successfully created
+        
         if order:
             self._send_confirmation_email(order)
             return HttpResponse(
@@ -183,15 +179,13 @@ class StripeWH_Handler:
         intent = event.data.object
         pid = intent.id
         
-        logger.warning(f"Payment failed for PaymentIntent {pid}")
+        logger.warning(f"Payment failed for PaymentIntent {pid}")        
         
-        # Find the order associated with this payment intent
         try:
             order = Order.objects.get(stripe_pid=pid)
             order.payment_status = 'FAILED'
-            order.save()
+            order.save()            
             
-            # Send email notification about failed payment
             from .tasks import send_payment_failure_email
             send_payment_failure_email(order.id)
             
