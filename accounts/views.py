@@ -25,6 +25,7 @@ from allauth.socialaccount.models import SocialLogin
 from django.views.generic import RedirectView, View
 from allauth.socialaccount.providers.oauth2.views import OAuth2CallbackView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from profiles.models import Profile
 
 from .forms import (
     CustomSignupForm,
@@ -41,50 +42,48 @@ def signup_view(request):
         if form.is_valid():
             try:
                 with transaction.atomic():
-                    # Check if user already exists with this email
                     email = form.cleaned_data.get('email')
                     if EmailAddress.objects.filter(email=email).exists():
-                        messages.error(
-                            request, "An account with this email already exists. Please use a different email or try to log in.")
+                        logger.warning(f"Signup attempt with existing email: {email}")
+                        messages.error(request, "An account with this email already exists. Please use a different email or try to log in.")
                         return render(request, "account/signup.html", {"form": form})
-                    
-                    # Create the user
-                    user = form.save()
-                    raw_password = form.cleaned_data.get('password1')
-                    authenticated_user = authenticate(
-                        username=user.username, password=raw_password)
-                    
-                    if authenticated_user is not None:
-                        auth_login(request, authenticated_user)
-                        
-                        # Send confirmation email
-                        try:
-                            send_confirmation_email(user, request)
-                            messages.success(
-                                request, 
-                                f"Welcome to MasteryHub, {user.username}! Your account has been created successfully. "
-                                f"We've sent a verification email to {user.email}. Please check your inbox and verify your email address."
-                            )
-                        except Exception as email_error:
-                            logger.error(f"Email sending error: {str(email_error)}")
-                            messages.warning(
-                                request, 
-                                f"Your account was created, but we couldn't send the verification email. "
-                                f"Please contact support if you don't receive a verification email soon."
-                            )
-                        
-                        return redirect("home:index")
+
+                    # Create user first
+                    user = form.save(request)
+                    logger.info(f"New user created: {user.email}")
+
+                    # Create profile with safe defaults
+                    try:
+                        Profile.objects.create(
+                            user=user,
+                            full_name=form.cleaned_data.get('full_name', user.email.split('@')[0]),
+                            bio=form.cleaned_data.get('bio', ''),
+                            country=form.cleaned_data.get('country', ''),
+                            is_mentor=form.cleaned_data.get('is_mentor', False)
+                        )
+                        logger.info(f"Profile created for user: {user.email}")
+                    except Exception as profile_error:
+                        logger.error(f"Profile creation error: {str(profile_error)}")
+                        # Continue even if profile creation fails
+                        messages.warning(request, "Account created but profile setup was incomplete. You can update your profile later.")
+
+                    # Log the user in immediately
+                    auth_login(request, user)
+                    logger.info(f"User logged in: {user.email}")
+
+                    messages.success(request, "Account created successfully!")
+                    return redirect('home:index')
+
             except Exception as e:
-                logger.error(f"Signup error: {str(e)}")
-                messages.error(
-                    request, "There was an error creating your account. Please try again.")
-                return redirect("accounts:signup")
+                logger.error(f"Error during signup: {str(e)}")
+                messages.error(request, "An error occurred during signup. Please try again.")
+                return render(request, "account/signup.html", {"form": form})
         else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"{error}")
+            logger.warning(f"Invalid signup form submission: {form.errors}")
+            messages.error(request, "Please correct the errors below.")
     else:
         form = CustomSignupForm()
+
     return render(request, "account/signup.html", {"form": form})
 
 
@@ -104,11 +103,13 @@ class CustomConfirmEmailView(ConfirmEmailView):
         try:
             email_confirmation = self.get_object()
             if email_confirmation.key_expired():
-                messages.error(request, "The confirmation link has expired. Please request a new one.")
+                messages.error(
+                    request, "The confirmation link has expired. Please request a new one.")
                 return redirect("accounts:login")
             return super().dispatch(request, *args, **kwargs)
         except Http404:
-            messages.error(request, "Invalid confirmation link. Please request a new one.")
+            messages.error(
+                request, "Invalid confirmation link. Please request a new one.")
             return redirect("accounts:login")
 
     def get(self, request, *args, **kwargs):
@@ -120,32 +121,28 @@ class CustomConfirmEmailView(ConfirmEmailView):
             return redirect("accounts:login")
         except Exception as e:
             logger.error(f"Email confirmation error: {str(e)}")
-            messages.error(request, "There was an error confirming your email. Please try again or contact support.")
+            messages.error(
+                request, "There was an error confirming your email. Please try again or contact support.")
             return redirect("accounts:login")
 
 
 def send_confirmation_email(user, request):
     current_site = get_current_site(request)
     subject = 'Confirm Your MasteryHub Email Address'
-    
-    # Create email confirmation for the user
+
     email_address, created = EmailAddress.objects.get_or_create(
         user=user,
         email=user.email,
         defaults={'verified': False, 'primary': True}
     )
-    
-    # Generate confirmation key
+
     email_confirmation = EmailConfirmationHMAC(email_address)
-    
-    # Generate confirmation URL
+
     protocol = 'https' if request.is_secure() else 'http'
     activate_url = f"{protocol}://{current_site.domain}/accounts/confirm-email/{email_confirmation.key}/"
-    
-    # Set site name and domain
+
     current_site.name = "MasteryHub"
-    
-    # Render email template with context
+
     message = render_to_string('account/email/email_confirmation_message.html', {
         'user': user,
         'current_site': current_site,
@@ -154,8 +151,7 @@ def send_confirmation_email(user, request):
         'expiry_days': 3,
         'site_name': "MasteryHub"
     })
-    
-    # Create plain text version
+
     text_message = render_to_string('account/email/email_confirmation_message.txt', {
         'user': user,
         'current_site': current_site,
@@ -163,8 +159,7 @@ def send_confirmation_email(user, request):
         'activate_url': activate_url,
         'site_name': "MasteryHub"
     })
-    
-    # Send the email
+
     email = EmailMultiAlternatives(
         subject=subject,
         body=text_message,
@@ -252,10 +247,10 @@ class CustomPasswordResetCompleteView(PasswordResetCompleteView):
 
 class CustomSocialLoginCancelledView(LoginCancelledView):
     """Handle cancelled social logins."""
-    
+
     def get(self, request, *args, **kwargs):
         messages.error(
-            request, 
+            request,
             "Social login was cancelled. Please try again or use your MasteryHub account."
         )
         return redirect("accounts:login")
@@ -263,14 +258,14 @@ class CustomSocialLoginCancelledView(LoginCancelledView):
 
 class CustomSocialLoginErrorView(RedirectView):
     """Handle social login errors."""
-    
+
     permanent = False
     query_string = True
     pattern_name = 'accounts:login'
-    
+
     def get(self, request, *args, **kwargs):
         messages.error(
-            request, 
+            request,
             "There was an error with your social login. Please try again or use your MasteryHub account."
         )
         return super().get(request, *args, **kwargs)
@@ -279,60 +274,50 @@ class CustomSocialLoginErrorView(RedirectView):
 class CustomGoogleCallbackView(View):
     """Custom callback view for Google OAuth2."""
     adapter_class = GoogleOAuth2Adapter
-    
+
     def dispatch(self, request, *args, **kwargs):
-        # Set a session flag to indicate this is a social login
         request.session['is_social_login'] = True
         request.session['sociallogin_provider'] = 'google'
-        
-        # Log the callback
+
         logger.info("Google OAuth callback received")
-        
+
         try:
-            # Create an instance of OAuth2CallbackView
             oauth2_view = OAuth2CallbackView()
             oauth2_view.adapter_class = self.adapter_class
-            
-            # Call the parent dispatch method
+
             response = oauth2_view.dispatch(request, *args, **kwargs)
-            
-            # If the user is authenticated, add a success message
+
             if request.user.is_authenticated:
-                # Mark the user's email as verified
                 try:
                     email_address, created = EmailAddress.objects.get_or_create(
                         user=request.user,
                         email=request.user.email,
                         defaults={'verified': True, 'primary': True}
                     )
-                    
+
                     if not email_address.verified:
                         email_address.verified = True
                         email_address.save()
                 except Exception as e:
                     logger.error(f"Error verifying email: {str(e)}")
-                
+
                 messages.success(
-                    request, 
+                    request,
                     f"Welcome, {request.user.username or request.user.email}! You've successfully signed in with Google."
                 )
-                
-                # Redirect to home page after successful login
+
                 return redirect('home:index')
-            
-            # If we get here, something went wrong with the authentication
+
             logger.error("User not authenticated after OAuth2 callback")
             messages.error(
                 request,
                 "There was an error with your Google login. Please try again or use your MasteryHub account."
             )
             return redirect("accounts:login")
-            
+
         except Exception as e:
-            # Log detailed error information
             logger.error(f"Google OAuth callback error: {str(e)}")
-            
-            # Add a more specific error message
+
             error_message = "There was an error with your Google login. "
             if "access_denied" in str(e).lower():
                 error_message += "Access was denied. Please try again."
@@ -346,8 +331,7 @@ class CustomGoogleCallbackView(View):
                 error_message += "Invalid scope. Please contact support."
             else:
                 error_message += "Please try again or use your MasteryHub account."
-            
+
             messages.error(request, error_message)
-            
-            # Redirect to login page
+
             return redirect("accounts:login")

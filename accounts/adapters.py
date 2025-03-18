@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from allauth.account.utils import perform_login
 from allauth.exceptions import ImmediateHttpResponse
 import logging
+from profiles.models import Profile
 
 logger = logging.getLogger(__name__)
 
@@ -54,86 +55,49 @@ class CustomAccountAdapter(DefaultAccountAdapter):
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     """
-    Custom adapter for social accounts that automatically verifies
-    email addresses from trusted providers like Google.
+    Custom adapter for social accounts that handles profile creation and redirects.
     """
     
-    def pre_social_login(self, request, sociallogin):
+    def populate_user(self, request, sociallogin, data):
         """
-        Invoked just after a user successfully authenticates via a social provider,
-        but before the login is actually processed.
+        Populate user information from social provider info.
         """
-        # Store the provider in the session
-        if hasattr(request, 'session'):
-            request.session['sociallogin_provider'] = sociallogin.account.provider
-        
-        # Get the email from the social account
-        email = sociallogin.account.extra_data.get('email')
-        if not email:
-            return
-        
-        # Check if this email already exists in the system
+        user = super().populate_user(request, sociallogin, data)
+        if sociallogin.account.provider == 'google':
+            user.email = sociallogin.account.extra_data.get('email', '')
+            user.first_name = sociallogin.account.extra_data.get('given_name', '')
+            user.last_name = sociallogin.account.extra_data.get('family_name', '')
+        return user
+    
+    def save_user(self, request, sociallogin, form=None):
+        """
+        Save the user and create their profile.
+        """
+        user = super().save_user(request, sociallogin, form)
         try:
-            existing_email = EmailAddress.objects.get(email=email)
-            
-            # If the email exists but belongs to a different user, connect the accounts
-            if existing_email.user != sociallogin.user:
-                # Log the user in directly with the existing account
-                user = existing_email.user
-                sociallogin.connect(request, user)
-                
-                # Add a success message
-                messages.success(
-                    request, 
-                    f"Welcome back, {user.username or user.email}! You've successfully signed in with Google."
-                )
-                
-                # Perform login and redirect
-                perform_login(request, user, email_verification="none")
-                
-                # Redirect to home page
-                raise ImmediateHttpResponse(redirect(reverse('home:index')))
-                
-        except EmailAddress.DoesNotExist:
-            # Email doesn't exist yet, we'll create it as verified
-            pass
-        
-        # Mark the email as verified for this social login
-        if not sociallogin.email_addresses:
-            return
-            
-        for email_address in sociallogin.email_addresses:
-            email_address.verified = True
-            
-        # Add a success message
-        user = sociallogin.user
-        messages.success(
-            request, 
-            f"Welcome, {user.username or user.email}! You've successfully signed in with Google."
-        )
-        
-        logger.info(f"Social login successful for user: {user.username or user.email}")
+            # Create profile for social account user
+            Profile.objects.get_or_create(
+                user=user,
+                defaults={
+                    'full_name': f"{user.first_name} {user.last_name}".strip(),
+                    'bio': '',
+                    'country': '',
+                    'is_mentor': False
+                }
+            )
+            logger.info(f"Profile created for social account user: {user.email}")
+        except Exception as e:
+            logger.error(f"Error creating profile for social account user: {str(e)}")
+        return user
+    
+    def is_auto_signup_allowed(self, request, sociallogin):
+        """
+        Enable auto signup for social accounts.
+        """
+        return True
     
     def get_connect_redirect_url(self, request, socialaccount):
         """
-        Returns the default URL to redirect to after successfully
-        connecting a social account.
+        Return the URL to redirect to after successfully connecting a social account.
         """
-        return reverse('home:index')
-        
-    def is_auto_signup_allowed(self, request, sociallogin):
-        """
-        Always allow auto signup for social accounts.
-        """
-        return True
-        
-    def populate_user(self, request, sociallogin, data):
-        """
-        Hook that can be used to further populate the user instance.
-        """
-        user = super().populate_user(request, sociallogin, data)
-        
-        # Set email as verified
-        user.emailaddress_set.create(email=user.email, verified=True, primary=True)
-        
-        return user 
+        return reverse('home:index') 
