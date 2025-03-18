@@ -54,6 +54,8 @@ urlpatterns = [
     path("matching-results/", views.matching_results, name='matching_results'),
     path("request-mentorship/<int:mentor_id>/",
          request_mentorship, name="request_mentorship"),
+    path("request-mentorship/profile/<int:profile_id>/", 
+        request_mentorship, name="request_mentorship_profile"),
     path("manage-mentorship-requests/", manage_mentorship_requests,
          name="manage_mentorship_requests"),
     path("accept-mentorship/<int:mentorship_id>/",

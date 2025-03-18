@@ -143,48 +143,60 @@ def search_mentors(request):
 
 
 @login_required
-def request_mentorship(request, mentor_id):
+def request_mentorship(request, mentor_id=None, profile_id=None):
     """Handle mentorship request."""
-    try:
-        mentor = get_object_or_404(Mentor, id=mentor_id)
 
-        if request.method == 'POST':
-            with transaction.atomic():
-                message = request.POST.get('message', '').strip()
+    if profile_id:
+        try:
+            profile = get_object_or_404(Profile, id=profile_id)
+            mentor, created = Mentor.objects.get_or_create(user=profile.user)
+        except Profile.DoesNotExist:
+            messages.error(
+                request, f"Profile with ID {profile_id} not found in database.")
+            return redirect('masteryhub:mentor_matching')
+    elif mentor_id:
+        try:
+            mentor = get_object_or_404(Mentor, id=mentor_id)
+        except Mentor.DoesNotExist:
+            messages.error(
+                request, f"Mentor with ID {mentor_id} not found in database.")
+            return redirect('masteryhub:mentor_matching')
+    else:
+        messages.error(
+            request, "No mentor or profile specified for mentorship request.")
+        return redirect('masteryhub:mentor_matching')
 
-                if not message:
-                    messages.error(
-                        request,
-                        "Please provide a message for your mentorship request."
-                    )
+    if request.method == 'POST':
+        with transaction.atomic():
+            message = request.POST.get('message', '').strip()
+
+            if not message:
+                messages.error(
+                    request,
+                    "Please provide a message for your mentorship request."
+                )
+                if profile_id:
+                    return redirect('masteryhub:request_mentorship_profile', profile_id=profile_id)
+                else:
                     return redirect('masteryhub:request_mentorship', mentor_id=mentor_id)
 
-                MentorshipRequest.objects.create(
-                    mentee=request.user,
-                    mentor=mentor.user,
-                    message=message,
-                    status='pending'
-                )
+            MentorshipRequest.objects.create(
+                mentee=request.user,
+                mentor=mentor.user,
+                message=message,
+                status='pending'
+            )
 
-                messages.success(
-                    request,
-                    "Your mentorship request has been sent successfully!"
-                )
-                return redirect('profiles:view_mentor_profile', username=mentor.user.username)
+            messages.success(
+                request,
+                "Your mentorship request has been sent successfully!"
+            )
+            return redirect('profiles:view_mentor_profile', username=mentor.user.username)
 
-        context = {
-            'mentor': mentor.user
-        }
-        return render(request, 'masteryhub/request_mentorship.html', context)
-
-    except Mentor.DoesNotExist:
-        messages.error(
-            request, f"Mentor with ID {mentor_id} not found in database.")
-        return redirect('masteryhub:mentor_matching')
-    except Exception as e:
-        messages.error(
-            request, f"An error occurred while processing your request: {str(e)}")
-        return redirect('masteryhub:mentor_matching')
+    context = {
+        'mentor': mentor.user
+    }
+    return render(request, 'masteryhub/request_mentorship.html', context)
 
 
 @login_required
@@ -412,35 +424,35 @@ def create_forum_post(request):
         if form.is_valid():
             try:
                 post = form.save(commit=False)
-                
-                # Check if user has a profile, create one if not
+
                 try:
                     if not hasattr(request.user, 'profile'):
                         profile = Profile.objects.create(user=request.user)
-                        logger.info(f"Created new profile for user {request.user.username}")
+                        logger.info(
+                            f"Created new profile for user {request.user.username}")
                     else:
                         profile = request.user.profile
-                    
+
                     post.author = profile
                 except Exception as profile_error:
-                    logger.error(f"Error with profile for user {request.user.username}: {str(profile_error)}")
-                    # If we can't get or create a profile, set author to None
-                    # This assumes the Forum model allows null for author field
+                    logger.error(
+                        f"Error with profile for user {request.user.username}: {str(profile_error)}")
                     post.author = None
-                    
+
                 post.save()
                 messages.success(request, "Forum post created successfully.")
                 return redirect("masteryhub:forum_list")
             except Exception as e:
                 logger.error(f"Error creating post: {str(e)}")
-                messages.error(request, f"An error occurred while creating the post: {str(e)}")
+                messages.error(
+                    request, f"An error occurred while creating the post: {str(e)}")
         else:
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
     else:
         form = ForumPostForm()
-    
+
     return render(request, "masteryhub/create_forum_post.html", {"form": form})
 
 
@@ -461,35 +473,37 @@ def reply_forum_post(request, post_id):
         if form.is_valid():
             try:
                 reply = form.save(commit=False)
-                
-                # Check if user has a profile, create one if not
+
                 try:
                     if not hasattr(request.user, 'profile'):
                         profile = Profile.objects.create(user=request.user)
-                        logger.info(f"Created new profile for user {request.user.username}")
+                        logger.info(
+                            f"Created new profile for user {request.user.username}")
                     else:
                         profile = request.user.profile
-                    
+
                     reply.author = profile
                 except Exception as profile_error:
-                    logger.error(f"Error with profile for user {request.user.username}: {str(profile_error)}")
+                    logger.error(
+                        f"Error with profile for user {request.user.username}: {str(profile_error)}")
                     # If we can't get or create a profile, set author to None
                     reply.author = None
-                
+
                 reply.parent_post = parent_post
                 reply.save()
                 messages.success(request, "Reply posted successfully.")
                 return redirect("masteryhub:view_forum_post", post_id=parent_post.id)
             except Exception as e:
                 logger.error(f"Error posting reply: {str(e)}")
-                messages.error(request, f"An error occurred while posting the reply: {str(e)}")
+                messages.error(
+                    request, f"An error occurred while posting the reply: {str(e)}")
         else:
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
     else:
         form = ForumPostForm()
-    
+
     return render(request, "masteryhub/reply_forum_post.html", {
         "form": form,
         "parent_post": parent_post
@@ -499,28 +513,29 @@ def reply_forum_post(request, post_id):
 @login_required
 def edit_forum_post(request, post_id):
     """A view that handles editing a forum post with error handling."""
-    # Get the post first
+
     post = get_object_or_404(Forum, id=post_id)
-    
-    # Get the user's profile or create one if it doesn't exist
+
     try:
         if not hasattr(request.user, 'profile'):
             profile = Profile.objects.create(user=request.user)
-            logger.info(f"Created new profile for user {request.user.username}")
+            logger.info(
+                f"Created new profile for user {request.user.username}")
         else:
             profile = request.user.profile
-        
-        # Check if the user is the author or an admin
+
         if post.author != profile and not request.user.is_staff:
             messages.error(request, "You can only edit your own posts.")
             return redirect("masteryhub:forum_list")
     except Exception as e:
-        logger.error(f"Error with profile for user {request.user.username}: {str(e)}")
-        # If admin, allow edit even without a profile
+        logger.error(
+            f"Error with profile for user {request.user.username}: {str(e)}")
+
         if not request.user.is_staff:
-            messages.error(request, "An error occurred while verifying your permissions.")
+            messages.error(
+                request, "An error occurred while verifying your permissions.")
             return redirect("masteryhub:forum_list")
-    
+
     if request.method == "POST":
         form = ForumPostForm(request.POST, instance=post)
         if form.is_valid():
@@ -530,51 +545,54 @@ def edit_forum_post(request, post_id):
                 return redirect("masteryhub:view_forum_post", post_id=post.id)
             except Exception as e:
                 logger.error(f"Error updating post: {str(e)}")
-                messages.error(request, f"An error occurred while updating the post: {str(e)}")
+                messages.error(
+                    request, f"An error occurred while updating the post: {str(e)}")
         else:
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
     else:
         form = ForumPostForm(instance=post)
-    
+
     return render(request, "masteryhub/edit_forum_post.html", {"form": form, "post": post})
 
 
 @login_required
 def delete_forum_post(request, post_id):
     """A view that handles deleting a forum post with error handling."""
-    # Get the post first
+
     post = get_object_or_404(Forum, id=post_id)
-    
-    # Get the user's profile or create one if it doesn't exist
+
     try:
         if not hasattr(request.user, 'profile'):
             profile = Profile.objects.create(user=request.user)
-            logger.info(f"Created new profile for user {request.user.username}")
+            logger.info(
+                f"Created new profile for user {request.user.username}")
         else:
             profile = request.user.profile
-        
-        # Check if the user is the author or an admin
+
         if post.author != profile and not request.user.is_staff:
             messages.error(request, "You can only delete your own posts.")
             return redirect("masteryhub:forum_list")
     except Exception as e:
-        logger.error(f"Error with profile for user {request.user.username}: {str(e)}")
-        # If admin, allow delete even without a profile
+        logger.error(
+            f"Error with profile for user {request.user.username}: {str(e)}")
         if not request.user.is_staff:
-            messages.error(request, "An error occurred while verifying your permissions.")
+            messages.error(
+                request, "An error occurred while verifying your permissions.")
             return redirect("masteryhub:forum_list")
-    
+
     if request.method == "POST":
         try:
             post_title = post.title
             post.delete()
-            messages.success(request, f"Forum post '{post_title}' deleted successfully.")
+            messages.success(
+                request, f"Forum post '{post_title}' deleted successfully.")
             return redirect("masteryhub:forum_list")
         except Exception as e:
             logger.error(f"Error deleting post: {str(e)}")
-            messages.error(request, f"An error occurred while deleting the post: {str(e)}")
+            messages.error(
+                request, f"An error occurred while deleting the post: {str(e)}")
 
     return render(request, "masteryhub/delete_forum_post.html", {"post": post})
 

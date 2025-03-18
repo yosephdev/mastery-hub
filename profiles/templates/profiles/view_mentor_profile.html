@@ -46,7 +46,7 @@
             {% if is_own_profile %}
             <a href="{% url 'profiles:edit_profile' %}" class="btn btn-warning">Edit Profile</a>
             {% else %}
-            <a href="{% url 'masteryhub:request_mentorship' mentor_id=profile.id %}" class="btn btn-success">Request Mentorship</a>
+            <a href="{% url 'masteryhub:request_mentorship_profile' profile_id=profile.id %}" class="btn btn-success">Request Mentorship</a>
             {% endif %}
         </div>
     </div>
