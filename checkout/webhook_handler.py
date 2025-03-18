@@ -103,7 +103,7 @@ class StripeWH_Handler:
                     street_address1__iexact=billing_details.address.line1,
                     street_address2__iexact=billing_details.address.line2,
                     county__iexact=billing_details.address.state,
-                    grand_total=grand_total,
+                    order_total=grand_total,
                     stripe_pid=pid,
                 )
                 order_exists = True
@@ -134,7 +134,8 @@ class StripeWH_Handler:
                 street_address2=billing_details.address.line2,
                 county=billing_details.address.state,
                 stripe_pid=pid,
-                grand_total=grand_total,
+                order_total=grand_total,
+                delivery_cost=0,
             )
             if session_id:
                 try:
