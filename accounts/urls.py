@@ -11,15 +11,17 @@ from .views import (
     CustomPasswordResetCompleteView,
     CustomSocialLoginCancelledView,
     CustomSocialLoginErrorView,
-    CustomGoogleCallbackView
+    CustomGoogleCallbackView,
+    CustomLoginView,
+    CustomLogoutView
 )
 
 app_name = 'accounts'
 
 urlpatterns = [
-    path("signup/", views.signup_view, name="signup"),
-    path("login/", views.CustomLoginView.as_view(), name="login"),
-    path("logout/", views.CustomLogoutView.as_view(), name="logout"),
+    path('signup/', views.signup_view, name='signup'),
+    path('login/', CustomLoginView.as_view(), name='login'),
+    path('logout/', CustomLogoutView.as_view(), name='logout'),
     path("admin/dashboard/", admin_views.admin_dashboard, name="admin_dashboard"),
     path('password/change/',
          auth_views.PasswordChangeView.as_view(
@@ -43,7 +45,7 @@ urlpatterns = [
          name='password_reset_complete'),
     path('confirm-email/<str:key>/',
          CustomConfirmEmailView.as_view(),
-         name='account_confirm_email'),
+         name='confirm_email'),
     path('confirm-email/',
          EmailVerificationSentView.as_view(
              template_name='account/verification_sent.html'),
@@ -55,4 +57,5 @@ urlpatterns = [
     path('social/login/error/',
          CustomSocialLoginErrorView.as_view(),
          name='socialaccount_login_error'),
+    path('google/callback/', CustomGoogleCallbackView.as_view(), name='google_callback'),
 ]
