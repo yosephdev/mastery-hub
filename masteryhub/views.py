@@ -99,27 +99,20 @@ def search_mentors(request):
     selected_rating = request.GET.get('rating', '')
     available_now = request.GET.get('available_now') == 'true'
 
+    # Get all mentors with their related user and profile data
     mentors = Mentor.objects.select_related(
-        'user').prefetch_related('skills').all()
-
-    print("All mentors before filtering:")
-    for mentor in mentors:
-        print(
-            f"- {mentor.user.first_name} {mentor.user.last_name} ({mentor.user.username})")
+        'user',
+        'user__profile'
+    ).prefetch_related('skills').all()
 
     if query:
-        print(f"\nSearching for: {query}")
         mentors = mentors.filter(
-            Q(user__first_name__icontains=query.split()[0]) |
-            Q(user__last_name__icontains=query.split()[-1]) |
+            Q(user__first_name__icontains=query) |
+            Q(user__last_name__icontains=query) |
             Q(user__username__icontains=query) |
             Q(bio__icontains=query) |
             Q(skills__title__icontains=query)
         ).distinct()
-
-        print("\nFiltered mentors:")
-        for mentor in mentors:
-            print(f"- {mentor.user.first_name} {mentor.user.last_name}")
 
     if selected_skills:
         mentors = mentors.filter(skills__id__in=selected_skills).distinct()
@@ -131,9 +124,6 @@ def search_mentors(request):
         mentors = mentors.filter(is_available=True)
 
     skills = Skill.objects.all().order_by('title')
-
-    print(f"\nFinal SQL Query: {mentors.query}")
-    print(f"Final Results count: {mentors.count()}")
 
     context = {
         'mentors': mentors,
