@@ -187,10 +187,13 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': [
             'profile',
             'email',
+            'openid',
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
             'prompt': 'consent',
+            'hd': None,
+            'include_granted_scopes': 'true'
         }
     }
 }
@@ -239,8 +242,8 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = "SAMEORIGIN"
-    SECURE_HSTS_SECONDS = 31536000
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

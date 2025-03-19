@@ -256,15 +256,6 @@ class CustomGoogleCallbackView(View):
             adapter = self.adapter_class(request)
             provider = adapter.get_provider()
             app = provider.app
-            client = OAuth2Client(
-                request,
-                app.client_id,
-                app.secret,
-                adapter.access_token_method,
-                adapter.access_token_url,
-                provider.get_callback_url(),
-                provider.get_scope()
-            )
             
             # Get the authorization code from the request
             code = request.GET.get('code')
@@ -272,8 +263,14 @@ class CustomGoogleCallbackView(View):
                 messages.error(request, 'No authorization code received from Google.')
                 return redirect('accounts:login')
             
+            # Get the state parameter to prevent CSRF
+            state = request.GET.get('state')
+            if not state or state != request.session.get('oauth2_state'):
+                messages.error(request, 'Invalid OAuth2 state. Please try again.')
+                return redirect('accounts:login')
+            
             # Get the access token
-            token = client.get_access_token(code)
+            token = adapter.get_access_token(request, code)
             if not token:
                 messages.error(request, 'Failed to get access token from Google.')
                 return redirect('accounts:login')
