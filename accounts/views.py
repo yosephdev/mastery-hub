@@ -259,7 +259,7 @@ class CustomGoogleCallbackView(View):
                 app.secret,
                 adapter.access_token_method,
                 adapter.access_token_url,
-                adapter.callback_url,
+                provider.get_callback_url(request),
                 adapter.scope
             )
             

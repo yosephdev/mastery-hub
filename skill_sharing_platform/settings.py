@@ -180,8 +180,8 @@ SOCIALACCOUNT_STORE_TOKENS = True
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': '817596482164-psq488e1hl9ok8h1qe8soui3rq0uu7mf.apps.googleusercontent.com',
-            'secret': 'GOCSPX-2QZqXqXqXqXqXqXqXqXqXqXqXqXqXqX',
+            'client_id': os.environ.get('SOCIALACCOUNT_GOOGLE_CLIENT_ID'),
+            'secret': os.environ.get('SOCIALACCOUNT_GOOGLE_SECRET'),
             'key': ''
         },
         'SCOPE': [
@@ -197,11 +197,6 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # Site ID for django.contrib.sites
 SITE_ID = 1
-
-# Ensure these settings are not duplicated
-SOCIALACCOUNT_EMAIL_REQUIRED = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-SOCIALACCOUNT_LOGIN_ON_GET = True
 
 # Additional social account settings
 SOCIALACCOUNT_ACCOUNT_EMAIL_REQUIRED = False
