@@ -192,7 +192,6 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {
             'access_type': 'online',
             'prompt': 'consent',
-            'hd': None,
             'include_granted_scopes': 'true'
         }
     }
