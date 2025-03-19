@@ -8,7 +8,7 @@
 
 {% block form_title %}
     <h2 class="h3 mb-3">{% trans "Sign In" %}</h2>
-    <p class="text-muted">{% trans "New to MasteryHub?" %} <a href="{{ signup_url }}" class="text-decoration-none">{% trans "Sign Up" %}</a></p>
+    <p class="text-muted">{% trans "New to MasteryHub?" %} <a href="{% url 'accounts:signup' %}" class="text-decoration-none">{% trans "Sign Up" %}</a></p>
 {% endblock %}
 
 {% block inner_content %}
