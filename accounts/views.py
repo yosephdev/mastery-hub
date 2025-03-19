@@ -263,7 +263,7 @@ class CustomGoogleCallbackView(View):
                 adapter.access_token_method,
                 adapter.access_token_url,
                 provider.get_callback_url(),
-                adapter.scope
+                provider.get_scope()
             )
             
             # Get the authorization code from the request
