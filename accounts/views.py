@@ -251,15 +251,10 @@ class CustomGoogleCallbackView(OAuth2CallbackView):
     """Custom callback view for Google OAuth2."""
     adapter_class = GoogleOAuth2Adapter
 
-    def dispatch(self, request, *args, **kwargs):
-        request.session['is_social_login'] = True
-        request.session['sociallogin_provider'] = 'google'
-
-        logger.info("Google OAuth callback received")
-
+    def get(self, request, *args, **kwargs):
         try:
-            response = super().dispatch(request, *args, **kwargs)
-
+            response = super().get(request, *args, **kwargs)
+            
             if request.user.is_authenticated:
                 try:
                     email_address, created = EmailAddress.objects.get_or_create(
