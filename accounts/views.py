@@ -21,7 +21,7 @@ from django.views.decorators.csrf import csrf_exempt
 from accounts.forms import CustomSetPasswordForm
 import logging
 from allauth.socialaccount.views import LoginCancelledView
-from allauth.socialaccount.models import SocialLogin
+from allauth.socialaccount.models import SocialLogin, SocialAccount
 from django.views.generic import RedirectView, View
 from allauth.socialaccount.providers.oauth2.views import OAuth2CallbackView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -31,6 +31,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
 from .forms import (
     CustomSignupForm,
@@ -247,66 +248,58 @@ class CustomSocialLoginErrorView(RedirectView):
 
 
 class CustomGoogleCallbackView(View):
-    """Custom callback view for Google OAuth2."""
-    adapter_class = GoogleOAuth2Adapter
-
-    def dispatch(self, request, *args, **kwargs):
-        request.session['is_social_login'] = True
-        request.session['sociallogin_provider'] = 'google'
-
-        logger.info("Google OAuth callback received")
-
+    def get(self, request, *args, **kwargs):
         try:
-            oauth2_view = OAuth2CallbackView()
-            oauth2_view.adapter_class = self.adapter_class
-
-            response = oauth2_view.dispatch(request, *args, **kwargs)
-
-            if request.user.is_authenticated:
-                try:
-                    email_address, created = EmailAddress.objects.get_or_create(
-                        user=request.user,
-                        email=request.user.email,
-                        defaults={'verified': True, 'primary': True}
-                    )
-
-                    if not email_address.verified:
-                        email_address.verified = True
-                        email_address.save()
-                except Exception as e:
-                    logger.error(f"Error verifying email: {str(e)}")
-
-                messages.success(
-                    request,
-                    f"Welcome, {request.user.username or request.user.email}! You've successfully signed in with Google."
-                )
-
-                return redirect('home:index')
-
-            logger.error("User not authenticated after OAuth2 callback")
-            messages.error(
+            adapter = GoogleOAuth2Adapter(request)
+            provider = adapter.get_provider()
+            app = provider.app
+            client = OAuth2Client(
                 request,
-                "There was an error with your Google login. Please try again or use your MasteryHub account."
+                app.client_id,
+                app.secret,
+                adapter.access_token_method,
+                adapter.access_token_url,
+                adapter.callback_url,
+                adapter.scope
             )
-            return redirect("accounts:login")
-
+            
+            # Get the authorization code from the request
+            code = request.GET.get('code')
+            if not code:
+                messages.error(request, 'No authorization code received from Google.')
+                return redirect('accounts:login')
+            
+            # Get the access token
+            token = client.get_access_token(code)
+            if not token:
+                messages.error(request, 'Failed to get access token from Google.')
+                return redirect('accounts:login')
+            
+            # Get user info
+            user_info = adapter.get_user_info(request, token)
+            if not user_info:
+                messages.error(request, 'Failed to get user info from Google.')
+                return redirect('accounts:login')
+            
+            # Get or create social account
+            social_account, created = SocialAccount.objects.get_or_create(
+                provider='google',
+                uid=user_info['id'],
+                defaults={
+                    'user': request.user if request.user.is_authenticated else None,
+                    'extra_data': user_info
+                }
+            )
+            
+            if not social_account.user:
+                messages.error(request, 'Please sign in first before connecting your Google account.')
+                return redirect('accounts:login')
+            
+            # Log the user in
+            login(request, social_account.user)
+            messages.success(request, 'Successfully connected your Google account!')
+            return redirect('home:index')
+            
         except Exception as e:
-            logger.error(f"Google OAuth callback error: {str(e)}")
-
-            error_message = "There was an error with your Google login. "
-            if "access_denied" in str(e).lower():
-                error_message += "Access was denied. Please try again."
-            elif "invalid_request" in str(e).lower():
-                error_message += "Invalid request. Please try again."
-            elif "invalid_client" in str(e).lower():
-                error_message += "Invalid client configuration. Please contact support."
-            elif "invalid_grant" in str(e).lower():
-                error_message += "Invalid grant. Please try logging in again."
-            elif "invalid_scope" in str(e).lower():
-                error_message += "Invalid scope. Please contact support."
-            else:
-                error_message += "Please try again or use your MasteryHub account."
-
-            messages.error(request, error_message)
-
-            return redirect("accounts:login")
+            messages.error(request, f'An error occurred during Google authentication: {str(e)}')
+            return redirect('accounts:login')

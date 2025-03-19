@@ -169,8 +169,8 @@ ACCOUNT_RATE_LIMITS = {
 
 # Social Auth Settings
 SOCIALACCOUNT_AUTO_SIGNUP = True
-SOCIALACCOUNT_EMAIL_REQUIRED = False
-SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 SOCIALACCOUNT_QUERY_EMAIL = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 SOCIALACCOUNT_ADAPTER = "accounts.adapters.CustomSocialAccountAdapter"
@@ -180,8 +180,8 @@ SOCIALACCOUNT_STORE_TOKENS = True
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': os.environ.get('SOCIALACCOUNT_GOOGLE_CLIENT_ID'),
-            'secret': os.environ.get('SOCIALACCOUNT_GOOGLE_SECRET'),
+            'client_id': '817596482164-psq488e1hl9ok8h1qe8soui3rq0uu7mf.apps.googleusercontent.com',
+            'secret': 'GOCSPX-2QZqXqXqXqXqXqXqXqXqXqXqXqXqXqX',
             'key': ''
         },
         'SCOPE': [
@@ -190,7 +190,8 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
-        },
+            'prompt': 'consent',
+        }
     }
 }
 
@@ -198,17 +199,15 @@ SOCIALACCOUNT_PROVIDERS = {
 SITE_ID = 1
 
 # Ensure these settings are not duplicated
-SOCIALACCOUNT_EMAIL_REQUIRED = False
-SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
 # Additional social account settings
 SOCIALACCOUNT_ACCOUNT_EMAIL_REQUIRED = False
 SOCIALACCOUNT_ACCOUNT_UNIQUE_EMAIL = True
 SOCIALACCOUNT_ACCOUNT_USERNAME_REQUIRED = False
 SOCIALACCOUNT_ACCOUNT_EMAIL_VERIFICATION = "none"
-SOCIALACCOUNT_ACCOUNT_LOGIN_ON_GET = True
-SOCIALACCOUNT_ACCOUNT_LOGOUT_ON_GET = True
-SOCIALACCOUNT_ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 SOCIALACCOUNT_ACCOUNT_LOGIN_ON_PASSWORD_RESET = True
 
 # Files Storage Settings
