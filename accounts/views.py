@@ -252,8 +252,24 @@ class CustomGoogleCallbackView(OAuth2CallbackView):
     adapter_class = GoogleOAuth2Adapter
 
     def get(self, request, *args, **kwargs):
-        try:
-            return super().get(request, *args, **kwargs)
+        try:            
+            code = request.GET.get('code')
+            if not code:
+                messages.error(request, 'No authorization code received from Google.')
+                return redirect('accounts:login')            
+            
+            state = request.GET.get('state')
+            if not state:
+                messages.error(request, 'No state parameter received from Google.')
+                return redirect('accounts:login')            
+            
+            response = super().get(request, *args, **kwargs)            
+            
+            if isinstance(response, HttpResponseRedirect):
+                messages.success(request, 'Successfully connected your Google account!')
+            
+            return response
+            
         except Exception as e:
             logger.error(f"Google OAuth callback error: {str(e)}")
             messages.error(request, f'An error occurred during Google authentication: {str(e)}')
