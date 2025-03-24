@@ -265,8 +265,8 @@ class CustomGoogleCallbackView(View):
             
             # Get the state parameter to prevent CSRF
             state = request.GET.get('state')
-            if not state or state != request.session.get('oauth2_state'):
-                messages.error(request, 'Invalid OAuth2 state. Please try again.')
+            if not state:
+                messages.error(request, 'No state parameter received from Google.')
                 return redirect('accounts:login')
             
             # Get the access token
