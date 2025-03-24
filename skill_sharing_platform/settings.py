@@ -3,7 +3,6 @@ import sys
 from pathlib import Path
 from dotenv import load_dotenv
 from urllib.parse import urlparse
-from django.db import connections
 
 load_dotenv()
 
@@ -18,13 +17,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Host Settings
 ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
-    (
-        "localhost,"
-        "127.0.0.1,"
-        "127.0.0.1:3000,"
-        "8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net,"
-        ".herokuapp.com"
-    ),
+    "localhost,127.0.0.1,127.0.0.1:3000,8000-yosephdev-masteryhub-xw239vmyc5m.ws.codeinstitute-ide.net,.herokuapp.com"
 ).split(",")
 
 CSRF_TRUSTED_ORIGINS = [
@@ -34,7 +27,6 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Application Definition
 INSTALLED_APPS = [
-    # Django Core
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -43,7 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
 
-    # Third Party
+    # Third-party
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -60,8 +52,8 @@ INSTALLED_APPS = [
     "widget_tweaks",
 
     # Local
-    "profiles.apps.ProfilesConfig",
-    "masteryhub.apps.MasteryhubConfig",
+    "profiles",
+    "masteryhub",
     "home",
     "checkout",
     "accounts",
@@ -99,7 +91,6 @@ DATABASES = {
         },
     }
 }
-
 
 # Handle test database settings
 if "test" in sys.argv:
@@ -140,41 +131,7 @@ LOGOUT_URL = 'accounts:logout'
 ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_USERNAME_MIN_LENGTH = 4
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
-ACCOUNT_FORMS = {
-    "signup": "accounts.forms.CustomSignupForm",
-    "login": "accounts.forms.CustomLoginForm",
-    "reset_password": "accounts.forms.CustomResetPasswordForm"
-}
-ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = 'home:index'
-ACCOUNT_ADAPTER = "accounts.adapters.CustomAccountAdapter"
-
-# Security and Session Settings
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
-ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
-ACCOUNT_LOGIN_ON_PASSWORD_RESET = False
-ACCOUNT_SESSION_REMEMBER = True
-ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
-
-# Rate Limiting Settings
-ACCOUNT_RATE_LIMITS = {
-    "login": "5/h",
-    "signup": "2/h",
-    "password_reset": "2/h",
-}
-
-# Social Auth Settings
-SOCIALACCOUNT_AUTO_SIGNUP = True
-SOCIALACCOUNT_EMAIL_REQUIRED = True
-SOCIALACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-SOCIALACCOUNT_QUERY_EMAIL = True
-SOCIALACCOUNT_LOGIN_ON_GET = True
-SOCIALACCOUNT_ADAPTER = "accounts.adapters.CustomSocialAccountAdapter"
-SOCIALACCOUNT_STORE_TOKENS = True
 
 # Google OAuth2 Settings
 SOCIALACCOUNT_PROVIDERS = {
@@ -193,12 +150,37 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online',
             'prompt': 'consent',
             'include_granted_scopes': 'true'
-        }
+        },
+        'OAUTH_PKCE_ENABLED': True,  # Ensures better security
+        # Prevents CSRF errors
+        'STATE': os.environ.get('SOCIALACCOUNT_STATE', 'randomstring'),
     }
 }
 
 # Site ID for django.contrib.sites
 SITE_ID = 1
+
+# Sender email settings
+DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', 'yosephbet@gmail.com')
+SERVER_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'yosephbet@gmail.com')
+
+# Email Subject Prefix
+EMAIL_SUBJECT_PREFIX = '[MasteryHub] '
+
+# Celery Configuration
+CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'memory://')
+CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'memory://')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_ALWAYS_EAGER = True
+
+# Stripe Configuration
+STRIPE_CURRENCY = 'usd'
+STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
+STRIPE_WH_SECRET = os.environ.get('STRIPE_WH_SECRET')
 
 # Files Storage Settings
 STATIC_URL = "/static/"
@@ -242,37 +224,14 @@ if not DEBUG:
 
 # Email Configuration
 if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.gmail.com'
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASS')
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
-    # Use console backend in production for now to avoid SMTP issues
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# Sender email settings
-DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', 'yosephbet@gmail.com')
-SERVER_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'yosephbet@gmail.com')
-
-# Email Subject Prefix
-EMAIL_SUBJECT_PREFIX = '[MasteryHub] '
-
-# Celery Configuration
-CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'memory://')
-CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'memory://')
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
-CELERY_TASK_ALWAYS_EAGER = True
-
-# Stripe Configuration
-STRIPE_CURRENCY = 'usd'
-STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
-STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
-STRIPE_WH_SECRET = os.environ.get('STRIPE_WH_SECRET')
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_USE_TLS = True
+    EMAIL_HOST = os.getenv("EMAIL_HOST")
+    EMAIL_PORT = 587
+    EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+    EMAIL_HOST_PASS = os.getenv("EMAIL_HOST_PASS")
 
 # Additional Settings
 LANGUAGE_CODE = "en-us"
