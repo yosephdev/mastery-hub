@@ -18,18 +18,11 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, include, re_path
-from accounts.views import CustomGoogleCallbackView
+from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # Our custom accounts URLs first to ensure our custom views are used
     path("accounts/", include("accounts.urls")),
-    # Custom Google callback
-    re_path(r'^accounts/google/login/callback/$', 
-            CustomGoogleCallbackView.as_view(), 
-            name='google_callback'),
-    # Default allauth URLs for any routes not covered by our custom views
     path("accounts/", include("allauth.urls")),
     path('checkout/', include('checkout.urls', namespace='checkout')),
     path('profiles/', include('profiles.urls', namespace='profiles')),
