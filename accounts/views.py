@@ -269,8 +269,19 @@ class CustomGoogleCallbackView(View):
                 messages.error(request, 'No state parameter received from Google.')
                 return redirect('accounts:login')
             
+            # Create OAuth2 client
+            client = OAuth2Client(
+                request,
+                app.client_id,
+                app.secret,
+                adapter.access_token_method,
+                adapter.access_token_url,
+                provider.get_callback_url(),
+                provider.get_scope()
+            )
+            
             # Get the access token
-            token = adapter.get_access_token(request, code)
+            token = client.get_access_token(code)
             if not token:
                 messages.error(request, 'Failed to get access token from Google.')
                 return redirect('accounts:login')
