@@ -247,70 +247,13 @@ class CustomSocialLoginErrorView(RedirectView):
         return super().get(request, *args, **kwargs)
 
 
-class CustomGoogleCallbackView(View):
+class CustomGoogleCallbackView(OAuth2CallbackView):
     """Custom callback view for Google OAuth2."""
     adapter_class = GoogleOAuth2Adapter
 
     def get(self, request, *args, **kwargs):
         try:
-            adapter = self.adapter_class(request)
-            provider = adapter.get_provider()
-            app = provider.app
-            
-            # Get the authorization code from the request
-            code = request.GET.get('code')
-            if not code:
-                messages.error(request, 'No authorization code received from Google.')
-                return redirect('accounts:login')
-            
-            # Get the state parameter to prevent CSRF
-            state = request.GET.get('state')
-            if not state:
-                messages.error(request, 'No state parameter received from Google.')
-                return redirect('accounts:login')
-            
-            # Create OAuth2 client
-            client = OAuth2Client(
-                request,
-                app.client_id,
-                app.secret,
-                adapter.access_token_method,
-                adapter.access_token_url,
-                provider.get_callback_url(),
-                provider.get_scope()
-            )
-            
-            # Get the access token
-            token = client.get_access_token(code)
-            if not token:
-                messages.error(request, 'Failed to get access token from Google.')
-                return redirect('accounts:login')
-            
-            # Get user info
-            user_info = adapter.get_user_info(request, token)
-            if not user_info:
-                messages.error(request, 'Failed to get user info from Google.')
-                return redirect('accounts:login')
-            
-            # Get or create social account
-            social_account, created = SocialAccount.objects.get_or_create(
-                provider='google',
-                uid=user_info['id'],
-                defaults={
-                    'user': request.user if request.user.is_authenticated else None,
-                    'extra_data': user_info
-                }
-            )
-            
-            if not social_account.user:
-                messages.error(request, 'Please sign in first before connecting your Google account.')
-                return redirect('accounts:login')
-            
-            # Log the user in
-            login(request, social_account.user)
-            messages.success(request, 'Successfully connected your Google account!')
-            return redirect('home:index')
-            
+            return super().get(request, *args, **kwargs)
         except Exception as e:
             logger.error(f"Google OAuth callback error: {str(e)}")
             messages.error(request, f'An error occurred during Google authentication: {str(e)}')
