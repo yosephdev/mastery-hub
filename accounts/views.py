@@ -23,7 +23,7 @@ import logging
 from allauth.socialaccount.views import LoginCancelledView
 from allauth.socialaccount.models import SocialLogin, SocialAccount
 from django.views.generic import RedirectView, View
-from allauth.socialaccount.providers.oauth2.views import OAuth2CallbackView
+from allauth.socialaccount.providers.oauth2.views import OAuth2CallbackView, OAuth2LoginView
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from profiles.models import Profile
 from django.contrib.auth import login
@@ -57,8 +57,10 @@ class CustomSignupView(SignupView):
                 messages.success(self.request, 'Account created successfully!')
             return response
         except Exception as e:
-            messages.error(self.request, f'An error occurred during signup: {str(e)}')
+            messages.error(
+                self.request, f'An error occurred during signup: {str(e)}')
             return self.form_invalid(form)
+
 
 signup_view = CustomSignupView.as_view()
 
@@ -247,30 +249,81 @@ class CustomSocialLoginErrorView(RedirectView):
         return super().get(request, *args, **kwargs)
 
 
-class CustomGoogleCallbackView(OAuth2CallbackView):
+@method_decorator(sensitive_post_parameters(), name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
+@method_decorator(never_cache, name='dispatch')
+class CustomGoogleLoginView(OAuth2LoginView):
+    """Custom login view for Google OAuth2."""
+    adapter_class = GoogleOAuth2Adapter
+
+
+@method_decorator(sensitive_post_parameters(), name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
+@method_decorator(never_cache, name='dispatch')
+class CustomGoogleCallbackView(View):
     """Custom callback view for Google OAuth2."""
     adapter_class = GoogleOAuth2Adapter
 
     def get(self, request, *args, **kwargs):
-        try:            
+        try:
+            adapter = self.adapter_class(request)
+            provider = adapter.get_provider()
+            app = provider.app
+
             code = request.GET.get('code')
             if not code:
-                messages.error(request, 'No authorization code received from Google.')
-                return redirect('accounts:login')            
-            
+                messages.error(
+                    request, 'No authorization code received from Google.')
+                return redirect('accounts:login')
+
             state = request.GET.get('state')
             if not state:
-                messages.error(request, 'No state parameter received from Google.')
-                return redirect('accounts:login')            
-            
-            response = super().get(request, *args, **kwargs)            
-            
-            if isinstance(response, HttpResponseRedirect):
-                messages.success(request, 'Successfully connected your Google account!')
-            
-            return response
-            
+                messages.error(
+                    request, 'No state parameter received from Google.')
+                return redirect('accounts:login')
+
+            client = OAuth2Client(
+                request,
+                app.client_id,
+                app.secret,
+                adapter.access_token_method,
+                adapter.access_token_url,
+                provider.get_callback_url(),
+                provider.get_scope()
+            )
+
+            token = client.get_access_token(code)
+            if not token:
+                messages.error(
+                    request, 'Failed to get access token from Google.')
+                return redirect('accounts:login')
+
+            user_info = adapter.get_user_info(request, token)
+            if not user_info:
+                messages.error(request, 'Failed to get user info from Google.')
+                return redirect('accounts:login')
+
+            social_account, created = SocialAccount.objects.get_or_create(
+                provider='google',
+                uid=user_info['id'],
+                defaults={
+                    'user': request.user if request.user.is_authenticated else None,
+                    'extra_data': user_info
+                }
+            )
+
+            if not social_account.user:
+                messages.error(
+                    request, 'Please sign in first before connecting your Google account.')
+                return redirect('accounts:login')
+
+            login(request, social_account.user)
+            messages.success(
+                request, 'Successfully connected your Google account!')
+            return redirect('home:index')
+
         except Exception as e:
             logger.error(f"Google OAuth callback error: {str(e)}")
-            messages.error(request, f'An error occurred during Google authentication: {str(e)}')
+            messages.error(
+                request, f'An error occurred during Google authentication: {str(e)}')
             return redirect('accounts:login')
