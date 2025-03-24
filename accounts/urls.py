@@ -1,4 +1,4 @@
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from . import views
 from . import admin_views
 from django.contrib.auth import views as auth_views
@@ -11,7 +11,6 @@ from .views import (
     CustomPasswordResetCompleteView,
     CustomSocialLoginCancelledView,
     CustomSocialLoginErrorView,
-    CustomGoogleCallbackView,
     CustomLoginView,
     CustomLogoutView
 )
@@ -21,7 +20,7 @@ app_name = 'accounts'
 urlpatterns = [
     path('signup/', views.signup_view, name='signup'),
     path('login/', CustomLoginView.as_view(), name='login'),
-    path('logout/', CustomLogoutView.as_view(), name='logout'),
+    path('logout/', CustomLogoutView.as_view(), name="logout"),
     path("admin/dashboard/", admin_views.admin_dashboard, name="admin_dashboard"),
     path('password/change/',
          auth_views.PasswordChangeView.as_view(
@@ -50,12 +49,11 @@ urlpatterns = [
          EmailVerificationSentView.as_view(
              template_name='account/verification_sent.html'),
          name='account_email_verification_sent'),
-    # Social login URLs
     path('social/login/cancelled/',
          CustomSocialLoginCancelledView.as_view(),
          name='socialaccount_login_cancelled'),
     path('social/login/error/',
          CustomSocialLoginErrorView.as_view(),
          name='socialaccount_login_error'),
-    path('google/login/callback/', CustomGoogleCallbackView.as_view(), name='google_callback'),
+    path('social/', include('allauth.socialaccount.urls')),
 ]
