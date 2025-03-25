@@ -31,6 +31,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from django.conf import settings
 
 from .forms import (
     CustomSignupForm,
@@ -56,9 +58,9 @@ class CustomSignupView(SignupView):
                 messages.success(self.request, 'Account created successfully!')
             return response
         except Exception as e:
-            messages.error(
+                messages.error(
                 self.request, f'An error occurred during signup: {str(e)}')
-            return self.form_invalid(form)
+        return self.form_invalid(form)
 
 
 signup_view = CustomSignupView.as_view()
@@ -84,7 +86,7 @@ class CustomConfirmEmailView(ConfirmEmailView):
                     request, "The confirmation link has expired. Please request a new one.")
                 return redirect("accounts:login")
             return super().dispatch(request, *args, **kwargs)
-        except Http404:
+        except (Exception, Http404) as e:
             messages.error(
                 request, "Invalid confirmation link. Please request a new one.")
             return redirect("accounts:login")
@@ -94,13 +96,13 @@ class CustomConfirmEmailView(ConfirmEmailView):
             email_confirmation = self.get_object()
             email_confirmation.confirm(request)
             messages.success(
-                request, "Your email has been confirmed successfully! You can now fully access all features of MasteryHub.")
+                    request, "Your email has been confirmed successfully! You can now fully access all features of MasteryHub.")
             return redirect("accounts:login")
         except Exception as e:
             logger.error(f"Email confirmation error: {str(e)}")
             messages.error(
                 request, "There was an error confirming your email. Please try again or contact support.")
-            return redirect("accounts:login")
+        return redirect("accounts:login")
 
 
 def send_confirmation_email(user, request):
@@ -246,3 +248,19 @@ class CustomSocialLoginErrorView(RedirectView):
             "There was an error with your social login. Please try again or use your MasteryHub account."
         )
         return super().get(request, *args, **kwargs)
+
+
+class CustomGoogleCallbackView(OAuth2CallbackView):
+    adapter_class = GoogleOAuth2Adapter
+    client_class = OAuth2Client
+
+    def get_client(self, request, app):
+        client = super().get_client(request, app)
+        client.scope = 'openid email profile'
+        return client
+
+    def get(self, request, *args, **kwargs):
+        try:
+            return super().get(request, *args, **kwargs)
+        except Exception as e:
+            return redirect('account_login')

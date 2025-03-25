@@ -16,7 +16,7 @@ from .forms import (
     ForumPostForm,
 )
 from .models import (
-    Feedback, Session, Category, Mentorship, Forum, Review, 
+    Feedback, Session, Category, Mentorship, Forum, Review,
     Skill, Mentor, MentorshipRequest, Activity
 )
 from profiles.models import Profile
@@ -141,7 +141,7 @@ def search_mentors(request):
 def request_mentorship(request, mentor_id=None, profile_id=None):
     """Handle mentorship request."""
     mentor_user = None
-    
+
     try:
         if profile_id:
             # Get profile and ensure it belongs to a mentor
@@ -157,40 +157,43 @@ def request_mentorship(request, mentor_id=None, profile_id=None):
                 }
             )
             mentor_user = profile.user
-            
+
             # Log the path taken to help with debugging
-            logger.info(f"Request mentorship via profile_id={profile_id}, found mentor {mentor.id}")
-            
+            logger.info(
+                f"Request mentorship via profile_id={profile_id}, found mentor {mentor.id}")
+
         elif mentor_id:
             # Get mentor directly by ID
             mentor = get_object_or_404(Mentor, id=mentor_id)
             mentor_user = mentor.user
-            
+
             # Log the path taken to help with debugging
-            logger.info(f"Request mentorship via mentor_id={mentor_id}, found user {mentor_user.username}")
-            
+            logger.info(
+                f"Request mentorship via mentor_id={mentor_id}, found user {mentor_user.username}")
+
         else:
             messages.error(
                 request, "No mentor or profile specified for mentorship request.")
             return redirect('masteryhub:mentor_matching')
-            
+
         # Check if the user is requesting mentorship from themselves
         if request.user == mentor_user:
-            messages.error(request, "You cannot request mentorship from yourself.")
+            messages.error(
+                request, "You cannot request mentorship from yourself.")
             return redirect('masteryhub:search_mentors')
-            
+
         # Check if a request already exists
         existing_request = MentorshipRequest.objects.filter(
             mentee=request.user,
             mentor=mentor_user,
             status='pending'
         ).exists()
-        
+
         if existing_request:
             messages.info(
                 request, "You already have a pending request with this mentor.")
             return redirect('profiles:view_mentor_profile', username=mentor_user.username)
-            
+
         if request.method == 'POST':
             with transaction.atomic():
                 message = request.POST.get('message', '').strip()
@@ -212,9 +215,10 @@ def request_mentorship(request, mentor_id=None, profile_id=None):
                     message=message,
                     status='pending'
                 )
-                
+
                 # Log the action
-                logger.info(f"Created mentorship request {mentorship_request.id} from {request.user.username} to {mentor_user.username}")
+                logger.info(
+                    f"Created mentorship request {mentorship_request.id} from {request.user.username} to {mentor_user.username}")
 
                 messages.success(
                     request,
@@ -227,7 +231,7 @@ def request_mentorship(request, mentor_id=None, profile_id=None):
             'mentor_profile': mentor
         }
         return render(request, 'masteryhub/request_mentorship.html', context)
-        
+
     except Exception as e:
         logger.error(f"Error in request_mentorship: {str(e)}")
         messages.error(
@@ -447,109 +451,89 @@ def forum_posts(request):
 @login_required
 def forum_list(request):
     """A view that handles the forum list."""
+    query = request.GET.get('q', '')
+    category_id = request.GET.get('category')
+
+    posts = Forum.objects.filter(parent_post=None).select_related(
+        'author', 'author__user', 'category'
+    ).order_by('-updated_at')
+
+    if query:
+        posts = posts.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query)
+        )
+
+    if category_id:
+        posts = posts.filter(category_id=category_id)
+
     categories = Category.objects.all()
-    posts = Forum.objects.filter(parent_post=None)
-    return render(request, "masteryhub/forum_list.html", {"categories": categories, "posts": posts})
+
+    context = {
+        'posts': posts,
+        'categories': categories,
+        'selected_category': category_id,
+        'query': query
+    }
+    return render(request, "masteryhub/forum_list.html", context)
 
 
 @login_required
 def create_forum_post(request):
-    """A view that handles creating a forum post with error handling."""
+    """A view that handles creating a forum post."""
     if request.method == "POST":
         form = ForumPostForm(request.POST)
         if form.is_valid():
             try:
                 post = form.save(commit=False)
-                
-                # Get or create user profile
-                profile, created = Profile.objects.get_or_create(
-                    user=request.user,
-                    defaults={
-                        'bio': '',
-                        'goals': '',
-                        'is_expert': False
-                    }
-                )
-                
-                if created:
-                    logger.info(f"Created new profile for user {request.user.username}")
-                
-                post.author = profile
+                post.author = request.user.profile
                 post.save()
-                
                 messages.success(request, "Forum post created successfully.")
-                return redirect("masteryhub:forum_list")
+                return redirect(post.get_absolute_url())
             except Exception as e:
-                logger.error(f"Error creating post: {str(e)}")
-                messages.error(request, f"An error occurred while creating the post: {str(e)}")
-                # Log additional details for debugging
-                logger.error(f"User: {request.user.username}, User ID: {request.user.id}")
-                logger.error(f"Profile exists: {hasattr(request.user, 'profile')}")
-                if hasattr(request.user, 'profile'):
-                    logger.error(f"Profile ID: {request.user.profile.id}")
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"{field}: {error}")
+                messages.error(request, f"Error creating post: {str(e)}")
     else:
         form = ForumPostForm()
 
-    # Get available categories
-    categories = Category.objects.all()
-    
-    context = {
-        "form": form,
-        "categories": categories
-    }
-    
-    return render(request, "masteryhub/create_forum_post.html", context)
+    return render(request, "masteryhub/create_forum_post.html", {"form": form})
 
 
 @login_required
 def view_forum_post(request, post_id):
     """A view that handles viewing a forum post."""
     post = get_object_or_404(Forum, id=post_id)
-    comments = post.comments.all()
-    return render(request, "masteryhub/view_forum_post.html", {"post": post, "comments": comments})
+    comments = post.comments.select_related(
+        'author', 'author__user'
+    ).order_by('created_at')
+    
+    can_edit = post.can_edit(request.user)
+    comment_permissions = {comment.id: comment.can_edit(request.user) for comment in comments}
+    
+    return render(request, "masteryhub/view_forum_post.html", {
+        "post": post,
+        "comments": comments,
+        "can_edit": can_edit,
+        "comment_permissions": comment_permissions
+    })
 
 
 @login_required
 def reply_forum_post(request, post_id):
-    """A view that handles replying to a forum post with error handling."""
+    """A view that handles replying to a forum post."""
     parent_post = get_object_or_404(Forum, id=post_id)
+
     if request.method == "POST":
         form = ForumPostForm(request.POST)
         if form.is_valid():
             try:
                 reply = form.save(commit=False)
-
-                try:
-                    if not hasattr(request.user, 'profile'):
-                        profile = Profile.objects.create(user=request.user)
-                        logger.info(
-                            f"Created new profile for user {request.user.username}")
-                    else:
-                        profile = request.user.profile
-
-                    reply.author = profile
-                except Exception as profile_error:
-                    logger.error(
-                        f"Error with profile for user {request.user.username}: {str(profile_error)}")
-                    # If we can't get or create a profile, set author to None
-                    reply.author = None
-
+                reply.author = request.user.profile
                 reply.parent_post = parent_post
                 reply.save()
                 messages.success(request, "Reply posted successfully.")
-                return redirect("masteryhub:view_forum_post", post_id=parent_post.id)
+                return redirect(parent_post.get_absolute_url())
             except Exception as e:
-                logger.error(f"Error posting reply: {str(e)}")
-                messages.error(
-                    request, f"An error occurred while posting the reply: {str(e)}")
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"{field}: {error}")
+                messages.error(request, f"Error posting reply: {str(e)}")
     else:
         form = ForumPostForm()
 
@@ -561,49 +545,31 @@ def reply_forum_post(request, post_id):
 
 @login_required
 def edit_forum_post(request, post_id):
-    """A view that handles editing a forum post with error handling."""
-
+    """A view that handles editing a forum post."""
     post = get_object_or_404(Forum, id=post_id)
 
-    try:
-        if not hasattr(request.user, 'profile'):
-            profile = Profile.objects.create(user=request.user)
-            logger.info(
-                f"Created new profile for user {request.user.username}")
-        else:
-            profile = request.user.profile
-
-        if post.author != profile and not request.user.is_staff:
-            messages.error(request, "You can only edit your own posts.")
-            return redirect("masteryhub:forum_list")
-    except Exception as e:
-        logger.error(
-            f"Error with profile for user {request.user.username}: {str(e)}")
-
-        if not request.user.is_staff:
-            messages.error(
-                request, "An error occurred while verifying your permissions.")
-            return redirect("masteryhub:forum_list")
+    if not post.can_edit(request.user):
+        messages.error(request, "You don't have permission to edit this post.")
+        return redirect(post.get_absolute_url())
 
     if request.method == "POST":
         form = ForumPostForm(request.POST, instance=post)
         if form.is_valid():
             try:
-                form.save()
-                messages.success(request, "Forum post updated successfully.")
-                return redirect("masteryhub:view_forum_post", post_id=post.id)
+                post = form.save()
+                post.is_edited = True
+                post.save()
+                messages.success(request, "Post updated successfully.")
+                return redirect(post.get_absolute_url())
             except Exception as e:
-                logger.error(f"Error updating post: {str(e)}")
-                messages.error(
-                    request, f"An error occurred while updating the post: {str(e)}")
-        else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f"{field}: {error}")
+                messages.error(request, f"Error updating post: {str(e)}")
     else:
         form = ForumPostForm(instance=post)
 
-    return render(request, "masteryhub/edit_forum_post.html", {"form": form, "post": post})
+    return render(request, "masteryhub/edit_forum_post.html", {
+        "form": form,
+        "post": post
+    })
 
 
 @login_required
@@ -806,27 +772,25 @@ def mentee_dashboard(request):
 
 @login_required
 def accept_mentorship(request, mentorship_id):
-    """A view that allows a mentor to accept a mentorship request."""
     try:
-        # Check if it's a mentorship request
-        mentorship_request = get_object_or_404(MentorshipRequest, id=mentorship_id)
-        
-        # Check authorization
+        mentorship_request = get_object_or_404(
+            MentorshipRequest, id=mentorship_id)
+
         if request.user != mentorship_request.mentor:
-            messages.error(request, "You are not authorized to accept this request.")
+            messages.error(
+                request, "You are not authorized to accept this request.")
             return redirect('masteryhub:my_mentorships')
-        
+
         with transaction.atomic():
-            # Get or create mentor profile
             mentor_profile = request.user.profile
-            
-            # Get or create mentee profile
+
             try:
-                mentee_profile = Profile.objects.get(user=mentorship_request.mentee)
+                mentee_profile = Profile.objects.get(
+                    user=mentorship_request.mentee)
             except Profile.DoesNotExist:
-                mentee_profile = Profile.objects.create(user=mentorship_request.mentee)
-                
-            # Create mentorship relationship
+                mentee_profile = Profile.objects.create(
+                    user=mentorship_request.mentee)
+
             mentorship, created = Mentorship.objects.get_or_create(
                 mentor=mentor_profile,
                 mentee=mentee_profile,
@@ -836,18 +800,16 @@ def accept_mentorship(request, mentorship_id):
                     'goals': mentorship_request.message,
                 }
             )
-            
+
             if not created:
                 mentorship.status = 'active'
                 mentorship.start_date = timezone.now().date()
                 mentorship.goals = mentorship_request.message
                 mentorship.save()
-            
-            # Update request status
+
             mentorship_request.status = 'accepted'
             mentorship_request.save()
-            
-            # Log activity
+
             try:
                 Activity.objects.create(
                     user=request.user,
@@ -856,13 +818,12 @@ def accept_mentorship(request, mentorship_id):
                 )
             except Exception as e:
                 logger.warning(f"Failed to create activity log: {str(e)}")
-            
-            messages.success(request, "Mentorship request accepted successfully.")
-            
+
+            messages.success(
+                request, "Mentorship request accepted successfully.")
             return redirect('masteryhub:my_mentorships')
-    
+
     except MentorshipRequest.DoesNotExist:
-        # If it's not a mentorship request, check if it's a mentorship record
         mentorship = get_object_or_404(Mentorship, id=mentorship_id)
 
         if request.user == mentorship.mentor.user:
@@ -871,10 +832,11 @@ def accept_mentorship(request, mentorship_id):
             mentorship.save()
             messages.success(request, "Mentorship accepted successfully.")
         else:
-            messages.error(request, "You are not authorized to accept this request.")
+            messages.error(
+                request, "You are not authorized to accept this request.")
 
         return redirect('masteryhub:my_mentorships')
-    
+
     except Exception as e:
         logger.error(f"Error accepting mentorship: {str(e)}")
         messages.error(request, f"An error occurred: {str(e)}")
@@ -883,26 +845,22 @@ def accept_mentorship(request, mentorship_id):
 
 @login_required
 def reject_mentorship(request, mentorship_id):
-    """A view that allows a mentor to reject a mentorship request."""
     try:
-        # Check if it's a mentorship request
-        mentorship_request = get_object_or_404(MentorshipRequest, id=mentorship_id)
-        
-        # Check authorization
+        mentorship_request = get_object_or_404(
+            MentorshipRequest, id=mentorship_id)
+
         if request.user != mentorship_request.mentor:
-            messages.error(request, "You are not authorized to reject this request.")
+            messages.error(
+                request, "You are not authorized to reject this request.")
             return redirect('masteryhub:my_mentorships')
-        
-        # Update request status
+
         mentorship_request.status = 'rejected'
         mentorship_request.save()
-        
+
         messages.success(request, "Mentorship request rejected successfully.")
-        
         return redirect('masteryhub:my_mentorships')
-    
+
     except MentorshipRequest.DoesNotExist:
-        # If it's not a mentorship request, check if it's a mentorship record
         mentorship = get_object_or_404(Mentorship, id=mentorship_id)
 
         if request.user == mentorship.mentor.user:
@@ -910,10 +868,11 @@ def reject_mentorship(request, mentorship_id):
             mentorship.save()
             messages.success(request, "Mentorship rejected successfully.")
         else:
-            messages.error(request, "You are not authorized to reject this request.")
+            messages.error(
+                request, "You are not authorized to reject this request.")
 
         return redirect('masteryhub:my_mentorships')
-    
+
     except Exception as e:
         logger.error(f"Error rejecting mentorship: {str(e)}")
         messages.error(request, f"An error occurred: {str(e)}")
@@ -1059,28 +1018,32 @@ def enroll_session(request, session_id):
 def cancel_mentorship_request(request, request_id):
     """A view that allows a mentee to cancel a pending mentorship request."""
     try:
-        mentorship_request = get_object_or_404(MentorshipRequest, id=request_id)
-        
+        mentorship_request = get_object_or_404(
+            MentorshipRequest, id=request_id)
+
         # Check authorization (only the mentee can cancel their request)
         if request.user != mentorship_request.mentee:
-            messages.error(request, "You are not authorized to cancel this request.")
+            messages.error(
+                request, "You are not authorized to cancel this request.")
             return redirect('masteryhub:my_mentorships')
-        
+
         # Only allow cancellation if the request is still pending
         if mentorship_request.status != 'pending':
-            messages.error(request, "This request cannot be cancelled as it's no longer pending.")
+            messages.error(
+                request, "This request cannot be cancelled as it's no longer pending.")
             return redirect('masteryhub:my_mentorships')
-        
+
         # Update request status
         mentorship_request.status = 'cancelled'
         mentorship_request.save()
-        
+
         # Log the action
-        logger.info(f"Mentorship request {request_id} cancelled by {request.user.username}")
-        
+        logger.info(
+            f"Mentorship request {request_id} cancelled by {request.user.username}")
+
         messages.success(request, "Mentorship request cancelled successfully.")
     except Exception as e:
         logger.error(f"Error cancelling mentorship request: {str(e)}")
         messages.error(request, f"An error occurred: {str(e)}")
-    
+
     return redirect('masteryhub:my_mentorships')
