@@ -180,16 +180,28 @@ class Forum(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     author = models.ForeignKey('profiles.Profile', on_delete=models.CASCADE)
-    category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='forum_posts')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    parent_post = models.ForeignKey(
-        "self", on_delete=models.CASCADE, null=True, blank=True, related_name="comments"
-    )
+    parent_post = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="comments")
+    is_edited = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('masteryhub:view_forum_post', kwargs={'post_id': self.id})
+
+    def get_reply_count(self):
+        return self.comments.count()
+
+    def get_last_activity(self):
+        if self.comments.exists():
+            return self.comments.order_by('-updated_at').first().updated_at
+        return self.updated_at
+
+    def can_edit(self, user):
+        return user.is_authenticated and (user.profile == self.author or user.is_staff)
 
 
 class Feedback(models.Model):
