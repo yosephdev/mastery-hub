@@ -1,32 +1,81 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load masteryhub_extras %}
 
 {% block content %}
-<div class="container pt-5">
+<div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
+            <div class="card shadow-sm mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">{{ post.title }}</h5>
-                    <p class="card-text">{{ post.content }}</p>
-                    <p class="card-text">Author: {{ post.author.user.username }}</p>
-                    <p class="card-text">Last activity: {{ post.updated_at }}</p>
-                    <a href="{% url 'masteryhub:reply_forum_post' post.id %}" class="btn btn-primary">Reply</a>
-                </div>
-            </div>
-            <div class="mt-4">
-                <h5>Replies</h5>
-                {% for comment in comments %}
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <p class="card-text">{{ comment.content }}</p>
-                        <p class="card-text">Author: {{ comment.author.user.username }}</p>
-                        <p class="card-text">Posted at: {{ comment.created_at }}</p>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h2 class="card-title mb-0">{{ post.title }}</h2>
+                        <div>
+                            {% if can_edit %}
+                            <a href="{% url 'masteryhub:edit_forum_post' post.id %}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'masteryhub:forum_list' %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="text-muted me-3">
+                            Posted by {{ post.author.user.username }}
+                        </span>
+                        <span class="text-muted me-3">
+                            in {{ post.category.name }}
+                        </span>
+                        <span class="text-muted">
+                            {{ post.created_at|timesince }} ago
+                        </span>
+                    </div>
+
+                    <div class="card-text mb-4">
+                        {{ post.content|linebreaks }}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="{% url 'masteryhub:reply_forum_post' post.id %}" class="btn btn-primary">
+                                <i class="fas fa-reply"></i> Reply
+                            </a>
+                        </div>
+                        <div class="text-muted">
+                            {{ post.get_reply_count }} replies
+                        </div>
                     </div>
                 </div>
-                {% endfor %}
             </div>
-            <a class="btn btn-outline-dark" href="{% url 'masteryhub:forum_list' %}">Back to Forum Home</a>
+
+            {% if comments %}
+            <h4 class="mb-3">Replies</h4>
+            {% for comment in comments %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <strong>{{ comment.author.user.username }}</strong>
+                            <span class="text-muted ms-2">
+                                {{ comment.created_at|timesince }} ago
+                            </span>
+                        </div>
+                        {% if comment_permissions|get_item:comment.id %}
+                        <a href="{% url 'masteryhub:edit_forum_post' comment.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="card-text">
+                        {{ comment.content|linebreaks }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>

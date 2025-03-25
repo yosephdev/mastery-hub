@@ -2,44 +2,81 @@
 {% load static %}
 
 {% block content %}
-<div class="container pt-5">
+<div class="container py-5">
     <div class="row">
         <div class="col-md-3">
-            <div class="list-group">
-                <a href="#" class="list-group-item list-group-item-action active">Forum Categories</a>
-                {% for category in categories %}
-                <a href="{% url 'masteryhub:forum_list' %}?category={{ category.id }}"
-                    class="list-group-item list-group-item-action">{{ category.name }}</a>
-                {% endfor %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Categories</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'masteryhub:forum_list' %}" 
+                       class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">
+                        All Posts
+                    </a>
+                    {% for category in categories %}
+                    <a href="{% url 'masteryhub:forum_list' %}?category={{ category.id }}"
+                       class="list-group-item list-group-item-action {% if selected_category == category.id %}active{% endif %}">
+                        {{ category.name }}
+                    </a>
+                    {% endfor %}
+                </div>
             </div>
         </div>
         <div class="col-md-9">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h1>Q&A and Discussion Forums</h1>
-                <a href="{% url 'masteryhub:create_forum_post' %}" class="btn btn-warning">New Post</a>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Forum Posts</h2>
+                <a href="{% url 'masteryhub:create_forum_post' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Post
+                </a>
             </div>
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Search for questions, answers, forums">
-                <div class="input-group-append">
-                    <button class="btn btn-black btn-block" type="button">Search</button>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <form method="get" class="d-flex">
+                        <input type="text" name="q" class="form-control me-2" 
+                               placeholder="Search posts..." value="{{ request.GET.q }}">
+                        <button type="submit" class="btn btn-outline-primary">Search</button>
+                    </form>
                 </div>
             </div>
-            <div class="row">
-                {% for post in posts %}
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ post.title }}</h5>
-                            <p class="card-text">{{ post.author.user.username }}</p>
-                            <p class="card-text">Replies: {{ post.comments.count }}</p>
-                            <p class="card-text">Last activity: {{ post.updated_at }}</p>
-                            <a href="{% url 'masteryhub:view_forum_post' post.id %}" class="btn btn-success">View
-                                Post</a>
+
+            {% for post in posts %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="card-title mb-1">
+                                <a href="{{ post.get_absolute_url }}" class="text-decoration-none">
+                                    {{ post.title }}
+                                </a>
+                            </h5>
+                            <p class="text-muted small mb-1">
+                                Posted by {{ post.author.user.username }} in {{ post.category.name }}
+                            </p>
+                            <p class="text-muted small mb-0">
+                                {{ post.get_reply_count }} replies • Last activity {{ post.get_last_activity|timesince }} ago
+                            </p>
+                        </div>
+                        <div class="text-end">
+                            <a href="{{ post.get_absolute_url }}" class="btn btn-sm btn-outline-primary">
+                                View Post
+                            </a>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
             </div>
+            {% empty %}
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <h5>No posts found</h5>
+                    <p class="text-muted">Be the first to start a discussion!</p>
+                    <a href="{% url 'masteryhub:create_forum_post' %}" class="btn btn-primary">
+                        Create New Post
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
