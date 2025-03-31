@@ -1,83 +1,151 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block content %}
 <div class="container py-5">
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Categories</h5>
-                </div>
-                <div class="list-group list-group-flush">
-                    <a href="{% url 'masteryhub:forum_list' %}" 
-                       class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">
-                        All Posts
-                    </a>
-                    {% for category in categories %}
-                    <a href="{% url 'masteryhub:forum_list' %}?category={{ category.id }}"
-                       class="list-group-item list-group-item-action {% if selected_category == category.id %}active{% endif %}">
-                        {{ category.name }}
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        <div class="col-md-9">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>Forum Posts</h2>
-                <a href="{% url 'masteryhub:create_forum_post' %}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> New Post
-                </a>
-            </div>
-            
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <form method="get" class="d-flex">
-                        <input type="text" name="q" class="form-control me-2" 
-                               placeholder="Search posts..." value="{{ request.GET.q }}">
-                        <button type="submit" class="btn btn-outline-primary">Search</button>
-                    </form>
-                </div>
-            </div>
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Forum</h1>
+        <a href="{% url 'masteryhub:create_forum_post' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>New Post
+        </a>
+    </div>
 
-            {% for post in posts %}
-            <div class="card shadow-sm mb-3">
+    <!-- Search and Filter Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control" placeholder="Search posts..." value="{{ request.GET.q }}">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if selected_category == category.id %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-2"></i>Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Posts List -->
+    <div class="row">
+        {% for post in posts %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h5 class="card-title mb-1">
-                                <a href="{{ post.get_absolute_url }}" class="text-decoration-none">
-                                    {{ post.title }}
-                                </a>
-                            </h5>
-                            <p class="text-muted small mb-1">
-                                Posted by {{ post.author.user.username }} in {{ post.category.name }}
-                            </p>
-                            <p class="text-muted small mb-0">
-                                {{ post.get_reply_count }} replies • Last activity {{ post.get_last_activity|timesince }} ago
-                            </p>
-                        </div>
-                        <div class="text-end">
-                            <a href="{{ post.get_absolute_url }}" class="btn btn-sm btn-outline-primary">
-                                View Post
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h2 class="h5 card-title mb-0">
+                            <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-dark">
+                                {{ post.title }}
                             </a>
+                        </h2>
+                        {% if post.author == request.user.profile %}
+                        <div class="dropdown">
+                            <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'masteryhub:edit_forum_post' post.id %}">
+                                        <i class="fas fa-edit me-2"></i>Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{% url 'masteryhub:delete_forum_post' post.id %}">
+                                        <i class="fas fa-trash me-2"></i>Delete
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="card-text text-muted small mb-3">
+                        Posted by {{ post.author.user.username }} in 
+                        <span class="badge bg-primary">{{ post.category.name }}</span>
+                    </p>
+                    
+                    <p class="card-text">{{ post.content|truncatewords:30 }}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="text-muted small">
+                            <i class="far fa-clock me-1"></i>
+                            {{ post.created_at|timesince }} ago
+                        </div>
+                        <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-comments me-1"></i>
+                            {{ post.replies.count }} Replies
+                        </a>
                     </div>
                 </div>
             </div>
-            {% empty %}
+        </div>
+        {% empty %}
+        <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-body text-center py-5">
-                    <h5>No posts found</h5>
-                    <p class="text-muted">Be the first to start a discussion!</p>
+                    <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                    <h3 class="h5 mb-2">No Posts Found</h3>
+                    <p class="text-muted mb-4">
+                        {% if request.GET.q or selected_category %}
+                        Try adjusting your search or filter criteria.
+                        {% else %}
+                        Be the first to start a discussion!
+                        {% endif %}
+                    </p>
                     <a href="{% url 'masteryhub:create_forum_post' %}" class="btn btn-primary">
-                        Create New Post
+                        <i class="fas fa-plus me-2"></i>Create New Post
                     </a>
                 </div>
             </div>
-            {% endfor %}
         </div>
+        {% endfor %}
     </div>
+
+    <!-- Pagination -->
+    {% if posts.has_other_pages %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if posts.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ posts.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in posts.paginator.page_range %}
+            <li class="page-item {% if posts.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                    {{ num }}
+                </a>
+            </li>
+            {% endfor %}
+
+            {% if posts.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ posts.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
 </div>
 {% endblock %}

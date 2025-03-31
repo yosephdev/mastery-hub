@@ -17,13 +17,14 @@ from .forms import (
 )
 from .models import (
     Feedback, Session, Category, Mentorship, Forum, Review,
-    Skill, Mentor, MentorshipRequest, Activity
+    Skill, Mentor, MentorshipRequest, Activity, Order
 )
 from profiles.models import Profile
 import stripe
 import logging
 from django.contrib.auth import get_user_model
 from datetime import datetime, timedelta
+from django.core.paginator import Paginator
 
 logger = logging.getLogger(__name__)
 
@@ -450,166 +451,133 @@ def forum_posts(request):
 
 @login_required
 def forum_list(request):
-    """A view that handles the forum list."""
-    query = request.GET.get('q', '')
-    category_id = request.GET.get('category')
-
-    posts = Forum.objects.filter(parent_post=None).select_related(
-        'author', 'author__user', 'category'
-    ).order_by('-updated_at')
-
-    if query:
+    """List all forum posts with search and category filtering."""
+    posts = Forum.objects.filter(parent_post=None).select_related('author__user', 'category')
+    
+    # Search functionality
+    q = request.GET.get('q')
+    if q:
         posts = posts.filter(
-            Q(title__icontains=query) |
-            Q(content__icontains=query)
+            Q(title__icontains=q) |
+            Q(content__icontains=q)
         )
-
+    
+    # Category filtering
+    category_id = request.GET.get('category')
     if category_id:
         posts = posts.filter(category_id=category_id)
-
+    
+    # Get all categories for the filter dropdown
     categories = Category.objects.all()
-
+    
+    # Order by most recent first
+    posts = posts.order_by('-created_at')
+    
+    # Pagination
+    paginator = Paginator(posts, 9)  # Show 9 posts per page
+    page = request.GET.get('page')
+    posts = paginator.get_page(page)
+    
     context = {
         'posts': posts,
         'categories': categories,
         'selected_category': category_id,
-        'query': query
+        'search_query': q,
     }
-    return render(request, "masteryhub/forum_list.html", context)
+    return render(request, 'masteryhub/forum_list.html', context)
 
 
 @login_required
 def create_forum_post(request):
-    """A view that handles creating a forum post."""
-    if request.method == "POST":
+    """Create a new forum post."""
+    if request.method == 'POST':
         form = ForumPostForm(request.POST)
         if form.is_valid():
-            try:
-                post = form.save(commit=False)
-                post.author = request.user.profile
-                post.save()
-                messages.success(request, "Forum post created successfully.")
-                return redirect(post.get_absolute_url())
-            except Exception as e:
-                messages.error(request, f"Error creating post: {str(e)}")
+            post = form.save(commit=False)
+            post.author = request.user.profile
+            post.save()
+            messages.success(request, 'Post created successfully!')
+            return redirect('masteryhub:view_forum_post', post_id=post.id)
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = ForumPostForm()
-
-    return render(request, "masteryhub/create_forum_post.html", {"form": form})
+    
+    return render(request, 'masteryhub/create_forum_post.html', {'form': form})
 
 
 @login_required
 def view_forum_post(request, post_id):
-    """A view that handles viewing a forum post."""
+    """View a forum post and its replies."""
     post = get_object_or_404(Forum, id=post_id)
-    comments = post.comments.select_related(
-        'author', 'author__user'
-    ).order_by('created_at')
     
-    can_edit = post.can_edit(request.user)
-    comment_permissions = {comment.id: comment.can_edit(request.user) for comment in comments}
+    # Get replies with author information
+    replies = Forum.objects.filter(parent_post=post).select_related('author__user', 'category')
     
-    return render(request, "masteryhub/view_forum_post.html", {
-        "post": post,
-        "comments": comments,
-        "can_edit": can_edit,
-        "comment_permissions": comment_permissions
-    })
-
-
-@login_required
-def reply_forum_post(request, post_id):
-    """A view that handles replying to a forum post."""
-    parent_post = get_object_or_404(Forum, id=post_id)
-
-    if request.method == "POST":
+    # Handle reply submission
+    if request.method == 'POST':
         form = ForumPostForm(request.POST)
         if form.is_valid():
-            try:
-                reply = form.save(commit=False)
-                reply.author = request.user.profile
-                reply.parent_post = parent_post
-                reply.save()
-                messages.success(request, "Reply posted successfully.")
-                return redirect(parent_post.get_absolute_url())
-            except Exception as e:
-                messages.error(request, f"Error posting reply: {str(e)}")
+            reply = form.save(commit=False)
+            reply.author = request.user.profile
+            reply.parent_post = post
+            reply.category = post.category  # Inherit category from parent post
+            reply.save()
+            messages.success(request, 'Reply posted successfully!')
+            return redirect(f"{post.get_absolute_url()}#comment-{reply.id}")
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = ForumPostForm()
-
-    return render(request, "masteryhub/reply_forum_post.html", {
-        "form": form,
-        "parent_post": parent_post
-    })
+    
+    context = {
+        'post': post,
+        'replies': replies,
+        'form': form,
+    }
+    return render(request, 'masteryhub/view_forum_post.html', context)
 
 
 @login_required
 def edit_forum_post(request, post_id):
-    """A view that handles editing a forum post."""
+    """Edit a forum post."""
     post = get_object_or_404(Forum, id=post_id)
-
+    
     if not post.can_edit(request.user):
-        messages.error(request, "You don't have permission to edit this post.")
-        return redirect(post.get_absolute_url())
-
-    if request.method == "POST":
+        messages.error(request, 'You do not have permission to edit this post.')
+        return redirect('masteryhub:forum_list')
+    
+    if request.method == 'POST':
         form = ForumPostForm(request.POST, instance=post)
         if form.is_valid():
-            try:
-                post = form.save()
-                post.is_edited = True
-                post.save()
-                messages.success(request, "Post updated successfully.")
-                return redirect(post.get_absolute_url())
-            except Exception as e:
-                messages.error(request, f"Error updating post: {str(e)}")
+            post = form.save()
+            post.is_edited = True
+            post.save()
+            messages.success(request, 'Post updated successfully!')
+            return redirect('masteryhub:view_forum_post', post_id=post.id)
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = ForumPostForm(instance=post)
-
-    return render(request, "masteryhub/edit_forum_post.html", {
-        "form": form,
-        "post": post
-    })
+    
+    return render(request, 'masteryhub/edit_forum_post.html', {'form': form, 'post': post})
 
 
 @login_required
 def delete_forum_post(request, post_id):
-    """A view that handles deleting a forum post with error handling."""
-
+    """Delete a forum post."""
     post = get_object_or_404(Forum, id=post_id)
-
-    try:
-        if not hasattr(request.user, 'profile'):
-            profile = Profile.objects.create(user=request.user)
-            logger.info(
-                f"Created new profile for user {request.user.username}")
-        else:
-            profile = request.user.profile
-
-        if post.author != profile and not request.user.is_staff:
-            messages.error(request, "You can only delete your own posts.")
-            return redirect("masteryhub:forum_list")
-    except Exception as e:
-        logger.error(
-            f"Error with profile for user {request.user.username}: {str(e)}")
-        if not request.user.is_staff:
-            messages.error(
-                request, "An error occurred while verifying your permissions.")
-            return redirect("masteryhub:forum_list")
-
-    if request.method == "POST":
-        try:
-            post_title = post.title
-            post.delete()
-            messages.success(
-                request, f"Forum post '{post_title}' deleted successfully.")
-            return redirect("masteryhub:forum_list")
-        except Exception as e:
-            logger.error(f"Error deleting post: {str(e)}")
-            messages.error(
-                request, f"An error occurred while deleting the post: {str(e)}")
-
-    return render(request, "masteryhub/delete_forum_post.html", {"post": post})
+    
+    if not post.can_edit(request.user):
+        messages.error(request, 'You do not have permission to delete this post.')
+        return redirect('masteryhub:forum_list')
+    
+    if request.method == 'POST':
+        post.delete()
+        messages.success(request, 'Post deleted successfully!')
+        return redirect('masteryhub:forum_list')
+    
+    return render(request, 'masteryhub/delete_forum_post.html', {'post': post})
 
 
 def mentor_rules(request):
@@ -1047,3 +1015,38 @@ def cancel_mentorship_request(request, request_id):
         messages.error(request, f"An error occurred: {str(e)}")
 
     return redirect('masteryhub:my_mentorships')
+
+
+@login_required
+def my_orders(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'masteryhub/my_orders.html', {'orders': orders})
+
+
+@login_required
+def my_learning(request):
+    try:
+        user_profile = request.user.profile
+    except Profile.DoesNotExist:
+        user_profile = None
+
+    context = {
+        'upcoming_sessions': Session.objects.filter(
+            participants=user_profile,
+            date__gte=timezone.now()
+        ).order_by('date')[:5] if user_profile else [],
+
+        'booked_sessions': Session.objects.filter(
+            participants=user_profile
+        ).order_by('-date') if user_profile else [],
+
+        'recent_activities': Activity.objects.filter(
+            user=request.user
+        ).order_by('-timestamp')[:5] if user_profile else [],
+
+        'orders': Order.objects.filter(
+            user=request.user
+        ).order_by('-created_at')[:5]
+    }
+
+    return render(request, 'masteryhub/my_learning.html', context)

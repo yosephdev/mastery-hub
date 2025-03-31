@@ -1,72 +1,88 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
 {% load masteryhub_extras %}
 
 {% block content %}
 <div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Main Post -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-3">
-                        <h2 class="card-title mb-0">{{ post.title }}</h2>
                         <div>
-                            {% if can_edit %}
-                            <a href="{% url 'masteryhub:edit_forum_post' post.id %}" class="btn btn-sm btn-outline-primary me-2">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            {% endif %}
-                            <a href="{% url 'masteryhub:forum_list' %}" class="btn btn-sm btn-outline-secondary">
-                                <i class="fas fa-arrow-left"></i> Back
-                            </a>
+                            <h2 class="card-title h4 mb-1">{{ post.title }}</h2>
+                            <div class="text-muted small">
+                                Posted by {{ post.author.user.username }} in 
+                                <span class="badge bg-primary">{{ post.category.name }}</span>
+                                <span class="ms-2">{{ post.created_at|timesince }} ago</span>
+                            </div>
                         </div>
+                        {% if can_edit %}
+                        <div class="dropdown">
+                            <button class="btn btn-link text-muted" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'masteryhub:edit_forum_post' post.id %}">
+                                        <i class="fas fa-edit text-primary me-2"></i>Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deletePostModal">
+                                        <i class="fas fa-trash me-2"></i>Delete
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        {% endif %}
                     </div>
                     
-                    <div class="d-flex align-items-center mb-3">
-                        <span class="text-muted me-3">
-                            Posted by {{ post.author.user.username }}
-                        </span>
-                        <span class="text-muted me-3">
-                            in {{ post.category.name }}
-                        </span>
-                        <span class="text-muted">
-                            {{ post.created_at|timesince }} ago
-                        </span>
-                    </div>
-
                     <div class="card-text mb-4">
                         {{ post.content|linebreaks }}
                     </div>
 
+                    <!-- Reply Button -->
                     <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <a href="{% url 'masteryhub:reply_forum_post' post.id %}" class="btn btn-primary">
-                                <i class="fas fa-reply"></i> Reply
-                            </a>
-                        </div>
-                        <div class="text-muted">
-                            {{ post.get_reply_count }} replies
+                        <a href="{% url 'masteryhub:reply_forum_post' post.id %}" class="btn btn-primary">
+                            <i class="fas fa-reply me-2"></i>Reply
+                        </a>
+                        <div class="text-muted small">
+                            <i class="fas fa-comments me-1"></i>{{ post.get_reply_count }} replies
                         </div>
                     </div>
                 </div>
             </div>
 
-            {% if comments %}
-            <h4 class="mb-3">Replies</h4>
+            <!-- Comments Section -->
+            <h3 class="h5 mb-4">Replies</h3>
             {% for comment in comments %}
-            <div class="card shadow-sm mb-3">
+            <div class="card shadow-sm mb-3" id="comment-{{ comment.id }}">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div>
-                            <strong>{{ comment.author.user.username }}</strong>
-                            <span class="text-muted ms-2">
-                                {{ comment.created_at|timesince }} ago
-                            </span>
+                            <div class="fw-bold">{{ comment.author.user.username }}</div>
+                            <div class="text-muted small">{{ comment.created_at|timesince }} ago</div>
                         </div>
                         {% if comment_permissions|get_item:comment.id %}
-                        <a href="{% url 'masteryhub:edit_forum_post' comment.id %}" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
+                        <div class="dropdown">
+                            <button class="btn btn-link text-muted" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'masteryhub:edit_forum_post' comment.id %}">
+                                        <i class="fas fa-edit text-primary me-2"></i>Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteCommentModal{{ comment.id }}">
+                                        <i class="fas fa-trash me-2"></i>Delete
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
                         {% endif %}
                     </div>
                     <div class="card-text">
@@ -74,8 +90,55 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Delete Comment Modal -->
+            <div class="modal fade" id="deleteCommentModal{{ comment.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete Reply</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete this reply?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <form method="post" action="{% url 'masteryhub:delete_forum_post' comment.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">
+                No replies yet. Be the first to reply!
+            </div>
             {% endfor %}
-            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Post Modal -->
+<div class="modal fade" id="deletePostModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this post? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="post" action="{% url 'masteryhub:delete_forum_post' post.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

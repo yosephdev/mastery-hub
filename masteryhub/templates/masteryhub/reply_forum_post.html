@@ -1,18 +1,59 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container pt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Parent Post Context -->
+            <div class="card shadow-sm mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">Reply to Post</h5>
+                    <h3 class="h5 mb-3">Replying to:</h3>
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h4 class="h6 mb-2">{{ parent_post.title }}</h4>
+                            <p class="card-text small text-muted mb-2">
+                                Posted by {{ parent_post.author.user.username }} in 
+                                <span class="badge bg-primary">{{ parent_post.category.name }}</span>
+                            </p>
+                            <p class="card-text">{{ parent_post.content|truncatewords:50 }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reply Form -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="h5 mb-4">Your Reply</h3>
                     <form method="post">
                         {% csrf_token %}
-                        {{ form|crispy }}
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.title.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.content.id_for_label }}" class="form-label">Content</label>
+                            {{ form.content }}
+                            {% if form.content.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.content.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ parent_post.get_absolute_url }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Post Reply
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
