@@ -108,6 +108,13 @@ class ForumPostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['category'].empty_label = "Select a category"
+        
+        # If this is a reply (parent_post is set), hide title and category fields
+        if self.instance and self.instance.parent_post:
+            self.fields['title'].widget = forms.HiddenInput()
+            self.fields['category'].widget = forms.HiddenInput()
+            self.fields['title'].required = False
+            self.fields['category'].required = False
 
 
 class MentorApplicationForm(forms.Form):

@@ -181,7 +181,7 @@ class Forum(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     author = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='forum_posts')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='forum_posts')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='forum_posts', null=True, blank=True)
     parent_post = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -381,7 +381,7 @@ class Order(models.Model):
         ('cancelled', 'Cancelled'),
     )
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='masteryhub_orders')
     order_number = models.CharField(max_length=32, null=False, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

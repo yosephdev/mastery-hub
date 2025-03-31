@@ -34,6 +34,7 @@ class Profile(models.Model):
         default='One-on-one'
     )
     is_available = models.BooleanField(default=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
         return self.user.username
