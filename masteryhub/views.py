@@ -522,11 +522,15 @@ def view_forum_post(request, post_id):
             reply.author = request.user.profile
             reply.parent_post = post
             reply.category = post.category  # Inherit category from parent post
+            reply.title = f"Re: {post.title}"  # Set a default title for replies
             reply.save()
             messages.success(request, 'Reply posted successfully!')
-            return redirect(f"{post.get_absolute_url()}#comment-{reply.id}")
+            return redirect('masteryhub:view_forum_post', post_id=post.id)
         else:
-            messages.error(request, 'Please correct the errors below.')
+            # If form is invalid, show the errors
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = ForumPostForm()
     
@@ -534,6 +538,8 @@ def view_forum_post(request, post_id):
         'post': post,
         'replies': replies,
         'form': form,
+        'can_edit': post.can_edit(request.user),
+        'comment_permissions': {reply.id: reply.can_edit(request.user) for reply in replies}
     }
     return render(request, 'masteryhub/view_forum_post.html', context)
 
@@ -1019,7 +1025,7 @@ def cancel_mentorship_request(request, request_id):
 
 @login_required
 def my_orders(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    orders = request.user.checkout_orders.all().order_by('-date')
     return render(request, 'masteryhub/my_orders.html', {'orders': orders})
 
 

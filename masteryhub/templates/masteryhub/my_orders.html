@@ -14,8 +14,8 @@
                             <tr>
                                 <th>Order Number</th>
                                 <th>Date</th>
-                                <th>Type</th>
-                                <th>Amount</th>
+                                <th>Items</th>
+                                <th>Total</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -23,15 +23,13 @@
                             {% for order in orders %}
                             <tr>
                                 <td>{{ order.order_number }}</td>
-                                <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                <td>{{ order.date|date:"M d, Y" }}</td>
                                 <td>
-                                    {% if order.session %}
-                                        Session: {{ order.session.title }}
-                                    {% elif order.mentorship %}
-                                        Mentorship
-                                    {% endif %}
+                                    {% for item in order.lineitems.all %}
+                                        {{ item.session.title }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
                                 </td>
-                                <td>${{ order.total_amount }}</td>
+                                <td>${{ order.grand_total }}</td>
                                 <td>
                                     <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'cancelled' %}bg-danger{% else %}bg-warning{% endif %}">
                                         {{ order.status|title }}

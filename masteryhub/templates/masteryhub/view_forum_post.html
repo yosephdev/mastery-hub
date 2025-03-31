@@ -45,11 +45,37 @@
 
                     <!-- Reply Button -->
                     <div class="d-flex justify-content-between align-items-center">
-                        <a href="{% url 'masteryhub:reply_forum_post' post.id %}" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#replyForm">
                             <i class="fas fa-reply me-2"></i>Reply
-                        </a>
+                        </button>
                         <div class="text-muted small">
                             <i class="fas fa-comments me-1"></i>{{ post.get_reply_count }} replies
+                        </div>
+                    </div>
+
+                    <!-- Reply Form -->
+                    <div class="collapse mt-4" id="replyForm">
+                        <div class="card-body">
+                            <h4 class="h6 mb-3">Write a Reply</h4>
+                            <form method="post">
+                                {% csrf_token %}
+                                {{ form.title }}
+                                {{ form.category }}
+                                <div class="mb-3">
+                                    <label for="{{ form.content.id_for_label }}" class="form-label">Your Reply</label>
+                                    {{ form.content }}
+                                    {% if form.content.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.content.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane me-2"></i>Post Reply
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -57,27 +83,27 @@
 
             <!-- Comments Section -->
             <h3 class="h5 mb-4">Replies</h3>
-            {% for comment in comments %}
-            <div class="card shadow-sm mb-3" id="comment-{{ comment.id }}">
+            {% for reply in replies %}
+            <div class="card shadow-sm mb-3" id="comment-{{ reply.id }}">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div>
-                            <div class="fw-bold">{{ comment.author.user.username }}</div>
-                            <div class="text-muted small">{{ comment.created_at|timesince }} ago</div>
+                            <div class="fw-bold">{{ reply.author.user.username }}</div>
+                            <div class="text-muted small">{{ reply.created_at|timesince }} ago</div>
                         </div>
-                        {% if comment_permissions|get_item:comment.id %}
+                        {% if comment_permissions|get_item:reply.id %}
                         <div class="dropdown">
                             <button class="btn btn-link text-muted" type="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
-                                    <a class="dropdown-item" href="{% url 'masteryhub:edit_forum_post' comment.id %}">
+                                    <a class="dropdown-item" href="{% url 'masteryhub:edit_forum_post' reply.id %}">
                                         <i class="fas fa-edit text-primary me-2"></i>Edit
                                     </a>
                                 </li>
                                 <li>
-                                    <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteCommentModal{{ comment.id }}">
+                                    <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteCommentModal{{ reply.id }}">
                                         <i class="fas fa-trash me-2"></i>Delete
                                     </button>
                                 </li>
@@ -86,13 +112,13 @@
                         {% endif %}
                     </div>
                     <div class="card-text">
-                        {{ comment.content|linebreaks }}
+                        {{ reply.content|linebreaks }}
                     </div>
                 </div>
             </div>
 
             <!-- Delete Comment Modal -->
-            <div class="modal fade" id="deleteCommentModal{{ comment.id }}" tabindex="-1">
+            <div class="modal fade" id="deleteCommentModal{{ reply.id }}" tabindex="-1">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -104,7 +130,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <form method="post" action="{% url 'masteryhub:delete_forum_post' comment.id %}" class="d-inline">
+                            <form method="post" action="{% url 'masteryhub:delete_forum_post' reply.id %}" class="d-inline">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">Delete</button>
                             </form>
