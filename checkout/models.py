@@ -133,7 +133,7 @@ class CartItem(models.Model):
 
 
 class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='checkout_orders')
     order_number = models.CharField(max_length=32, unique=True)
     date = models.DateTimeField(auto_now_add=True)
     full_name = models.CharField(max_length=50)
@@ -151,6 +151,11 @@ class Order(models.Model):
     grand_total = models.DecimalField(max_digits=10, decimal_places=2)
     stripe_pid = models.CharField(max_length=255, null=True, blank=True)
     confirmation_email_sent = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled')
+    ], default='pending')
 
     def _generate_order_number(self):
         """Generate a random, unique order number using UUID"""

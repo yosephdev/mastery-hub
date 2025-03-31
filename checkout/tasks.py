@@ -23,11 +23,8 @@ def send_order_confirmation(order_id):
             return f"Confirmation email already sent for order {order.order_number}"
             
         logger.info(f"Preparing email for order {order.order_number}")
-        subject = render_to_string(
-            'checkout/confirmation_emails/confirmation_email_subject.txt',
-            {'order': order}
-        )
-
+        subject = f'MasteryHub - Order Confirmation #{order.order_number}'
+        
         context = {
             'order': order,
             'contact_email': settings.DEFAULT_FROM_EMAIL,
@@ -46,12 +43,17 @@ def send_order_confirmation(order_id):
             context
         )
 
-        logger.info(f"Sending email to {order.email} for order {order.order_number}")
+        # Send to both user and admin
+        recipient_list = [order.email]
+        if settings.DEFAULT_FROM_EMAIL:
+            recipient_list.append(settings.DEFAULT_FROM_EMAIL)
+
+        logger.info(f"Sending email to {recipient_list} for order {order.order_number}")
         send_mail(
             subject,
             message,
             settings.DEFAULT_FROM_EMAIL,
-            [order.email],
+            recipient_list,
             fail_silently=False,
             html_message=html_message
         )

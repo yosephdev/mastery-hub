@@ -332,72 +332,73 @@ def checkout(request):
             order_form = OrderForm(request.POST)
             if order_form.is_valid():
                 try:
+                    # Create the order first
+                    order = order_form.save(commit=False)
+                    order.user = request.user
+                    order.order_total = grand_total
+                    order.grand_total = grand_total
+                    order.save()
+
+                    # Create order line items
+                    for cart_item in cart.items.all():
+                        OrderLineItem.objects.create(
+                            order=order,
+                            session=cart_item.session,
+                            quantity=cart_item.quantity,
+                            price=cart_item.get_cost()
+                        )
+
+                    # Create payment intent after order is created
                     intent = stripe.PaymentIntent.create(
                         amount=stripe_total,
                         currency=settings.STRIPE_CURRENCY,
                         metadata={
                             'user_id': request.user.id,
                             'username': request.user.username,
-                            'cart_id': cart.id
+                            'cart_id': cart.id,
+                            'order_id': order.id
+                        },
+                        automatic_payment_methods={
+                            'enabled': True,
                         }
                     )
 
-                    with transaction.atomic():
-                        order = order_form.save(commit=False)
-                        order.user = request.user
-                        order.order_number = uuid.uuid4().hex.upper()
-                        order.order_total = grand_total
-                        order.grand_total = grand_total
-                        order.stripe_pid = intent.id
-                        order.save()
+                    # Update order with payment intent ID
+                    order.stripe_pid = intent.id
+                    order.save()
 
-                        for item in cart.items.all():
-                            OrderLineItem.objects.create(
-                                order=order,
-                                session=item.session,
-                                quantity=item.quantity,
-                                price=item.get_cost()
-                            )
+                    # Send confirmation email
+                    send_order_confirmation.delay(order.id)
 
-                        cart.items.all().delete()
-
-                        try:
-                            send_order_confirmation(order.id)
-                        except Exception as e:
-                            logger.error(
-                                f"Failed to send confirmation email: {e}")
-                            # Continue with the checkout process even if email fails
+                    # Clear the cart
+                    cart.items.all().delete()
+                    cart.delete()
 
                     return redirect('checkout:checkout_success', order_number=order.order_number)
-
                 except stripe.error.StripeError as e:
-                    logger.error(f"Stripe error: {str(e)}")
-                    messages.error(
-                        request, f"Payment processing error: {str(e)}")
+                    messages.error(request, f'Error creating payment intent: {str(e)}')
                     return redirect('checkout:view_cart')
-
-                except Exception as e:
-                    logger.error(
-                        f"Checkout error for user {request.user.id}: {str(e)}")
-                    messages.error(
-                        request, "There was an error processing your order. Please try again.")
-                    return redirect('checkout:view_cart')
-
             else:
-                for field, errors in order_form.errors.items():
-                    for error in errors:
-                        messages.error(request, f"{field}: {error}")
-                messages.error(
-                    request, 'There was an error with your form. Please check your information.')
+                messages.error(request, 'Please correct the errors in the form.')
         else:
-            # GET request - display the form
+            # Get user's profile data for pre-filling the form
             try:
-                # Get user profile if it exists
-                profile = None
-                if hasattr(request.user, 'profile'):
-                    profile = request.user.profile
-                
-                # Create a new intent for the payment
+                profile = request.user.profile
+                initial_data = {
+                    'full_name': request.user.get_full_name(),
+                    'email': request.user.email,
+                    'phone_number': profile.phone_number if profile.phone_number else ''
+                }
+            except Profile.DoesNotExist:
+                initial_data = {
+                    'full_name': request.user.get_full_name(),
+                    'email': request.user.email
+                }
+            
+            order_form = OrderForm(initial=initial_data)
+
+            # Create payment intent for the form
+            try:
                 intent = stripe.PaymentIntent.create(
                     amount=stripe_total,
                     currency=settings.STRIPE_CURRENCY,
@@ -405,37 +406,28 @@ def checkout(request):
                         'user_id': request.user.id,
                         'username': request.user.username,
                         'cart_id': cart.id
+                    },
+                    automatic_payment_methods={
+                        'enabled': True,
                     }
                 )
-                
-                # Initialize the form with profile data if available
-                order_form = OrderForm(instance=profile)
-                
+                client_secret = intent.client_secret
             except stripe.error.StripeError as e:
-                logger.error(f"Stripe error: {str(e)}")
-                messages.error(request, f"Payment processing error: {str(e)}")
+                messages.error(request, f'Error creating payment intent: {str(e)}')
                 return redirect('checkout:view_cart')
 
         context = {
             'order_form': order_form,
             'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
-            'client_secret': intent.client_secret,
+            'client_secret': client_secret if 'client_secret' in locals() else None,
             'cart': cart,
             'total_price': total_price,
             'grand_total': grand_total,
         }
-
         return render(request, 'checkout/checkout.html', context)
 
     except Cart.DoesNotExist:
-        messages.error(request, 'There was an error with your cart.')
-        return redirect('checkout:view_cart')
-    except ValidationError as e:
-        messages.error(request, str(e))
-        return redirect('checkout:view_cart')
-    except Exception as e:
-        logger.error(f"Unexpected error in checkout: {str(e)}")
-        messages.error(request, "An unexpected error occurred. Please try again.")
+        messages.error(request, 'Your cart is empty.')
         return redirect('checkout:view_cart')
 
 
