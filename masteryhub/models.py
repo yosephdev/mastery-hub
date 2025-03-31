@@ -177,31 +177,42 @@ class Review(models.Model):
 
 
 class Forum(models.Model):
-    title = models.CharField(max_length=255)
+    """Model for forum posts and replies."""
+    title = models.CharField(max_length=200)
     content = models.TextField()
-    author = models.ForeignKey('profiles.Profile', on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='forum_posts')
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='forum_posts')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='forum_posts')
+    parent_post = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    parent_post = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True, related_name="comments")
     is_edited = models.BooleanField(default=False)
-
+    
+    class Meta:
+        ordering = ['-created_at']
+    
     def __str__(self):
         return self.title
-
+    
     def get_absolute_url(self):
-        return reverse('masteryhub:view_forum_post', kwargs={'post_id': self.id})
-
-    def get_reply_count(self):
-        return self.comments.count()
-
-    def get_last_activity(self):
-        if self.comments.exists():
-            return self.comments.order_by('-updated_at').first().updated_at
-        return self.updated_at
-
+        """Get the URL for viewing this post."""
+        return reverse('masteryhub:view_forum_post', args=[str(self.id)])
+    
     def can_edit(self, user):
-        return user.is_authenticated and (user.profile == self.author or user.is_staff)
+        """Check if the user can edit this post."""
+        if not hasattr(user, 'profile'):
+            return False
+        return self.author == user.profile or user.is_staff
+    
+    def get_reply_count(self):
+        """Get the total number of replies to this post."""
+        return self.replies.count()
+    
+    def get_last_activity(self):
+        """Get the timestamp of the most recent activity."""
+        latest_reply = self.replies.order_by('-updated_at').first()
+        if latest_reply:
+            return max(self.updated_at, latest_reply.updated_at)
+        return self.updated_at
 
 
 class Feedback(models.Model):
@@ -361,3 +372,31 @@ class Activity(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.activity_type} - {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
+
+
+class Order(models.Model):
+    ORDER_STATUS = (
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    )
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    order_number = models.CharField(max_length=32, null=False, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending')
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, null=False, default=0)
+    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True, blank=True)
+    mentorship = models.ForeignKey(Mentorship, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    def __str__(self):
+        return f'Order {self.order_number}'
+    
+    def save(self, *args, **kwargs):
+        if not self.order_number:
+            self.order_number = self._generate_order_number()
+        super().save(*args, **kwargs)
+    
+    def _generate_order_number(self):
+        return f'ORD-{timezone.now().strftime("%Y%m%d%H%M%S")}-{self.user.id}'
