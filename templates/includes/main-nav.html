@@ -7,20 +7,20 @@
         </a>
         <ul class="dropdown-menu dropdown-menu-animated shadow-sm border-0" aria-labelledby="browseDropdown">
             <li>
-                <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:browse_skills' %}">
-                    <i class="fas fa-laptop-code fa-fw text-primary me-2"></i>
-                    <div>
-                        <span class="d-block">All Skills</span>
-                        <small class="text-muted">Browse all available skills</small>
-                    </div>
-                </a>
-            </li>
-            <li>
                 <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:session_list' %}">
                     <i class="fas fa-calendar-alt fa-fw text-success me-2"></i>
                     <div>
                         <span class="d-block">Live Sessions</span>
                         <small class="text-muted">Upcoming learning sessions</small>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:browse_skills' %}">
+                    <i class="fas fa-laptop-code fa-fw text-primary me-2"></i>
+                    <div>
+                        <span class="d-block">All Skills</span>
+                        <small class="text-muted">Browse all available skills</small>
                     </div>
                 </a>
             </li>
@@ -134,6 +134,11 @@
             <li>
                 <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:my_mentorships' %}">
                     <i class="fas fa-graduation-cap fa-fw text-success me-2"></i>My Learning
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:my_orders' %}">
+                    <i class="fas fa-shopping-bag fa-fw text-info me-2"></i>My Orders
                 </a>
             </li>
             {% if request.user.profile.is_expert %}

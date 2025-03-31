@@ -28,6 +28,16 @@
     </a>
 </li>
 
+<!-- My Orders -->
+<li>
+    <a class="dropdown-item d-flex align-items-center" href="{% url 'masteryhub:my_orders' %}">
+        <span class="menu-icon bg-primary-soft">
+            <i class="fas fa-shopping-bag text-primary"></i>
+        </span>
+        <span class="menu-text">My Orders</span>
+    </a>
+</li>
+
 {% if request.user.profile.is_expert %}
     <!-- Mentor Dashboard -->
     <li>
