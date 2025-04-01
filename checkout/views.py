@@ -315,15 +315,12 @@ def create_order(user, order_form, cart, grand_total):
 @transaction.atomic
 def checkout(request):
     stripe.api_key = settings.STRIPE_SECRET_KEY
-
     try:
         cart = Cart.objects.get(user=request.user)
         if not cart.items.exists():
             messages.error(request, 'Your cart is empty.')
             return redirect('checkout:view_cart')
-
         cart.validate_cart_items()
-
         total_price = cart.get_total_price()
         grand_total = total_price
         stripe_total = int(grand_total * 100)
@@ -332,13 +329,30 @@ def checkout(request):
             order_form = OrderForm(request.POST)
             if order_form.is_valid():
                 try:
-                    # Create the order first
+                    # Create payment intent first
+                    intent = stripe.PaymentIntent.create(
+                        amount=stripe_total,
+                        currency=settings.STRIPE_CURRENCY,
+                        metadata={
+                            'user_id': request.user.id,
+                            'username': request.user.username,
+                            'cart_id': cart.id
+                        },
+                        automatic_payment_methods={
+                            'enabled': True,
+                        }
+                    )
+                    # Assign stripe_pid to the cart
+                    cart.stripe_pid = intent.id
+                    cart.save()
+
+                    # Create the order with the payment intent ID
                     order = order_form.save(commit=False)
                     order.user = request.user
                     order.order_total = grand_total
                     order.grand_total = grand_total
+                    order.stripe_pid = intent.id
                     order.save()
-
                     # Create order line items
                     for cart_item in cart.items.all():
                         OrderLineItem.objects.create(
@@ -347,39 +361,23 @@ def checkout(request):
                             quantity=cart_item.quantity,
                             price=cart_item.get_cost()
                         )
-
-                    # Create payment intent after order is created
-                    intent = stripe.PaymentIntent.create(
-                        amount=stripe_total,
-                        currency=settings.STRIPE_CURRENCY,
-                        metadata={
-                            'user_id': request.user.id,
-                            'username': request.user.username,
-                            'cart_id': cart.id,
-                            'order_id': order.id
-                        },
-                        automatic_payment_methods={
-                            'enabled': True,
-                        }
-                    )
-
-                    # Update order with payment intent ID
-                    order.stripe_pid = intent.id
-                    order.save()
-
-                    # Send confirmation email
-                    send_order_confirmation.delay(order.id)
-
                     # Clear the cart
                     cart.items.all().delete()
                     cart.delete()
-
+                    # Send confirmation email
+                    send_order_confirmation.delay(order.id)
                     return redirect('checkout:checkout_success', order_number=order.order_number)
                 except stripe.error.StripeError as e:
-                    messages.error(request, f'Error creating payment intent: {str(e)}')
+                    messages.error(
+                        request, f'Error creating payment intent: {str(e)}')
+                    # If there's an error, delete the order and its line items
+                    if 'order' in locals():
+                        order.lineitems.all().delete()
+                        order.delete()
                     return redirect('checkout:view_cart')
             else:
-                messages.error(request, 'Please correct the errors in the form.')
+                messages.error(
+                    request, 'Please correct the errors in the form.')
         else:
             # Get user's profile data for pre-filling the form
             try:
@@ -394,9 +392,7 @@ def checkout(request):
                     'full_name': request.user.get_full_name(),
                     'email': request.user.email
                 }
-            
             order_form = OrderForm(initial=initial_data)
-
             # Create payment intent for the form
             try:
                 intent = stripe.PaymentIntent.create(
@@ -413,9 +409,9 @@ def checkout(request):
                 )
                 client_secret = intent.client_secret
             except stripe.error.StripeError as e:
-                messages.error(request, f'Error creating payment intent: {str(e)}')
+                messages.error(
+                    request, f'Error creating payment intent: {str(e)}')
                 return redirect('checkout:view_cart')
-
         context = {
             'order_form': order_form,
             'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
@@ -425,7 +421,6 @@ def checkout(request):
             'grand_total': grand_total,
         }
         return render(request, 'checkout/checkout.html', context)
-
     except Cart.DoesNotExist:
         messages.error(request, 'Your cart is empty.')
         return redirect('checkout:view_cart')
@@ -522,8 +517,7 @@ def checkout_success(request, order_number):
 
     if 'cart' in request.session:
         del request.session['cart']
-
-    # The email is already sent by the Celery task in the checkout function
+    
     messages.success(
         request, "A confirmation email has been sent to your inbox.")
 
@@ -641,17 +635,17 @@ def check_session_availability(cart):
 
 def handle_payment_success(payment_intent):
     """Handle successful payment event from Stripe."""
-
     try:
         order = Order.objects.get(stripe_pid=payment_intent.id)
-        order.payment_status = 'COMPLETED'
-        order.save()
-
-        from .tasks import send_order_confirmation
-        send_order_confirmation(order.id)
-
-        logger.info(f"Order {order.order_number} marked as completed.")
-
+        if order.payment_status != 'COMPLETED':
+            order.payment_status = 'COMPLETED'
+            order.status = 'completed'
+            order.save()
+            
+            if not order.confirmation_email_sent:
+                send_order_confirmation.delay(order.id)
+            logger.info(
+                f"Order {order.order_number} marked as completed and confirmation email sent.")
     except Order.DoesNotExist:
         logger.error(f"Order not found for PaymentIntent {payment_intent.id}")
         raise Exception("Order not found")

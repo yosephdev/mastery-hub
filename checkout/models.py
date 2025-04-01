@@ -26,6 +26,7 @@ class Payment(models.Model):
 
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    stripe_pid = models.CharField(max_length=254, null=True, blank=True, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     last_activity = models.DateTimeField(auto_now=True)
@@ -135,6 +136,7 @@ class CartItem(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='checkout_orders')
     order_number = models.CharField(max_length=32, unique=True)
+    webhook_processed = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
     full_name = models.CharField(max_length=50)
     email = models.EmailField(max_length=254, blank=True, null=True)

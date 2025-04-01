@@ -6,7 +6,11 @@ register = template.Library()
 def get_payment_intent_id(client_secret):
     """Extract payment intent ID from client secret"""
     if client_secret:
-        return client_secret.split('_secret_')[0]
+        try:
+            # The client secret format is: pi_<payment_intent_id>_secret_<secret>
+            return client_secret.split('_secret_')[0]
+        except:
+            return ''
     return ''
 
 @register.filter

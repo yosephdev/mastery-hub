@@ -452,8 +452,9 @@ def forum_posts(request):
 @login_required
 def forum_list(request):
     """List all forum posts with search and category filtering."""
-    posts = Forum.objects.filter(parent_post=None).select_related('author__user', 'category')
-    
+    posts = Forum.objects.filter(parent_post=None).select_related(
+        'author__user', 'category')
+
     # Search functionality
     q = request.GET.get('q')
     if q:
@@ -461,23 +462,23 @@ def forum_list(request):
             Q(title__icontains=q) |
             Q(content__icontains=q)
         )
-    
+
     # Category filtering
     category_id = request.GET.get('category')
     if category_id:
         posts = posts.filter(category_id=category_id)
-    
+
     # Get all categories for the filter dropdown
     categories = Category.objects.all()
-    
+
     # Order by most recent first
     posts = posts.order_by('-created_at')
-    
+
     # Pagination
     paginator = Paginator(posts, 9)  # Show 9 posts per page
     page = request.GET.get('page')
     posts = paginator.get_page(page)
-    
+
     context = {
         'posts': posts,
         'categories': categories,

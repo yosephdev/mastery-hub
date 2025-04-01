@@ -86,9 +86,19 @@ class StripeWH_Handler:
                 logger.error(
                     f"Error updating profile for username {username}: {str(e)}")
 
-        order_exists = False
-        attempt = 1
-        while attempt <= 5:
+        # First try to find an existing order with the payment intent ID
+        try:
+            order = Order.objects.get(stripe_pid=pid)
+            if order.status != 'completed':
+                order.status = 'completed'
+                order.save()
+                self._send_confirmation_email(order)
+            return HttpResponse(
+                content=f'Webhook received: {event["type"]} | SUCCESS: Updated existing order',
+                status=200,
+            )
+        except Order.DoesNotExist:
+            # If no order exists with the payment intent ID, try to find one with matching details
             try:
                 order = Order.objects.get(
                     full_name__iexact=billing_details.name,
@@ -101,76 +111,67 @@ class StripeWH_Handler:
                     street_address2__iexact=billing_details.address.line2,
                     county__iexact=billing_details.address.state,
                     order_total=grand_total,
-                    stripe_pid=pid,
+                    status='pending'
                 )
-                order_exists = True
-                break
+                # Update the order with the payment intent ID and mark as completed
+                order.stripe_pid = pid
+                order.status = 'completed'
+                order.save()
+                self._send_confirmation_email(order)
+                return HttpResponse(
+                    content=f'Webhook received: {event["type"]} | SUCCESS: Updated existing order with payment intent',
+                    status=200,
+                )
             except Order.DoesNotExist:
-                attempt += 1
-                time.sleep(1)
-
-        if order_exists:
-            self._send_confirmation_email(order)
-            return HttpResponse(
-                content=f'Webhook received: {event["type"]} | SUCCESS: Verified order already in database',
-                status=200,
-            )
-        
-        order = None
-        try:
-            order = Order.objects.create(
-                full_name=billing_details.name,
-                user=profile.user if profile else None,
-                email=billing_details.email,
-                phone_number=billing_details.phone,
-                country=billing_details.address.country,
-                postcode=billing_details.address.postal_code,
-                town_or_city=billing_details.address.city,
-                street_address1=billing_details.address.line1,
-                street_address2=billing_details.address.line2,
-                county=billing_details.address.state,
-                stripe_pid=pid,
-                order_total=grand_total,
-                grand_total=grand_total,
-                delivery_cost=0,
-            )
-            if session_id:
+                # If no matching order exists, create a new one
                 try:
-                    session = Session.objects.get(id=session_id)
-                    Payment.objects.create(
-                        user=profile,
-                        amount=grand_total,
-                        session=session,
+                    order = Order.objects.create(
+                        full_name=billing_details.name,
+                        user=profile.user if profile else None,
+                        email=billing_details.email,
+                        phone_number=billing_details.phone,
+                        country=billing_details.address.country,
+                        postcode=billing_details.address.postal_code,
+                        town_or_city=billing_details.address.city,
+                        street_address1=billing_details.address.line1,
+                        street_address2=billing_details.address.line2,
+                        county=billing_details.address.state,
+                        stripe_pid=pid,
+                        order_total=grand_total,
+                        grand_total=grand_total,
+                        delivery_cost=0,
+                        status='completed'
                     )
-                except Session.DoesNotExist:
-                    logger.error(f"Session not found for session_id: {session_id}")
+                    if session_id:
+                        try:
+                            session = Session.objects.get(id=session_id)
+                            Payment.objects.create(
+                                user=profile,
+                                amount=grand_total,
+                                session=session,
+                            )
+                        except Session.DoesNotExist:
+                            logger.error(f"Session not found for session_id: {session_id}")
+                            if order:
+                                order.delete()
+                            return HttpResponse(
+                                content=f'Webhook received: {event["type"]} | ERROR: Session not found',
+                                status=500,
+                            )
+                    self._send_confirmation_email(order)
+                    return HttpResponse(
+                        content=f'Webhook received: {event["type"]} | SUCCESS: Created new order',
+                        status=200,
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"Error creating order for PaymentIntent {pid}: {str(e)}")
                     if order:
                         order.delete()
                     return HttpResponse(
-                        content=f'Webhook received: {event["type"]} | ERROR: Session not found',
+                        content=f'Webhook received: {event["type"]} | ERROR: {str(e)}',
                         status=500,
                     )
-        except Exception as e:
-            logger.error(
-                f"Error creating order for PaymentIntent {pid}: {str(e)}")
-            if order:
-                order.delete()
-            return HttpResponse(
-                content=f'Webhook received: {event["type"]} | ERROR: {str(e)}',
-                status=500,
-            )
-        
-        if order:
-            self._send_confirmation_email(order)
-            return HttpResponse(
-                content=f'Webhook received: {event["type"]} | SUCCESS: Created order in webhook',
-                status=200,
-            )
-        else:
-            return HttpResponse(
-                content=f'Webhook received: {event["type"]} | ERROR: Failed to create order',
-                status=500,
-            )
 
     def handle_payment_intent_payment_failed(self, event):
         """

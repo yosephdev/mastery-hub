@@ -93,8 +93,7 @@
                     <input type="hidden" 
                            value="{{ client_secret }}" 
                            name="client_secret" 
-                           id="id_client_secret"
-                           data-payment-intent-id="{{ client_secret|get_payment_intent_id }}">
+                           id="id_client_secret">
                 </fieldset>
                 <div class="submit-button text-right mt-5 mb-2">
                     <a href="{% url 'checkout:view_cart' %}" class="btn btn-outline-dark rounded-0">
