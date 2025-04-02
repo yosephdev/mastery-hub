@@ -174,7 +174,7 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
-CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_ALWAYS_EAGER = False
 
 # Stripe Configuration
 STRIPE_CURRENCY = 'usd'
@@ -229,9 +229,9 @@ else:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_USE_TLS = True
     EMAIL_HOST = os.getenv("EMAIL_HOST")
-EMAIL_PORT = 587
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASS = os.getenv("EMAIL_HOST_PASS")
+    EMAIL_PORT = 587
+    EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASS")
 
 # Additional Settings
 LANGUAGE_CODE = "en-us"
