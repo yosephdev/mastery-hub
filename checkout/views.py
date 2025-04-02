@@ -20,6 +20,7 @@ from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.decorators.vary import vary_on_cookie
+from django.template.loader import render_to_string
 
 import stripe
 
@@ -519,12 +520,48 @@ def checkout_success(request, order_number):
     
     # Ensure email is sent if not already sent
     if not order.confirmation_email_sent:
-        send_order_confirmation.delay(order.id)
-        messages.success(
-            request, "A confirmation email has been sent to your inbox.")
+        try:
+            subject = f'MasteryHub - Order Confirmation #{order.order_number}'
+            context = {
+                'order': order,
+                'contact_email': settings.DEFAULT_FROM_EMAIL,
+                'site_name': 'MasteryHub',
+            }
+            
+            # Plain text email
+            message = render_to_string(
+                'checkout/confirmation_emails/confirmation_email_body.txt',
+                context
+            )
+            
+            # HTML email
+            html_message = render_to_string(
+                'checkout/confirmation_emails/confirmation_email.html',
+                context
+            )
+            
+            # Send to both user and admin
+            recipient_list = [order.email]
+            if settings.DEFAULT_FROM_EMAIL:
+                recipient_list.append(settings.DEFAULT_FROM_EMAIL)
+            
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                recipient_list,
+                fail_silently=False,
+                html_message=html_message
+            )
+            
+            order.confirmation_email_sent = True
+            order.save()
+            messages.success(request, "A confirmation email has been sent to your inbox.")
+        except Exception as e:
+            logger.error(f"Error sending confirmation email: {str(e)}")
+            messages.error(request, "There was an error sending your confirmation email. Please contact support.")
     else:
-        messages.info(
-            request, "A confirmation email was already sent for this order.")
+        messages.info(request, "A confirmation email was already sent for this order.")
 
     template = 'checkout/checkout_success.html'
     context = {
