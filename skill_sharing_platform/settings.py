@@ -240,8 +240,7 @@ else:
     EMAIL_PORT = 587
     EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'yosephbet@gmail.com')
     EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASS')
-    DEFAULT_FROM_EMAIL = os.environ.get(
-        'EMAIL_HOST_USER', 'yosephbet@gmail.com')
+    DEFAULT_FROM_EMAIL = os.environ.get('EMAIL_HOST_USER', 'yosephbet@gmail.com')
 
 # Email Logging
 LOGGING = {
@@ -250,6 +249,13 @@ LOGGING = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
         },
     },
     'loggers': {
@@ -264,6 +270,11 @@ LOGGING = {
             'propagate': True,
         },
         'django.mail': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'checkout.tasks': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': True,
