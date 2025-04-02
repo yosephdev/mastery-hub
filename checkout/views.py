@@ -685,9 +685,45 @@ def handle_payment_success(payment_intent):
             order.save()
             
             if not order.confirmation_email_sent:
-                send_order_confirmation.delay(order.id)
-            logger.info(
-                f"Order {order.order_number} marked as completed and confirmation email sent.")
+                try:
+                    subject = f'MasteryHub - Order Confirmation #{order.order_number}'
+                    context = {
+                        'order': order,
+                        'contact_email': settings.DEFAULT_FROM_EMAIL,
+                        'site_name': 'MasteryHub',
+                    }
+                    
+                    # Plain text email
+                    message = render_to_string(
+                        'checkout/confirmation_emails/confirmation_email_body.txt',
+                        context
+                    )
+                    
+                    # HTML email
+                    html_message = render_to_string(
+                        'checkout/confirmation_emails/confirmation_email.html',
+                        context
+                    )
+                    
+                    # Send to both user and admin
+                    recipient_list = [order.email]
+                    if settings.DEFAULT_FROM_EMAIL:
+                        recipient_list.append(settings.DEFAULT_FROM_EMAIL)
+                    
+                    send_mail(
+                        subject,
+                        message,
+                        settings.DEFAULT_FROM_EMAIL,
+                        recipient_list,
+                        fail_silently=False,
+                        html_message=html_message
+                    )
+                    
+                    order.confirmation_email_sent = True
+                    order.save()
+                    logger.info(f"Order {order.order_number} marked as completed and confirmation email sent.")
+                except Exception as e:
+                    logger.error(f"Error sending confirmation email for order {order.order_number}: {str(e)}")
     except Order.DoesNotExist:
         logger.error(f"Order not found for PaymentIntent {payment_intent.id}")
         raise Exception("Order not found")
