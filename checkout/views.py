@@ -481,7 +481,6 @@ def checkout_success(request, order_number):
     """
     Handle successful checkouts.
     """
-
     order = get_object_or_404(Order, order_number=order_number)
     save_info = request.session.get('save_info', False)
 
@@ -518,8 +517,14 @@ def checkout_success(request, order_number):
     if 'cart' in request.session:
         del request.session['cart']
     
-    messages.success(
-        request, "A confirmation email has been sent to your inbox.")
+    # Ensure email is sent if not already sent
+    if not order.confirmation_email_sent:
+        send_order_confirmation.delay(order.id)
+        messages.success(
+            request, "A confirmation email has been sent to your inbox.")
+    else:
+        messages.info(
+            request, "A confirmation email was already sent for this order.")
 
     template = 'checkout/checkout_success.html'
     context = {
