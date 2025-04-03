@@ -167,8 +167,8 @@ else:
     EMAIL_HOST = "smtp.postmarkapp.com"
     EMAIL_PORT = 587
     EMAIL_USE_TLS = True
-    EMAIL_HOST_USER = os.environ.get('POSTMARK_API_KEY')
-    EMAIL_HOST_PASSWORD = os.environ.get('POSTMARK_API_KEY')
+    EMAIL_HOST_USER = os.getenv('POSTMARK_ACCESS_KEY')
+    EMAIL_HOST_PASSWORD = os.getenv('POSTMARK_SECRET_KEY')
     DEFAULT_FROM_EMAIL = "contact@yoseph.dev"
     SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
