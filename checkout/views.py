@@ -28,7 +28,6 @@ from profiles.models import Profile
 from profiles.forms import ProfileForm
 from masteryhub.models import Session
 from .models import Order, CartItem, Cart, OrderLineItem
-from .tasks import send_order_confirmation, send_payment_failure_email
 from .decorators import cart_action_handler
 
 
@@ -749,14 +748,49 @@ def create_payment_intent(amount, currency='usd'):
 
 
 def handle_payment_failure(payment_intent):
-    order = Order.objects.filter(stripe_pid=payment_intent.id).first()
-    if order:
-        order.payment_status = 'FAILED'
-        order.save()
+    """Handle payment failure event from Stripe."""
+    try:
+        order = Order.objects.filter(stripe_pid=payment_intent.id).first()
+        if order:
+            order.payment_status = 'FAILED'
+            order.save()
 
-        send_payment_failure_email.delay(order.id)
+            try:
+                subject = f'MasteryHub - Payment Failed for Order #{order.order_number}'
+                context = {
+                    'order': order,
+                    'contact_email': settings.DEFAULT_FROM_EMAIL,
+                    'site_name': 'MasteryHub',
+                }
+                
+                # Plain text email
+                message = render_to_string(
+                    'checkout/confirmation_emails/payment_failure_email.txt',
+                    context
+                )
+                
+                # HTML email
+                html_message = render_to_string(
+                    'checkout/confirmation_emails/payment_failure_email.html',
+                    context
+                )
+                
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [order.email],
+                    fail_silently=False,
+                    html_message=html_message
+                )
+                
+                logger.info(f"Payment failure email sent for order {order.order_number}")
+            except Exception as e:
+                logger.error(f"Error sending payment failure email for order {order.order_number}: {str(e)}")
 
-        logger.warning(f"Order {order.order_number} marked as failed.")
+            logger.warning(f"Order {order.order_number} marked as failed.")
+    except Exception as e:
+        logger.error(f"Error handling payment failure: {str(e)}")
 
 
 @login_required
