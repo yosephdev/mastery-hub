@@ -7,48 +7,51 @@ import logging
 from masteryhub.models import Session
 from checkout.models import Order, Payment
 from profiles.models import Profile
-import time
+from django.utils.html import strip_tags
 
 logger = logging.getLogger(__name__)
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class StripeWH_Handler:
-    """Handle Stripe webhooks"""
-
     def __init__(self, request):
         self.request = request
 
     def _send_confirmation_email(self, order):
-        """
-        Send the user a confirmation email.
-        Logs any errors during email sending.
-        """      
         if hasattr(order, 'confirmation_email_sent') and order.confirmation_email_sent:
-            logger.info(f"Confirmation email already sent for order {order.order_number}")
+            logger.info(
+                f"Confirmation email already sent for order {order.order_number}")
             return
-            
-        try:            
-            from .tasks import send_order_confirmation
-            send_order_confirmation(order.id)
+
+        try:
+            subject = f"MasteryHub Order Confirmation #{order.order_number}"
+            html_message = render_to_string(
+                'confirmation_emails/confirmation.html', {'order': order})
+            plain_message = strip_tags(html_message)
+
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[order.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+
+            order.confirmation_email_sent = True
+            order.save()
+            logger.info(
+                f"Confirmation email sent successfully for order {order.order_number}")
+
         except Exception as e:
             logger.error(
                 f"Failed to send confirmation email for order {order.order_number}: {str(e)}")
 
     def handle_event(self, event):
-        """
-        Handle a generic/unknown/unexpected webhook event.
-        Logs unhandled events for debugging.
-        """
         logger.info(f"Unhandled webhook received: {event['type']}")
-        return HttpResponse(
-            content=f'Webhook received: {event["type"]}', status=200
-        )
+        return HttpResponse(content=f'Webhook received: {event["type"]}', status=200)
 
     def handle_payment_intent_succeeded(self, event):
-        """
-        Handle the payment_intent.succeeded webhook from Stripe.
-        """
         intent = event.data.object
         pid = intent.id
         session_id = intent.metadata.get('session_id')
@@ -61,10 +64,7 @@ class StripeWH_Handler:
         except Exception as e:
             logger.error(
                 f"Error retrieving Stripe charge for PaymentIntent {pid}: {str(e)}")
-            return HttpResponse(
-                content=f'Webhook received: {event["type"]} | ERROR: Failed to retrieve charge',
-                status=500,
-            )
+            return HttpResponse(content=f'Webhook received: {event["type"]} | ERROR: Failed to retrieve charge', status=500)
 
         profile = None
         username = intent.metadata.get('username')
@@ -86,19 +86,14 @@ class StripeWH_Handler:
                 logger.error(
                     f"Error updating profile for username {username}: {str(e)}")
 
-        # First try to find an existing order with the payment intent ID
         try:
             order = Order.objects.get(stripe_pid=pid)
             if order.status != 'completed':
                 order.status = 'completed'
                 order.save()
                 self._send_confirmation_email(order)
-            return HttpResponse(
-                content=f'Webhook received: {event["type"]} | SUCCESS: Updated existing order',
-                status=200,
-            )
+            return HttpResponse(content=f'Webhook received: {event["type"]} | SUCCESS: Updated existing order', status=200)
         except Order.DoesNotExist:
-            # If no order exists with the payment intent ID, try to find one with matching details
             try:
                 order = Order.objects.get(
                     full_name__iexact=billing_details.name,
@@ -113,17 +108,12 @@ class StripeWH_Handler:
                     order_total=grand_total,
                     status='pending'
                 )
-                # Update the order with the payment intent ID and mark as completed
                 order.stripe_pid = pid
                 order.status = 'completed'
                 order.save()
                 self._send_confirmation_email(order)
-                return HttpResponse(
-                    content=f'Webhook received: {event["type"]} | SUCCESS: Updated existing order with payment intent',
-                    status=200,
-                )
+                return HttpResponse(content=f'Webhook received: {event["type"]} | SUCCESS: Updated existing order with payment intent', status=200)
             except Order.DoesNotExist:
-                # If no matching order exists, create a new one
                 try:
                     order = Order.objects.create(
                         full_name=billing_details.name,
@@ -151,53 +141,37 @@ class StripeWH_Handler:
                                 session=session,
                             )
                         except Session.DoesNotExist:
-                            logger.error(f"Session not found for session_id: {session_id}")
+                            logger.error(
+                                f"Session not found for session_id: {session_id}")
                             if order:
                                 order.delete()
-                            return HttpResponse(
-                                content=f'Webhook received: {event["type"]} | ERROR: Session not found',
-                                status=500,
-                            )
+                            return HttpResponse(content=f'Webhook received: {event["type"]} | ERROR: Session not found', status=500)
                     self._send_confirmation_email(order)
-                    return HttpResponse(
-                        content=f'Webhook received: {event["type"]} | SUCCESS: Created new order',
-                        status=200,
-                    )
+                    return HttpResponse(content=f'Webhook received: {event["type"]} | SUCCESS: Created new order', status=200)
                 except Exception as e:
                     logger.error(
                         f"Error creating order for PaymentIntent {pid}: {str(e)}")
                     if order:
                         order.delete()
-                    return HttpResponse(
-                        content=f'Webhook received: {event["type"]} | ERROR: {str(e)}',
-                        status=500,
-                    )
+                    return HttpResponse(content=f'Webhook received: {event["type"]} | ERROR: {str(e)}', status=500)
 
     def handle_payment_intent_payment_failed(self, event):
-        """
-        Handle the payment_intent.payment_failed webhook from Stripe
-        """
         intent = event.data.object
         pid = intent.id
-        
-        logger.warning(f"Payment failed for PaymentIntent {pid}")        
-        
+
+        logger.warning(f"Payment failed for PaymentIntent {pid}")
+
         try:
             order = Order.objects.get(stripe_pid=pid)
             order.payment_status = 'FAILED'
-            order.save()            
-            
-            from .tasks import send_payment_failure_email
-            send_payment_failure_email(order.id)
-            
+            order.save()
+
             logger.info(f"Order {order.order_number} marked as failed payment")
-            
+
         except Order.DoesNotExist:
             logger.warning(f"No order found for failed PaymentIntent {pid}")
         except Exception as e:
-            logger.error(f"Error handling payment failure for PaymentIntent {pid}: {str(e)}")
-        
-        return HttpResponse(
-            content=f'Webhook received: {event["type"]} | SUCCESS: Payment failure recorded',
-            status=200
-        )
+            logger.error(
+                f"Error handling payment failure for PaymentIntent {pid}: {str(e)}")
+
+        return HttpResponse(content=f'Webhook received: {event["type"]} | SUCCESS: Payment failure recorded', status=200)
