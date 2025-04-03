@@ -31,6 +31,7 @@ django-db-connection-pool==1.2.5
 django-db-geventpool==4.0.6
 django-environ==0.11.2
 django-extensions==3.2.3
+django-postmark==0.1.6
 django-sslserver==0.22
 django-storages==1.14.4
 django-widget-tweaks==1.5.0
@@ -40,6 +41,7 @@ flower==2.0.1
 graphviz==0.20.3
 greenlet==3.0.3
 gunicorn==22.0.0
+httplib2==0.22.0
 humanize==4.12.2
 idna==3.10
 isort==6.0.1
