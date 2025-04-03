@@ -365,19 +365,46 @@ def checkout(request):
                     cart.items.all().delete()
                     cart.delete()
                     # Send confirmation email
-                    send_mail(
-                        f'Order Confirmation - {order.order_number}',
-                        render_to_string(
+                    try:
+                        subject = f'Order Confirmation - {order.order_number}'
+                        context = {
+                            'order': order,
+                            'contact_email': settings.DEFAULT_FROM_EMAIL
+                        }
+                        
+                        # Plain text email
+                        message = render_to_string(
                             'checkout/confirmation_emails/confirmation_email_body.txt',
-                            {'order': order, 'contact_email': settings.DEFAULT_FROM_EMAIL}
-                        ),
-                        settings.DEFAULT_FROM_EMAIL,
-                        [order.email],
-                        html_message=render_to_string(
-                            'checkout/confirmation_emails/confirmation_email.html',
-                            {'order': order, 'contact_email': settings.DEFAULT_FROM_EMAIL}
+                            context
                         )
-                    )
+                        
+                        # HTML email
+                        html_message = render_to_string(
+                            'checkout/confirmation_emails/confirmation_email.html',
+                            context
+                        )
+                        
+                        # Send to both user and admin
+                        recipient_list = [order.email]
+                        if settings.DEFAULT_FROM_EMAIL:
+                            recipient_list.append(settings.DEFAULT_FROM_EMAIL)
+                        
+                        send_mail(
+                            subject,
+                            message,
+                            settings.DEFAULT_FROM_EMAIL,
+                            recipient_list,
+                            fail_silently=False,
+                            html_message=html_message
+                        )
+                        
+                        order.confirmation_email_sent = True
+                        order.save()
+                        messages.success(request, "A confirmation email has been sent to your inbox.")
+                    except Exception as e:
+                        logger.error(f"Error sending confirmation email: {str(e)}")
+                        messages.error(request, "There was an error sending your confirmation email. Please contact support.")
+                    
                     return redirect('checkout:checkout_success', order_number=order.order_number)
                 except stripe.error.StripeError as e:
                     messages.error(
