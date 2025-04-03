@@ -349,10 +349,12 @@ def checkout(request):
                     # Create the order with the payment intent ID
                     order = order_form.save(commit=False)
                     order.user = request.user
+                    order.email = order_form.cleaned_data['email']
                     order.order_total = grand_total
                     order.grand_total = grand_total
                     order.stripe_pid = intent.id
                     order.save()
+
                     # Create order line items
                     for cart_item in cart.items.all():
                         OrderLineItem.objects.create(
@@ -361,9 +363,11 @@ def checkout(request):
                             quantity=cart_item.quantity,
                             price=cart_item.get_cost()
                         )
+                    
                     # Clear the cart
                     cart.items.all().delete()
                     cart.delete()
+
                     # Send confirmation email
                     try:
                         subject = f'Order Confirmation - {order.order_number}'
@@ -371,24 +375,24 @@ def checkout(request):
                             'order': order,
                             'contact_email': settings.DEFAULT_FROM_EMAIL
                         }
-                        
+
                         # Plain text email
                         message = render_to_string(
                             'checkout/confirmation_emails/confirmation_email_body.txt',
                             context
                         )
-                        
+
                         # HTML email
                         html_message = render_to_string(
                             'checkout/confirmation_emails/confirmation_email.html',
                             context
                         )
-                        
+
                         # Send to both user and admin
                         recipient_list = [order.email]
                         if settings.DEFAULT_FROM_EMAIL:
                             recipient_list.append(settings.DEFAULT_FROM_EMAIL)
-                        
+
                         send_mail(
                             subject,
                             message,
@@ -397,19 +401,20 @@ def checkout(request):
                             fail_silently=False,
                             html_message=html_message
                         )
-                        
+
                         order.confirmation_email_sent = True
                         order.save()
-                        messages.success(request, "A confirmation email has been sent to your inbox.")
+                        messages.success(
+                            request, "A confirmation email has been sent to your inbox.")
                     except Exception as e:
-                        logger.error(f"Error sending confirmation email: {str(e)}")
-                        messages.error(request, "There was an error sending your confirmation email. Please contact support.")
-                    
+                        error_message = f"Error sending confirmation email: {str(e)}"
+                        logger.error(error_message)
+                        messages.error(request, error_message)
+
                     return redirect('checkout:checkout_success', order_number=order.order_number)
                 except stripe.error.StripeError as e:
                     messages.error(
                         request, f'Error creating payment intent: {str(e)}')
-                    # If there's an error, delete the order and its line items
                     if 'order' in locals():
                         order.lineitems.all().delete()
                         order.delete()
@@ -555,51 +560,54 @@ def checkout_success(request, order_number):
 
     if 'cart' in request.session:
         del request.session['cart']
-    
-    # Ensure email is sent if not already sent
-    if not order.confirmation_email_sent:
-        try:
-            subject = f'MasteryHub - Order Confirmation #{order.order_number}'
-            context = {
-                'order': order,
-                'contact_email': settings.DEFAULT_FROM_EMAIL,
-                'site_name': 'MasteryHub',
-            }
-            
-            # Plain text email
-            message = render_to_string(
-                'checkout/confirmation_emails/confirmation_email_body.txt',
-                context
-            )
-            
-            # HTML email
-            html_message = render_to_string(
-                'checkout/confirmation_emails/confirmation_email.html',
-                context
-            )
-            
-            # Send to both user and admin
-            recipient_list = [order.email]
-            if settings.DEFAULT_FROM_EMAIL:
-                recipient_list.append(settings.DEFAULT_FROM_EMAIL)
-            
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                recipient_list,
-                fail_silently=False,
-                html_message=html_message
-            )
-            
-            order.confirmation_email_sent = True
-            order.save()
-            messages.success(request, "A confirmation email has been sent to your inbox.")
-        except Exception as e:
-            logger.error(f"Error sending confirmation email: {str(e)}")
-            messages.error(request, "There was an error sending your confirmation email. Please contact support.")
-    else:
-        messages.info(request, "A confirmation email was already sent for this order.")
+
+    # Step 1: Check if the email exists before sending
+    if not order.email:
+        messages.error(request, "No email address found for this order.")
+        return redirect('home')
+
+    # Step 2: Temporarily remove the check for confirmation_email_sent
+    try:
+        subject = f'MasteryHub - Order Confirmation #{order.order_number}'
+        context = {
+            'order': order,
+            'contact_email': settings.DEFAULT_FROM_EMAIL,
+            'site_name': 'MasteryHub',
+        }
+
+        # Plain text email
+        message = render_to_string(
+            'checkout/confirmation_emails/confirmation_email_body.txt',
+            context
+        )
+
+        # HTML email
+        html_message = render_to_string(
+            'checkout/confirmation_emails/confirmation_email.html',
+            context
+        )
+
+        # Send to both user and admin
+        recipient_list = [order.email]
+        if settings.DEFAULT_FROM_EMAIL:
+            recipient_list.append(settings.DEFAULT_FROM_EMAIL)
+
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            recipient_list,
+            fail_silently=False,
+            html_message=html_message
+        )
+
+        order.confirmation_email_sent = True
+        order.save()       
+
+    except Exception as e:
+        error_message = f"Error sending confirmation email: {str(e)}"
+        logger.error(error_message)
+        messages.error(request, error_message)
 
     template = 'checkout/checkout_success.html'
     context = {
@@ -721,7 +729,7 @@ def handle_payment_success(payment_intent):
             order.payment_status = 'COMPLETED'
             order.status = 'completed'
             order.save()
-            
+
             if not order.confirmation_email_sent:
                 try:
                     subject = f'MasteryHub - Order Confirmation #{order.order_number}'
@@ -730,24 +738,24 @@ def handle_payment_success(payment_intent):
                         'contact_email': settings.DEFAULT_FROM_EMAIL,
                         'site_name': 'MasteryHub',
                     }
-                    
+
                     # Plain text email
                     message = render_to_string(
                         'checkout/confirmation_emails/confirmation_email_body.txt',
                         context
                     )
-                    
+
                     # HTML email
                     html_message = render_to_string(
                         'checkout/confirmation_emails/confirmation_email.html',
                         context
                     )
-                    
+
                     # Send to both user and admin
                     recipient_list = [order.email]
                     if settings.DEFAULT_FROM_EMAIL:
                         recipient_list.append(settings.DEFAULT_FROM_EMAIL)
-                    
+
                     send_mail(
                         subject,
                         message,
@@ -756,12 +764,14 @@ def handle_payment_success(payment_intent):
                         fail_silently=False,
                         html_message=html_message
                     )
-                    
+
                     order.confirmation_email_sent = True
                     order.save()
-                    logger.info(f"Order {order.order_number} marked as completed and confirmation email sent.")
+                    logger.info(
+                        f"Order {order.order_number} marked as completed and confirmation email sent.")
                 except Exception as e:
-                    logger.error(f"Error sending confirmation email for order {order.order_number}: {str(e)}")
+                    logger.error(
+                        f"Error sending confirmation email for order {order.order_number}: {str(e)}")
     except Order.DoesNotExist:
         logger.error(f"Order not found for PaymentIntent {payment_intent.id}")
         raise Exception("Order not found")
@@ -801,19 +811,19 @@ def handle_payment_failure(payment_intent):
                     'contact_email': settings.DEFAULT_FROM_EMAIL,
                     'site_name': 'MasteryHub',
                 }
-                
+
                 # Plain text email
                 message = render_to_string(
                     'checkout/confirmation_emails/payment_failure_email.txt',
                     context
                 )
-                
+
                 # HTML email
                 html_message = render_to_string(
                     'checkout/confirmation_emails/payment_failure_email.html',
                     context
                 )
-                
+
                 send_mail(
                     subject,
                     message,
@@ -822,10 +832,12 @@ def handle_payment_failure(payment_intent):
                     fail_silently=False,
                     html_message=html_message
                 )
-                
-                logger.info(f"Payment failure email sent for order {order.order_number}")
+
+                logger.info(
+                    f"Payment failure email sent for order {order.order_number}")
             except Exception as e:
-                logger.error(f"Error sending payment failure email for order {order.order_number}: {str(e)}")
+                logger.error(
+                    f"Error sending payment failure email for order {order.order_number}: {str(e)}")
 
             logger.warning(f"Order {order.order_number} marked as failed.")
     except Exception as e:
