@@ -365,7 +365,19 @@ def checkout(request):
                     cart.items.all().delete()
                     cart.delete()
                     # Send confirmation email
-                    send_order_confirmation.delay(order.id)
+                    send_mail(
+                        f'Order Confirmation - {order.order_number}',
+                        render_to_string(
+                            'checkout/confirmation_emails/confirmation_email_body.txt',
+                            {'order': order, 'contact_email': settings.DEFAULT_FROM_EMAIL}
+                        ),
+                        settings.DEFAULT_FROM_EMAIL,
+                        [order.email],
+                        html_message=render_to_string(
+                            'checkout/confirmation_emails/confirmation_email.html',
+                            {'order': order, 'contact_email': settings.DEFAULT_FROM_EMAIL}
+                        )
+                    )
                     return redirect('checkout:checkout_success', order_number=order.order_number)
                 except stripe.error.StripeError as e:
                     messages.error(
