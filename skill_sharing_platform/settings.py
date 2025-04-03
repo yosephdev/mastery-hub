@@ -151,8 +151,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'prompt': 'consent',
             'include_granted_scopes': 'true'
         },
-        'OAUTH_PKCE_ENABLED': True,  # Ensures better security
-        # Prevents CSRF errors
+        'OAUTH_PKCE_ENABLED': True,        
         'STATE': os.environ.get('SOCIALACCOUNT_STATE', 'randomstring'),
     }
 }
@@ -163,14 +162,16 @@ SITE_ID = 1
 # Email Configuration
 if DEBUG or 'DEVELOPMENT' in os.environ:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = 'masteryhub@example.com'
-    SERVER_EMAIL = DEFAULT_FROM_EMAIL
 else:
-    EMAIL_BACKEND = 'postmark.django.backend.EmailBackend'
-    POSTMARK_API_KEY = os.environ.get('POSTMARK_API_KEY')
-
-    DEFAULT_FROM_EMAIL = 'contact@yoseph.dev'
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = "smtp.postmarkapp.com"
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = os.environ.get('POSTMARK_API_KEY')
+    EMAIL_HOST_PASSWORD = os.environ.get('POSTMARK_API_KEY')
+    DEFAULT_FROM_EMAIL = "contact@yoseph.dev"
     SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
   
 # Email Subject Prefix
 EMAIL_SUBJECT_PREFIX = '[MasteryHub] '
