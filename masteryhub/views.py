@@ -580,8 +580,15 @@ def delete_forum_post(request, post_id):
         return redirect('masteryhub:forum_list')
     
     if request.method == 'POST':
+        # Check if it's a reply or a main post
+        is_reply = post.parent_post is not None
         post.delete()
-        messages.success(request, 'Post deleted successfully!')
+        
+        if is_reply:
+            messages.success(request, 'Reply deleted successfully!')
+        else:
+            messages.success(request, 'Post deleted successfully!')
+            
         return redirect('masteryhub:forum_list')
     
     return render(request, 'masteryhub/delete_forum_post.html', {'post': post})
