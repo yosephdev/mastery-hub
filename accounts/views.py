@@ -49,6 +49,12 @@ class CustomSignupView(SignupView):
     form_class = CustomSignupForm
     template_name = 'account/signup.html'
     success_url = reverse_lazy('home:index')
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Redirect already authenticated users to home page
+        if request.user.is_authenticated:
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         try:
@@ -152,6 +158,12 @@ def send_confirmation_email(user, request):
 class CustomLoginView(LoginView):
     """Handle user login."""
     template_name = "account/login.html"
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Redirect already authenticated users to home page
+        if request.user.is_authenticated:
+            return redirect('home:index')
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         storage = messages.get_messages(self.request)
