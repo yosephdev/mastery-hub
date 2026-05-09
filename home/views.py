@@ -1,19 +1,30 @@
+import logging
+
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail, BadHeaderError
 from django.conf import settings
+from django.contrib import messages
 from django.http import HttpResponse
 from django.db.models import Q
 from masteryhub.models import Session, Category
 from profiles.models import Profile
 from .forms import ContactForm
 from allauth.socialaccount.models import SocialApp
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from decimal import Decimal
 
-# Create your views here.
+logger = logging.getLogger(__name__)
+
+User = get_user_model()
 
 
 def create_default_sessions():
+    """
+    Seed the database with demo sessions if none exist.
+    Uses get_or_create throughout to remain idempotent.
+    Note: a superuser must already exist before this is called,
+    or the sessions will simply be skipped.
+    """
     categories = {
         'Technology': Category.objects.get_or_create(name='Technology')[0],
         'Marketing': Category.objects.get_or_create(name='Marketing')[0],
@@ -23,14 +34,13 @@ def create_default_sessions():
     try:
         default_host = Profile.objects.first()
         if not default_host:
-            user = User.objects.create_user(
-                username='default_mentor',
-                email='default@example.com',
-                password='defaultpassword123'
+            logger.warning(
+                "No Profile found – skipping default session creation. "
+                "Create at least one user via the admin panel first."
             )
-            default_host = Profile.objects.create(user=user)
+            return
     except Exception as e:
-        print(f"Error creating default host: {e}")
+        logger.error("Error fetching default host for demo sessions: %s", e)
         return
 
     default_sessions = [
@@ -316,19 +326,16 @@ def index(request):
         category__name='Technology',
         is_active=True
     ).order_by('-created_at')[:3]
-    print(f"Web Dev Sessions: {web_dev_sessions.count()}")
 
     digital_marketing_sessions = Session.objects.filter(
         category__name='Marketing',
         is_active=True
     ).order_by('-created_at')[:3]
-    print(f"Marketing Sessions: {digital_marketing_sessions.count()}")
 
     data_science_sessions = Session.objects.filter(
         category__name='Data Science',
         is_active=True
     ).order_by('-created_at')[:3]
-    print(f"Data Science Sessions: {data_science_sessions.count()}")
 
     context = {
         'slides': slides,
@@ -352,73 +359,73 @@ def about(request):
 
 
 def contact(request):
-    """A view that handles the contact page."""
-    return render(request, "home/contact.html")
-
-
-def contact_view(request):
-    """A view that handles the contact form submission."""
+    """Handle the contact page and form submission."""
     if request.method == "POST":
         form = ContactForm(request.POST)
         if form.is_valid():
             name = form.cleaned_data["name"]
             email = form.cleaned_data["email"]
-            message = form.cleaned_data["message"]
+            message_body = form.cleaned_data["message"]
 
             try:
                 send_mail(
                     f"Message from {name} via MasteryHub",
-                    message,
+                    message_body,
                     email,
                     [settings.DEFAULT_FROM_EMAIL],
                     fail_silently=False,
                 )
+                messages.success(
+                    request,
+                    "Thank you! Your message has been sent successfully."
+                )
             except BadHeaderError:
-                return HttpResponse("Invalid header found.")
+                messages.error(request, "Invalid header found. Please try again.")
             except Exception as e:
-                return HttpResponse(f"Error sending email: {e}")
-
-            request.session["message_sent"] = True
+                logger.error("Contact form email error: %s", e)
+                messages.error(
+                    request,
+                    "Sorry, we could not send your message. Please try again later."
+                )
             return redirect("home:contact")
     else:
         form = ContactForm()
 
-    message_sent = request.session.pop("message_sent", False)
-
-    return render(
-        request,
-        "home/contact.html",
-        {"form": form, "message_sent": message_sent},
-    )
+    return render(request, "home/contact.html", {"form": form})
 
 
 def search(request):
-    """A view that handles search functionality."""
+    """Handle site-wide search for mentors and sessions."""
     query = request.GET.get("q", "").strip()
     profiles = []
     sessions = []
-    error_message = ""
+    no_results = False
 
     if query:
         try:
-            profiles = Profile.objects.filter(
-                Q(user__username__icontains=query) | Q(skills__icontains=query)
+            profiles = list(
+                Profile.objects.filter(
+                    Q(user__username__icontains=query)
+                    | Q(user__first_name__icontains=query)
+                    | Q(user__last_name__icontains=query)
+                    | Q(skills__icontains=query)
+                ).select_related("user")
             )
-            sessions = Session.objects.filter(
-                Q(title__icontains=query) | Q(description__icontains=query)
+            sessions = list(
+                Session.objects.filter(
+                    Q(title__icontains=query) | Q(description__icontains=query),
+                    is_active=True,
+                ).select_related("host", "category")
             )
-
-            if not profiles and not sessions:
-                error_message = "No results found for your search."
+            no_results = not profiles and not sessions
         except Exception as e:
-            error_message = f"An error occurred during the search: {str(e)}"
-    else:
-        error_message = "Please enter a search term."
+            logger.error("Search error for query '%s': %s", query, e)
+            messages.error(request, "An error occurred. Please try again.")
 
     context = {
         "query": query,
         "profiles": profiles,
         "sessions": sessions,
-        "error_message": error_message,
+        "no_results": no_results,
     }
     return render(request, "home/search_results.html", context)

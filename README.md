@@ -1,21 +1,27 @@
 # MasteryHub: Skill-Sharing Platform for Professionals
 
-![MasteryHub Preview](docs/readme_images/responsive-preview.png)
+![MasteryHub Homepage Preview](docs/readme_images/homepage-preview-image.png)
 
-Welcome to MasteryHub, your go-to platform for mentorship and skill development. This application connects mentees with experienced mentors across various fields, offering personalized guidance and support.
+Welcome to **MasteryHub**, your go-to platform for mentorship and skill development. This application connects mentees with experienced mentors across various fields, offering personalized guidance, live session booking, and community-powered learning.
 
-[Live link to MasteryHub](https://skill-sharing-446c0336ffb5.herokuapp.com/)
+**[🚀 Live Demo](https://masteryhub.yoseph.dev/)** · **[GitHub Repository](https://github.com/yosephdev/mastery-hub)**
+
+---
 
 ## Key Features
 
-- Personalized mentorship sessions
-- Expert-led skill development
-- Real-time session booking
-- Secure payment processing
-- User profiles and progress tracking
-- Interactive learning resources
+| Feature | Description |
+|---|---|
+| 🎓 **Mentor Matching** | Intelligent matching algorithm pairs mentees with the right expert |
+| 📅 **Session Booking** | Browse and book live mentorship sessions in real time |
+| 💳 **Secure Payments** | Stripe-powered checkout with email confirmation |
+| 👤 **User Profiles** | Full mentor and mentee profiles with skills, achievements & availability |
+| 💬 **Discussion Forums** | Community Q&A and knowledge sharing |
+| 🔍 **Smart Search** | Search mentors and sessions by skill, category, or keyword |
+| 🔒 **Authentication** | Email + Google OAuth2 login via Django-Allauth |
+| 📊 **Dashboards** | Separate expert and mentee dashboards with activity tracking |
 
-Some features are available exclusively to registered users, including accessing the dashboard, booking mentorship sessions, and tracking progress.
+> Some features are available exclusively to registered users — including the dashboard, session booking, and mentorship requests.
 
 <br>
 
@@ -480,7 +486,7 @@ This resulted in the final list of 10-15 keywords spanning general topics as wel
 
 ### **Sitemap.xml**
 
-I created a sitemap using [XML-Sitemaps](https://www.xml-sitemaps.com) on my live website [https://skill-sharing-446c0336ffb5.herokuapp.com/](https://skill-sharing-446c0336ffb5.herokuapp.com/)
+I created a sitemap using [XML-Sitemaps](https://www.xml-sitemaps.com) on my live website [https://masteryhub.yoseph.dev/](https://masteryhub.yoseph.dev/)
 
 The XML that was created is in the root directory of the website.
 
@@ -531,7 +537,7 @@ The robots.txt file was created using this guide [https://www.conductor.com/acad
 
 - [GitPod](https://www.gitpod.io/)
 - [GitHub](https://github.com/)
-- [Heroku](https://heroku.com)
+- [Coolify](https://coolify.io)
 - [ElephantSQL](https://www.elephantsql.com/)
 - [AWS](https://aws.amazon.com)
 - [Coolors](https://coolors.co/)
@@ -572,7 +578,7 @@ For all testing, please refer to the [TESTING.md](TESTING.md) file.
 
 ### Deployment
 
-The live deployed application can be found deployed on [Heroku](https://skill-sharing-446c0336ffb5.herokuapp.com/).
+The live deployed application can be found at [masteryhub.yoseph.dev](https://masteryhub.yoseph.dev/), deployed via [Coolify](https://coolify.io).
 
 ### Neon PostgreSQL Database  
 
@@ -595,7 +601,7 @@ Use the provided connection string in your application's environment variables t
 
 ### Amazon AWS
 
-This project uses [AWS](https://aws.amazon.com) to store media and static files online, due to the fact that Heroku doesn't persist this type of data.
+This project uses [AWS](https://aws.amazon.com) to store media and static files online, keeping static and media assets on a reliable CDN separate from the application container.
 
 Once you've created an AWS account and logged in, follow these series of steps to get your project connected.
 Make sure you're on the **AWS Management Console** page.
@@ -603,8 +609,8 @@ Make sure you're on the **AWS Management Console** page.
 #### S3 Bucket
 
 - Search for **S3**.
-- Create a new bucket, give it a name (matching your Heroku app name), and choose the region closest to you.
-- Uncheck **Block all public access**, and acknowledge that the bucket will be public (required for it to work on Heroku).
+- Create a new bucket, give it a name (e.g. `masteryhub-static`), and choose the region closest to you.
+- Uncheck **Block all public access**, and acknowledge that the bucket will be public (required for serving static and media files).
 - From **Object Ownership**, make sure to have **ACLs enabled**, and **Bucket owner preferred** selected.
 - From the **Properties** tab, turn on static website hosting, and type `index.html` and `error.html` in their respective fields, then click **Save**.
 - From the **Permissions** tab, paste in the following CORS configuration:
@@ -717,7 +723,7 @@ Once on the IAM page, follow these steps:
 
 #### Final AWS Setup
 
-- If Heroku Config Vars has `DISABLE_COLLECTSTATIC` still, this can be removed now, so that AWS will handle the static files.
+- Make sure `USE_AWS=True` is set in your environment variables so that AWS will handle the static files.
 - Back within **S3**, create a new folder called: `media`.
 - Select any existing media images for your project to prepare them for being uploaded into the new folder.
 - Under **Manage Public Permissions**, select **Grant public read access to this object(s)**.
@@ -738,7 +744,7 @@ As a backup, in case users prematurely close the purchase-order page during paym
 
 - From your Stripe dashboard, click **Developers**, and select **Webhooks**.
 - From there, click **Add Endpoint**.
-  - `https://skill-sharing-446c0336ffb5.herokuapp.com/checkout/wh/`
+  - `https://your-domain.com/checkout/wh/`
 - Click **receive all events**.
 - Click **Add Endpoint** to complete the process.
 - You'll have a new key here:
@@ -766,101 +772,157 @@ Once you've created a Gmail (Google) account and logged in, follow these series 
   - `EMAIL_HOST_PASS` = user's 16-character API key
   - `EMAIL_HOST_USER` = user's own personal Gmail email address
 
-### Heroku Deployment
+### Coolify Deployment
 
-This project uses [Heroku](https://www.heroku.com), a platform as a service (PaaS) that enables developers to build, run, and operate applications entirely in the cloud.
+This project is deployed using [Coolify](https://coolify.io), a self-hosted open-source PaaS that runs on your own server. Coolify builds the app from the included `Dockerfile`, manages a PostgreSQL database, and sits behind a Traefik reverse proxy that handles HTTPS automatically.
 
-Deployment steps are as follows, after account setup:
+#### Prerequisites
 
-- Select **New** in the top-right corner of your Heroku Dashboard, and select **Create new app** from the dropdown menu.
-- Your app name must be unique, and then choose a region closest to you (EU or USA), and finally, select **Create App**.
-- From the new app **Settings**, click **Reveal Config Vars**, and set your environment variables.
+- A Linux server (VPS or dedicated) with at least 2 GB RAM and Docker installed.
+- A domain name pointed at your server's IP address.
+- [Coolify installed](https://coolify.io/docs/installation) on the server.
 
-| Key                     | Value                                                                |
-| ----------------------- | -------------------------------------------------------------------- |
-| `AWS_ACCESS_KEY_ID`     | user's own value                                                     |
-| `AWS_SECRET_ACCESS_KEY` | user's own value                                                     |
-| `DATABASE_URL`          | user's own value                                                     |
-| `DISABLE_COLLECTSTATIC` | 1 (_this is temporary, and can be removed for the final deployment_) |
-| `EMAIL_HOST_PASS`       | user's own value                                                     |
-| `EMAIL_HOST_USER`       | user's own value                                                     |
-| `SECRET_KEY`            | user's own value                                                     |
-| `STRIPE_PUBLIC_KEY`     | user's own value                                                     |
-| `STRIPE_SECRET_KEY`     | user's own value                                                     |
-| `STRIPE_WH_SECRET`      | user's own value                                                     |
-| `USE_AWS`               | True                                                                 |
+#### Step 1 — Create a PostgreSQL service in Coolify
 
-Heroku needs two additional files in order to deploy properly.
+1. In the Coolify dashboard, go to **Resources → New Resource → Database → PostgreSQL**.
+2. Give the database a name (e.g. `masteryhub-db`) and click **Deploy**.
+3. Once running, copy the **Connection URL** from the database's **Configuration** tab — it looks like `postgres://user:password@host:5432/dbname`.
 
-- requirements.txt
-- Procfile
+#### Step 2 — Create the application
 
-You can install this project's **requirements** (where applicable) using:
+1. Go to **Resources → New Resource → Application → Public Repository** (or connect your GitHub account for private repos).
+2. Paste your repository URL: `https://github.com/yosephdev/mastery-hub`
+3. Set the **branch** to `main`.
+4. Set **Build Pack** to `Dockerfile`. Coolify will auto-detect the `Dockerfile` in the repo root.
+5. Set the **Port** to `8000`.
+6. Click **Save** (don't deploy yet — set env vars first).
 
-- `pip3 install -r requirements.txt`
+#### Step 3 — Set environment variables
 
-If you have your own packages that have been installed, then the requirements file needs updated using:
+Go to **Environment Variables** inside the application and add the following:
 
-- `pip3 freeze --local > requirements.txt`
+| Variable | Value |
+|---|---|
+| `SECRET_KEY` | A long random string — generate with `python -c "import secrets; print(secrets.token_hex(50))"` |
+| `DEBUG` | `False` |
+| `ALLOWED_HOSTS` | `your-domain.com,www.your-domain.com` |
+| `CSRF_TRUSTED_ORIGINS` | `https://your-domain.com,https://www.your-domain.com` |
+| `SITE_DOMAIN` | `your-domain.com` |
+| `DATABASE_URL` | Connection URL copied from Step 1 |
+| `USE_AWS` | `True` |
+| `AWS_ACCESS_KEY_ID` | From your IAM user credentials |
+| `AWS_SECRET_ACCESS_KEY` | From your IAM user credentials |
+| `AWS_STORAGE_BUCKET_NAME` | Your S3 bucket name (default: `skill-sharing`) |
+| `AWS_S3_REGION_NAME` | Your S3 bucket region (default: `eu-west-1`) |
+| `STRIPE_PUBLIC_KEY` | Publishable key from Stripe Dashboard |
+| `STRIPE_SECRET_KEY` | Secret key from Stripe Dashboard |
+| `STRIPE_WH_SECRET` | Webhook signing secret from Stripe Dashboard |
+| `POSTMARK_ACCESS_KEY` | Server token from Postmark |
+| `POSTMARK_SECRET_KEY` | Server token from Postmark (same value) |
+| `SOCIALACCOUNT_GOOGLE_CLIENT_ID` | From Google Cloud Console |
+| `SOCIALACCOUNT_GOOGLE_SECRET` | From Google Cloud Console |
+| `PORT` | `8000` |
+| `GUNICORN_WORKERS` | `2` (increase for higher-traffic servers) |
 
-The **Procfile** can be created with the following command:
+#### Step 4 — Configure the domain
 
-- `echo web: gunicorn app_name.wsgi > Procfile`
-- _replace **app_name** with the name of your primary Django app name; the folder where settings.py is located_
+1. In the application's **Domains** tab, add your domain: `https://your-domain.com`.
+2. Enable **Let's Encrypt** for automatic TLS — Traefik handles HTTPS termination automatically.
 
-For Heroku deployment, follow these steps to connect your own GitHub repository to the newly created app:
+#### Step 5 — Deploy
 
-Either:
+Click **Deploy** in the Coolify dashboard. Coolify will:
 
-- Select **Automatic Deployment** from the Heroku app.
+1. Pull the latest code from GitHub.
+2. Build the Docker image using the multi-stage `Dockerfile`.
+3. Run `entrypoint.sh` which runs `migrate`, `collectstatic`, then starts Gunicorn.
+4. Route HTTPS traffic through Traefik to port 8000.
 
-Or:
+Watch the **Deployment Logs** tab to confirm everything starts cleanly. A successful deploy ends with a line like:
 
-- In the Terminal/CLI, connect to Heroku using this command: `heroku login -i`
-- Set the remote for Heroku: `heroku git:remote -a app_name` (replace _app_name_ with your app name)
-- After performing the standard Git `add`, `commit`, and `push` to GitHub, you can now type:
-  - `git push heroku main`
-
-The project should now be connected and deployed to Heroku!
-
-### Local Deployment
-
-This project can be cloned or forked in order to make a local copy on your own system.
-
-For either method, you will need to install any applicable packages found within the _requirements.txt_ file.
-
-- `pip3 install -r requirements.txt`.
-
-You will need to create a new file called `env.py` at the root-level,
-and include the same environment variables listed above from the Heroku deployment steps.
-
-Sample `env.py` file:
-
-```python
-import os
-
-os.environ.setdefault("AWS_ACCESS_KEY_ID", "user's own value")
-os.environ.setdefault("AWS_SECRET_ACCESS_KEY", "user's own value")
-os.environ.setdefault("DATABASE_URL", "user's own value")
-os.environ.setdefault("EMAIL_HOST_PASS", "user's own value")
-os.environ.setdefault("EMAIL_HOST_USER", "user's own value")
-os.environ.setdefault("SECRET_KEY", "user's own value")
-os.environ.setdefault("STRIPE_PUBLIC_KEY", "user's own value")
-os.environ.setdefault("STRIPE_SECRET_KEY", "user's own value")
-os.environ.setdefault("STRIPE_WH_SECRET", "user's own value")
-
-os.environ.setdefault("DEBUG", "True")
+```
+[INFO] Booting worker with pid: ...
 ```
 
-Once the project is cloned or forked, in order to run it locally, you'll need to follow these steps:
+#### Step 6 — Configure Stripe webhook
 
-- Start the Django app: `python3 manage.py runserver`
-- Stop the app once it's loaded: `CTRL+C` or `⌘+C` (Mac)
-- Make any necessary migrations: `python3 manage.py makemigrations`
-- Migrate the data to the database: `python3 manage.py migrate`
-- Create a superuser: `python3 manage.py createsuperuser`
-- Load fixtures (if applicable): `python3 manage.py loaddata file-name.json` (repeat for each file)
-- Everything should be ready now, so run the Django app again: `python3 manage.py runserver`
+Update the webhook endpoint in your Stripe Dashboard to:
+
+```
+https://your-domain.com/checkout/wh/
+```
+
+#### Continuous deployment
+
+In the application's **Settings → Source** tab, enable **Auto-deploy on push** to have Coolify rebuild and redeploy whenever you push to the `main` branch on GitHub.
+
+### Local Development
+
+The recommended way to run MasteryHub locally mirrors the production environment using Docker Compose.
+
+#### Option A — Docker Compose (recommended)
+
+**Requirements:** Docker Desktop (or Docker Engine + Compose plugin).
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/yosephdev/mastery-hub.git
+cd mastery-hub
+
+# 2. Copy the example env file and fill in your values
+cp .env.example .env
+# Edit .env — at minimum set SECRET_KEY, Stripe keys, and AWS keys.
+# DATABASE_URL is overridden by docker-compose.yml so you can leave it as-is.
+
+# 3. Build and start all services (Django + PostgreSQL)
+docker compose up --build
+
+# 4. In a second terminal, create a superuser
+docker compose exec web python manage.py createsuperuser
+```
+
+The app will be available at **http://localhost:8000**.
+
+To stop: `CTRL+C`, then `docker compose down`.
+
+#### Option B — Plain Python (SQLite, no Docker)
+
+```bash
+# 1. Clone and enter the directory
+git clone https://github.com/yosephdev/mastery-hub.git
+cd mastery-hub
+
+# 2. Create and activate a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Create a .env file at the project root
+cp .env.example .env
+# Edit .env — set at least SECRET_KEY=any-random-string and DEBUG=True.
+# Leave DATABASE_URL unset to use the SQLite fallback automatically.
+
+# 5. Apply migrations and create a superuser
+python manage.py migrate
+python manage.py createsuperuser
+
+# 6. Run the development server
+python manage.py runserver
+```
+
+The app will be available at **http://127.0.0.1:8000**.
+
+Key environment variables for local dev (see `.env.example` for the full list):
+
+| Variable | Local value |
+|---|---|
+| `SECRET_KEY` | Any random string |
+| `DEBUG` | `True` |
+| `DATABASE_URL` | Leave unset → SQLite; or set to a local Postgres URL |
+| `USE_AWS` | `False` (media served locally from `/media/`) |
+| `STRIPE_PUBLIC_KEY` / `STRIPE_SECRET_KEY` | Use Stripe test-mode keys |
 
 If you'd like to backup your database models, use the following command for each model you'd like to create a fixture for:
 
@@ -908,28 +970,8 @@ Furthermore, I am grateful to my classmates for their camaraderie and encouragem
 
 ## Recent Improvements and Fixes
 
-The MasteryHub platform has undergone several important improvements to enhance user experience and fix functionality issues:
-
-### Authentication Enhancements
-- Fixed Google OAuth2 authentication to work properly with existing accounts
-- Improved email verification process with proper site name and domain
-- Enhanced social account adapter to better handle existing users
-
-### E-commerce Functionality
-- Improved checkout process with robust error handling and validation
-- Enhanced payment processing with detailed feedback for successful and failed payments
-- Fixed form validation for phone numbers and postal codes to ensure proper formats
-
-### Content Management
-- Enhanced forum post creation, editing, and deletion functionality
-- Fixed server errors when creating forum posts as admin users
-- Improved error messaging and user feedback throughout the platform
-
-### User Profile Management
-- Fixed profile deletion functionality to properly handle user accounts
-- Enhanced profile editing with improved validation
-- Added proper error handling for all profile operations
-
-These improvements ensure a smoother user experience and more reliable functionality across the platform.
-
-[Back to Top](#table-of-contents)
+### Code Quality & Security
+- **Removed hardcoded credentials** — `create_default_sessions()` no longer creates a user with a plaintext password; it now logs a warning if no profile exists and skips seeding safely.
+- **Replaced `print()` with `logging`** — all debug output in views now goes through Python's `logging` module so it can be filtered/silenced in production.
+- **Consolidated duplicate contact views** — `contact` and `contact_view` were merged into a single view with proper `messages.success/error` feedback and `POST → Redirect → GET` pattern.
+- **Fixed s

@@ -263,15 +263,7 @@ def session_list(request):
         'host__user'
     ).prefetch_related('participants')
 
-    print(f"Total sessions found: {sessions.count()}")
-    for session in sessions:
-        print(f"""
-        Session: {session.title}
-        Host: {session.host.user.username}
-        Category: {session.category}
-        Price: {session.price}
-        Participants: {session.participants.count()}/{session.max_participants}
-        """)
+    logger.debug("Total sessions found: %d", sessions.count())
 
     if query:
         sessions = sessions.filter(
@@ -978,10 +970,10 @@ def enroll_session(request, session_id):
 
     try:
         profile = request.user.profile
-        print(f"Found profile: {profile.id}")
+        logger.debug("Found profile: %s", profile.id)
     except Profile.DoesNotExist:
         profile = Profile.objects.create(user=request.user)
-        print(f"Created new profile: {profile.id}")
+        logger.debug("Created new profile: %s", profile.id)
         messages.info(request, "A new profile was created for you.")
 
     try:
@@ -990,7 +982,6 @@ def enroll_session(request, session_id):
         messages.success(
             request, "You have successfully enrolled in this session!")
     except Exception as e:
-        print(f"Error details: {str(e)}")
         messages.error(request, f"An error occurred while enrolling: {str(e)}")
 
     return redirect('masteryhub:view_session', session_id=session.id)

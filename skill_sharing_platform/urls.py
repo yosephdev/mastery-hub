@@ -35,3 +35,4 @@ if settings.DEBUG:
                           document_root=settings.MEDIA_ROOT)
 
 handler404 = "skill_sharing_platform.views.handler404"
+handler500 = "skill_sharing_platform.views.handler500"

@@ -1,3 +1,7 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
 from django import template
 
 register = template.Library()
@@ -31,7 +35,6 @@ def custom_field_errors(field):
 
 @register.filter(name='addclass')
 def add_class(field, css_class):
-    print(f"add_class called with field type: {type(field).__name__}")
     if hasattr(field, 'as_widget'):
         return field.as_widget(attrs={"class": css_class})
     else:

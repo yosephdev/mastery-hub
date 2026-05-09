@@ -1,0 +1,61 @@
+# ============================================================
+# .dockerignore — files excluded from the Docker build context
+# ============================================================
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Environment / secrets — NEVER bake into the image
+.env
+.env.*
+!.env.example
+
+# Python bytecode & caches
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+env/
+venv/
+.venv/
+ENV/
+
+# Test & coverage artefacts
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+*.log
+
+# Local database
+db.sqlite3
+
+# Static / media collected locally (S3 is used in production)
+staticfiles/
+media/
+
+# Node (if any frontend tooling exists)
+node_modules/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# IDE configs
+.vscode/
+.idea/
+
+# Docs (large images not needed in image)
+docs/
+
+# Gitpod / CI configs not needed in the image
+.gitpod.yml
+.gitpod.dockerfile

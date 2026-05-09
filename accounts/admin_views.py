@@ -35,7 +35,6 @@ def admin_dashboard(request):
         }
         return render(request, "admin/dashboard.html", context)
     except Exception as e:
-        print(f"Error in admin_dashboard: {str(e)}")
         context = {
             "title": "MasteryHub Admin Dashboard",
             "subtitle": "Error loading dashboard data",

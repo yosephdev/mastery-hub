@@ -69,13 +69,13 @@
                     expert-led sessions and personalized mentorship.</p>
                 <div class="signup-buttons">
                     <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg mx-2 mb-3 mb-md-0">
-                        <i class="fas fa-user-plus mr-2"></i> Sign Up Free
+                        <i class="fas fa-user-plus me-2"></i> Sign Up Free
                     </a>
                     {% get_providers as socialaccount_providers %}
                     {% for provider in socialaccount_providers %}
                     {% if provider.id == 'google' %}
                     <a href="{% provider_login_url 'google' %}" class="btn btn-outline-light btn-lg mx-2">
-                        <i class="fab fa-google mr-2"></i> Continue with Google
+                        <i class="fab fa-google me-2"></i> Continue with Google
                     </a>
                     {% endif %}
                     {% endfor %}
@@ -150,7 +150,7 @@
                         <img src="{% static 'images/web-development.webp' %}" class="card-img-top" alt="Web Development"
                             loading="lazy">
                         <div class="skill-overlay">
-                            <span class="badge badge-primary">Most Popular</span>
+                            <span class="badge bg-primary text-white">Most Popular</span>
                         </div>
                     </div>
                     <div class="card-body">
@@ -183,7 +183,7 @@
                         <img src="{% static 'images/digital-marketing.webp' %}" class="card-img-top"
                             alt="Digital Marketing" loading="lazy">
                         <div class="skill-overlay">
-                            <span class="badge badge-success">Trending</span>
+                            <span class="badge bg-success text-white">Trending</span>
                         </div>
                     </div>
                     <div class="card-body">
@@ -216,7 +216,7 @@
                         <img src="{% static 'images/data-science.webp' %}" class="card-img-top" alt="Data Science"
                             loading="lazy">
                         <div class="skill-overlay">
-                            <span class="badge badge-info">Hot</span>
+                            <span class="badge bg-info text-white">Hot</span>
                         </div>
                     </div>
                     <div class="card-body">
@@ -344,14 +344,14 @@
                 <h2 class="display-4 mb-4">Ready to Start Your Learning Journey?</h2>
                 <p class="lead mb-4">Join thousands of learners who are achieving their goals with MasteryHub</p>
                 <div class="cta-buttons">
-                    <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg mr-3 px-4">
+                    <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg me-3 px-4">
                         Get Started Free
                     </a>
                     {% get_providers as socialaccount_providers %}
                     {% for provider in socialaccount_providers %}
                     {% if provider.id == 'google' %}
                     <a href="{% provider_login_url 'google' %}" class="btn btn-outline-light btn-lg px-4">
-                        <i class="fab fa-google mr-2"></i> Sign up with Google
+                        <i class="fab fa-google me-2"></i> Sign up with Google
                     </a>
                     {% endif %}
                     {% endfor %}

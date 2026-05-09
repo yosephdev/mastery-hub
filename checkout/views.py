@@ -278,7 +278,6 @@ def pricing(request):
 
 @login_required
 def view_cart(request):
-    print("Template path:", request.resolver_match.view_name)
     cart = get_object_or_404(Cart, user=request.user)
     cart_items = cart.items.all()
 
@@ -290,11 +289,6 @@ def view_cart(request):
     }
 
     response = render(request, 'checkout/cart.html', context)
-
-    print("Rendered HTML:")
-    print(response.content.decode())
-
-    print("Response status:", response.status_code)
     return response
 
 

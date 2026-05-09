@@ -17,13 +17,17 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function initializeToasts() {
-    try {
-        const toastElList = [].slice.call(document.querySelectorAll('.toast'));
-        const toastList = toastElList.map(toastEl => new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 }));
-        toastList.forEach(toast => toast.show());
-    } catch (error) {
-        console.warn('Toast initialization failed:', error);
+    // Bootstrap 5 toasts — initialise and show all at once.
+    // The base template marks them with data-bs-autohide="true" data-bs-delay="5000"
+    // so Bootstrap handles the auto-dismiss itself.
+    if (typeof bootstrap === 'undefined') {
+        console.warn('Bootstrap JS not loaded — toasts unavailable.');
+        return;
     }
+    document.querySelectorAll('.toast').forEach(function (toastEl) {
+        const toast = bootstrap.Toast.getOrCreateInstance(toastEl);
+        toast.show();
+    });
 }
 
 function initializeAnnouncementCarousel() {
@@ -197,9 +201,14 @@ function initializeDropdowns() {
 
 function setActiveNavItem() {
     const currentPath = window.location.pathname;
-    document.querySelectorAll('.nav-link').forEach(link => {
-        if (link.getAttribute('href') === currentPath) {
+    document.querySelectorAll('.navbar-nav .nav-link').forEach(function (link) {
+        const href = link.getAttribute('href');
+        if (!href || href === '#') return;
+        // Exact match OR the current path starts with the link href
+        // (e.g. /search/results/ still highlights the Search link)
+        if (currentPath === href || (href !== '/' && currentPath.startsWith(href))) {
             link.classList.add('active');
+            link.setAttribute('aria-current', 'page');
         }
     });
 }

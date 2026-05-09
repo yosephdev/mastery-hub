@@ -1,0 +1,62 @@
+# ============================================================
+# MasteryHub — Local Development with Docker Compose
+#
+# Mirrors the Coolify production environment:
+#   • PostgreSQL 15  (matches Coolify's managed Postgres)
+#   • Same env-var interface as production
+#
+# Usage:
+#   cp .env.example .env        # fill in your values
+#   docker compose up --build
+# ============================================================
+
+services:
+
+  # ── PostgreSQL database ──────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: masteryhub
+      POSTGRES_USER: masteryhub
+      POSTGRES_PASSWORD: masteryhub_dev_pw
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U masteryhub"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Django application ───────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Override DATABASE_URL to point at the local Compose DB service
+      DATABASE_URL: postgres://masteryhub:masteryhub_dev_pw@db:5432/masteryhub
+      # Local Postgres has no SSL — disable it here; production keeps "require"
+      DB_SSLMODE: "disable"
+      DEBUG: "True"
+      PORT: "8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # Mount source for live-reload during development
+      - .:/app
+      - /app/staticfiles
+      - media_files:/app/media
+
+volumes:
+  postgres_data:
+  media_files:
